@@ -1,16 +1,35 @@
 <!DOCTYPE html>
+<!-- ^ Объявление HTML5. Первая строка файла. -->
+
 <html lang="ru">
+<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
+
 <head>
+  <!-- ^ Метаданные. Не видны на странице, но нужны браузеру. -->
+
   <meta charset="UTF-8">
+  <!-- ^ Кодировка UTF-8. Без неё русский текст может отобразиться кракозябрами. -->
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Карточка книг — BookNest</title>
+  <!-- ^ Адаптивность. Требование задания — ставить на каждой странице. -->
+
+  <title>Тайная история — BookNest</title>
+  <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
 </head>
+
 <body>
+  <!-- ^ Всё, что видно на странице. -->
 
   <header>
+    <!-- ^ Шапка. Одинакова на всех страницах сайта. -->
+
     <h1>BookNest</h1>
+    <!-- ^ Единственный h1 на странице. -->
+
     <p>Книжный клуб университета</p>
+
     <nav>
+      <!-- ^ Основное меню. -->
       <ul>
         <li><a href="index.html">Каталог</a></li>
         <li><a href="book.html">Книга</a></li>
@@ -19,12 +38,155 @@
     </nav>
   </header>
 
+  <nav aria-label="Хлебные крошки">
+    <!-- ^ Второй nav — для навигации по разделу.
+         aria-label отличает его от главного меню (для скринридеров). -->
+    <ol>
+      <!-- ^ ol — упорядоченный список. Крошки идут по порядку вложенности. -->
+      <li><a href="index.html">Каталог</a></li>
+      <li><a href="index.html">Триллер</a></li>
+      <li aria-current="page">Тайная история</li>
+      <!-- ^ aria-current="page" — текущая страница, не ссылка. -->
+    </ol>
+  </nav>
+
   <main>
-    <!-- содержимое страницы -->
+    <!-- ^ Основное содержимое страницы. -->
+
+    <article>
+      <!-- ^ Вся карточка книги — одна самодостаточная единица. -->
+
+      <header>
+        <!-- ^ Вводная часть: название + обложка. -->
+
+        <h2>Тайная история</h2>
+        <!-- ^ h2 — заголовок книги. Вложен в h1 (BookNest) по смыслу. -->
+
+        <figure>
+          <!-- ^ figure — картинка с подписью, самостоятельная единица. -->
+          <img src="images/cover.jpg"
+               alt="Обложка романа «Тайная история» Донны Тартт"
+               width="300" height="450">
+          <!-- ^ img — обложка.
+               src — путь к файлу (пока заглушка).
+               alt — текстовое описание.
+               width/height — размеры, требование задания. -->
+
+          <figcaption>Обложка издания 1992 года</figcaption>
+          <!-- ^ Подпись под картинкой. -->
+        </figure>
+      </header>
+
+      <section aria-labelledby="details-heading">
+        <!-- ^ section — логический раздел. aria-labelledby связывает его с заголовком. -->
+
+        <h3 id="details-heading">Характеристики</h3>
+        <!-- ^ id нужен для связи с aria-labelledby на section. -->
+
+        <dl>
+          <!-- ^ dl — список определений. Для пар "термин → значение". -->
+
+          <dt>Автор</dt>
+          <dd>Донна Тартт</dd>
+
+          <dt>Жанры</dt>
+          <dd>
+            <a href="index.html?genre=triller">триллер</a>,
+            <a href="index.html?genre=roman">роман</a>
+          </dd>
+
+          <dt>Год издания</dt>
+          <dd><time datetime="1992">1992</time></dd>
+          <!-- ^ time — семантический тег для дат. -->
+
+          <dt>ISBN</dt>
+          <dd>978-5-17-123456-7</dd>
+
+          <dt>Страниц</dt>
+          <dd><data value="592">592</data></dd>
+          <!-- ^ data — машиночитаемое значение + текст. -->
+
+          <dt>Всего экземпляров</dt>
+          <dd><data value="5">5</data></dd>
+
+          <dt>Свободно сейчас</dt>
+          <dd><data value="3">3</data></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="description-heading">
+        <h3 id="description-heading">Описание</h3>
+        <p>Роман Донны Тартт, опубликованный в 1992 году. История о группе студентов
+        колледжа, изучающих древнегреческий язык, и о том, как их закрытый мир
+        приводит к трагедии. Книга сочетает интеллектуальную прозу, психологическую
+        драму и элементы детектива.</p>
+      </section>
+
+      <section aria-labelledby="reviews-heading">
+        <h3 id="reviews-heading">Отзывы читателей</h3>
+
+        <article>
+          <!-- ^ Каждый отзыв — отдельный article. -->
+          <header>
+            <h4>Анна Петрова</h4>
+            <!-- ^ h4 — четвёртый уровень. Вложен в h3 "Отзывы читателей". -->
+            <p><time datetime="2026-09-10">10 сентября 2026</time></p>
+          </header>
+          <p>Одна из тех книг, после которых долго не можешь начать читать что-то другое.
+          Атмосфера колледжа передана идеально.</p>
+        </article>
+
+        <article>
+          <header>
+            <h4>Иван Смирнов</h4>
+            <p><time datetime="2026-08-22">22 августа 2026</time></p>
+          </header>
+          <p>Первая половина показалась медленной, но вторая всё оправдывает.
+          Концовка — сильная.</p>
+        </article>
+      </section>
+
+      <section aria-labelledby="new-review-heading">
+        <h3 id="new-review-heading">Оставить отзыв</h3>
+
+        <form method="post" action="book.html">
+          <!-- ^ Форма отзыва. Отправляется на этот же файл (каркас для будущего). -->
+
+          <fieldset>
+            <legend>Ваш отзыв</legend>
+
+            <label for="review-author">Ваше имя</label>
+            <input type="text" id="review-author" name="author" required maxlength="100">
+            <!-- ^ required — браузер не отправит форму без этого поля. -->
+
+            <label for="review-rating">Оценка (1–10)</label>
+            <input type="number" id="review-rating" name="rating" min="1" max="10" required>
+            <!-- ^ min/max — ограничения на число. -->
+
+            <label for="review-text">Текст отзыва</label>
+            <textarea id="review-text" name="text" rows="5" required maxlength="2000"></textarea>
+            <!-- ^ textarea — многострочное поле. rows — высота в строках. -->
+
+            <button type="submit">Отправить отзыв</button>
+          </fieldset>
+        </form>
+      </section>
+    </article>
+
+    <aside aria-labelledby="similar-heading">
+      <!-- ^ aside — дополнительный контент, не основной. -->
+
+      <h3 id="similar-heading">Похожие книги</h3>
+      <ul>
+        <li><a href="book.html">Девятый дом — Ли Бардуго</a></li>
+        <li><a href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
+        <li><a href="book.html">Институт — Стивен Кинг</a></li>
+      </ul>
+    </aside>
   </main>
 
   <footer>
-    <p>© 2026 BookNest</p>
+    <p>© 2026 BookNest — книжный клуб университета</p>
     <address>
       <a href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
