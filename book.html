@@ -32,8 +32,11 @@
       <!-- ^ Основное меню. -->
       <ul>
         <li><a href="index.html">Каталог</a></li>
-        <li><a href="book.html">Книга</a></li>
+        <li><a href="book.html" aria-current="page">Книга</a></li>
+        <!-- ^ aria-current="page" — подсказка скринридерам, что это текущая страница. -->
         <li><a href="loan.html">Выдача</a></li>
+        <li><a href="profile.html">Профиль</a></li>
+        <!-- ^ Пункт «Профиль» добавлен в доп. задании — четвёртый экран. -->
       </ul>
     </nav>
   </header>
@@ -53,24 +56,48 @@
   <main>
     <!-- ^ Основное содержимое страницы. -->
 
-    <article>
-      <!-- ^ Вся карточка книги — одна самодостаточная единица. -->
+    <article itemscope itemtype="https://schema.org/Book">
+      <!-- ^ Вся карточка книги — одна самодостаточная единица.
+           ДОП. ЗАДАНИЕ 1: Microdata.
+           itemscope — «внутри этого элемента описан один объект».
+           itemtype="https://schema.org/Book" — тип объекта: книга.
+           Это чистый HTML-атрибут, без <script>, валидатор W3C его принимает. -->
 
       <header>
         <!-- ^ Вводная часть: название + обложка. -->
 
-        <h2>Тайная история</h2>
-        <!-- ^ h2 — заголовок книги. Вложен в h1 (BookNest) по смыслу. -->
+        <h2 itemprop="name">Тайная история</h2>
+        <!-- ^ h2 — заголовок книги. Вложен в h1 (BookNest) по смыслу.
+             itemprop="name" — связывает этот текст со свойством name объекта Book. -->
 
         <figure>
           <!-- ^ figure — картинка с подписью, самостоятельная единица. -->
-          <img src="images/cover.jpg"
-               alt="Обложка романа «Тайная история» Донны Тартт"
-               width="300" height="450">
-          <!-- ^ img — обложка.
-               src — путь к файлу (пока заглушка).
-               alt — текстовое описание.
-               width/height — размеры, требование задания. -->
+
+          <picture>
+            <!-- ^ ДОП. ЗАДАНИЕ 3: <picture> с srcset.
+                 <picture> — контейнер для нескольких вариантов изображения.
+                 Браузер сам выберет подходящий файл по плотности экрана. -->
+
+            <source
+              srcset="images/cover-1x.jpg 1x,
+                      images/cover-2x.jpg 2x,
+                      images/cover-3x.jpg 3x"
+              type="image/jpeg">
+            <!-- ^ <source> описывает доступные варианты.
+                 srcset — список путей с дескрипторами плотности:
+                   1x — обычный экран,
+                   2x — Retina,
+                   3x — экран с высокой плотностью.
+                 type — MIME-тип файла. -->
+
+            <img itemprop="image"
+                 src="images/cover-1x.jpg"
+                 alt="Обложка романа «Тайная история» Донны Тартт"
+                 width="300" height="450">
+            <!-- ^ <img> внутри <picture> обязателен — это fallback
+                 для браузеров без поддержки <picture> и место для alt/width/height.
+                 itemprop="image" — связывает картинку со свойством image объекта Book. -->
+          </picture>
 
           <figcaption>Обложка издания 1992 года</figcaption>
           <!-- ^ Подпись под картинкой. -->
@@ -84,42 +111,51 @@
         <!-- ^ id нужен для связи с aria-labelledby на section. -->
 
         <dl>
-          <!-- ^ dl — список определений. Для пар "термин → значение". -->
+          <!-- ^ dl — список определений. Для пар "термин → значение".
+               Внутри — Microdata-свойства книги. -->
 
           <dt>Автор</dt>
-          <dd>Донна Тартт</dd>
+          <dd itemprop="author">Донна Тартт</dd>
+          <!-- ^ itemprop="author" — автор книги. -->
 
           <dt>Жанры</dt>
           <dd>
-            <a href="index.html?genre=triller">триллер</a>,
-            <a href="index.html?genre=roman">роман</a>
+            <a itemprop="genre" href="index.html?genre=triller">триллер</a>,
+            <a itemprop="genre" href="index.html?genre=roman">роман</a>
+            <!-- ^ itemprop="genre" можно повторять — машина соберёт массив жанров. -->
           </dd>
 
           <dt>Год издания</dt>
-          <dd><time datetime="1992">1992</time></dd>
-          <!-- ^ time — семантический тег для дат. -->
+          <dd><time itemprop="datePublished" datetime="1992">1992</time></dd>
+          <!-- ^ itemprop="datePublished" — дата первой публикации книги. -->
 
           <dt>ISBN</dt>
-          <dd>978-5-17-123456-7</dd>
+          <dd itemprop="isbn">978-5-17-123456-7</dd>
+          <!-- ^ itemprop="isbn" — международный номер книги. -->
 
           <dt>Страниц</dt>
-          <dd><data value="592">592</data></dd>
-          <!-- ^ data — машиночитаемое значение + текст. -->
+          <dd><data itemprop="numberOfPages" value="592">592</data></dd>
+          <!-- ^ itemprop="numberOfPages" — количество страниц.
+               data сохраняет машиночитаемое value="592". -->
 
           <dt>Всего экземпляров</dt>
           <dd><data value="5">5</data></dd>
+          <!-- ^ Не размечено: в schema.org/Book такого свойства нет,
+               это библиотечный учёт, а не характеристика самой книги. -->
 
           <dt>Свободно сейчас</dt>
           <dd><data value="3">3</data></dd>
+          <!-- ^ То же — не часть schema.org/Book. -->
         </dl>
       </section>
 
       <section aria-labelledby="description-heading">
         <h3 id="description-heading">Описание</h3>
-        <p>Роман Донны Тартт, опубликованный в 1992 году. История о группе студентов
-        колледжа, изучающих древнегреческий язык, и о том, как их закрытый мир
-        приводит к трагедии. Книга сочетает интеллектуальную прозу, психологическую
-        драму и элементы детектива.</p>
+        <p itemprop="description">Роман Донны Тартт, опубликованный в 1992 году.
+        История о группе студентов колледжа, изучающих древнегреческий язык,
+        и о том, как их закрытый мир приводит к трагедии. Книга сочетает
+        интеллектуальную прозу, психологическую драму и элементы детектива.</p>
+        <!-- ^ itemprop="description" — краткое описание книги для машин. -->
       </section>
 
       <section aria-labelledby="reviews-heading">
