@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- ^ Объявление HTML5. -->
+
+<html lang="ru">
+<!-- ^ Язык страницы — русский. -->
+
+<head>
+  <meta charset="UTF-8">
+  <!-- ^ Кодировка UTF-8 для корректной кириллицы. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ^ Адаптивность. -->
+
+  <title>Профиль читателя — BookNest</title>
+  <!-- ^ Заголовок вкладки. -->
+</head>
+
+<body>
+
+  <header>
+    <!-- ^ Шапка сайта, одинаковая для всех страниц. -->
+
+    <h1>BookNest</h1>
+    <!-- ^ Единственный h1 на странице. -->
+
+    <p>Книжный клуб университета</p>
+
+    <nav>
+      <ul>
+        <li><a href="index.html">Каталог</a></li>
+        <li><a href="book.html">Книга</a></li>
+        <li><a href="loan.html">Выдача</a></li>
+        <li><a href="profile.html" aria-current="page">Профиль</a></li>
+        <!-- ^ aria-current="page" — эта страница текущая. -->
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ^ Основное содержимое. -->
+
+    <h2>Профиль читателя</h2>
+
+    <section aria-labelledby="profile-info-heading">
+      <!-- ^ Секция с личными данными. -->
+
+      <h3 id="profile-info-heading">Личные данные</h3>
+
+      <dl>
+        <!-- ^ dl — пары "термин → значение". -->
+
+        <dt>ФИО</dt>
+        <dd>Иванов Иван Иванович</dd>
+
+        <dt>Email</dt>
+        <dd><a href="mailto:ivanov@university.ru">ivanov@university.ru</a></dd>
+
+        <dt>Статус</dt>
+        <dd>Студент</dd>
+
+        <dt>Дата регистрации</dt>
+        <dd><time datetime="2025-09-01">1 сентября 2025</time></dd>
+        <!-- ^ time — машиночитаемая дата. -->
+
+        <dt>Активных выдач</dt>
+        <dd><data value="2">2</data></dd>
+      </dl>
+    </section>
+
+    <section aria-labelledby="history-heading">
+      <!-- ^ Секция с историей выдач в виде таблицы. -->
+
+      <h3 id="history-heading">История выдач</h3>
+
+      <table>
+        <!-- ^ table — семантическая таблица для данных. -->
+
+        <caption>Все выдачи читателя Иванова И. И. за 2026 год</caption>
+        <!-- ^ caption — подпись таблицы. Нужна для доступности. -->
+
+        <thead>
+          <!-- ^ Заголовки столбцов. -->
+          <tr>
+            <th scope="col">Книга</th>
+            <th scope="col">Автор</th>
+            <th scope="col">Дата выдачи</th>
+            <th scope="col">Срок возврата</th>
+            <th scope="col">Статус</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- ^ Тело таблицы с данными. -->
+
+          <tr>
+            <th scope="row">Мастер и Маргарита</th>
+            <!-- ^ scope="row" — заголовок строки. -->
+            <td>Михаил Булгаков</td>
+            <td><time datetime="2026-09-01">1 сентября 2026</time></td>
+            <td><time datetime="2026-09-15">15 сентября 2026</time></td>
+            <td>Возвращена</td>
+          </tr>
+
+          <tr>
+            <th scope="row">1984</th>
+            <td>Джордж Оруэлл</td>
+            <td><time datetime="2026-09-10">10 сентября 2026</time></td>
+            <td><time datetime="2026-09-24">24 сентября 2026</time></td>
+            <td>На руках</td>
+          </tr>
+
+          <tr>
+            <th scope="row">Дюна</th>
+            <td>Фрэнк Герберт</td>
+            <td><time datetime="2026-08-01">1 августа 2026</time></td>
+            <td><time datetime="2026-08-15">15 августа 2026</time></td>
+            <td>Просрочена</td>
+          </tr>
+
+          <tr>
+            <th scope="row">Тайная история</th>
+            <td>Донна Тартт</td>
+            <td><time datetime="2026-07-15">15 июля 2026</time></td>
+            <td><time datetime="2026-07-29">29 июля 2026</time></td>
+            <td>Возвращена</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <aside aria-labelledby="wishlist-heading">
+      <!-- ^ aside — дополнительный контент: список желаемого. -->
+
+      <h3 id="wishlist-heading">Список желаемого</h3>
+      <ul>
+        <li><a href="book.html">Девятый дом — Ли Бардуго</a></li>
+        <li><a href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>
+    <p>© 2026 BookNest — книжный клуб университета</p>
+    <address>
+      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
+    </address>
+  </footer>
+
+</body>
+</html>
