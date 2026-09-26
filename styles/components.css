@@ -1,0 +1,211 @@
+/* components.css — стили компонентов.
+   Здесь: карточка книги, кнопки, поля форм, отзывы, таблица.
+   Всё через токены из tokens.css — ни одного пикселя или hex-кода руками.
+   Компоненты друг о друге не знают, их можно переиспользовать на любой
+   странице: .card, .btn, .field подходят и каталогу, и профилю. */
+
+/* ------------------------------------------------------------------
+   Карточка книги.
+
+   flex-колонка: заголовок сверху, метаданные посередине, ссылка
+   прижата к низу. Благодаря flex у всех карточек в ряду одинаковая
+   высота, даже если у одной текст короче. */
+article {
+  background-color: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  box-shadow: var(--shadow-sm);           /* мягкая тень, едва заметная */
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  transition: box-shadow var(--dur) var(--ease);
+}
+
+article:hover {
+  box-shadow: var(--shadow);              /* при наведении тень чуть глубже */
+}
+
+article header h3 {
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+
+article p {
+  color: var(--muted);                    /* метаданные приглушённые */
+  font-size: var(--text-sm);
+}
+
+/* Последняя ссылка внутри карточки («Подробнее») прижимается
+   к низу: margin-top: auto съедает свободное место сверху. */
+article > p:last-child {
+  margin-top: auto;
+  padding-top: var(--sp-2);
+}
+
+/* ------------------------------------------------------------------
+   Кнопки.
+
+   Общий вид: фон акцента, скруглённые углы, плавный переход при hover.
+   Отдельно слежу за focus-visible — рамка должна быть видна. */
+button,
+input[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-2) var(--sp-4);
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease);
+}
+
+button:hover {
+  background-color: var(--ink);            /* при наведении — темнее */
+}
+
+button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------
+   Поля формы: input, select, textarea.
+
+   Растянуты на всю ширину родителя, скруглённые, с бордером
+   из палитры. Состояния :focus-visible и :invalid — визуально
+   отличаются, чтобы пользователь видел, где ошибка. */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  color: var(--ink);
+  transition: border-color var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;                           /* убираю стандартный контур,
+                                              заменяю своей рамкой ниже */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Поле с ошибкой валидации (required не заполнен, email неверный).
+   :invalid срабатывает только на формах с атрибутом required —
+   иначе пустое поле считалось бы ошибкой по умолчанию. */
+input:invalid:not(:placeholder-shown),
+textarea:invalid:not(:placeholder-shown) {
+  border-color: #b45a5a;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: var(--surface-2);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Подписи к полям — блок над полем, не в строке с ним. */
+label {
+  display: block;
+  margin-top: var(--sp-3);
+  margin-bottom: var(--sp-1);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+/* Группировка полей формы в fieldset — рамка и внутренние отступы. */
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  background-color: var(--surface);
+}
+
+legend {
+  padding-inline: var(--sp-2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------
+   Метки доступности: «доступно», «нет экземпляров», «просрочена».
+   Через data-атрибут value у тега <data> можно навешивать разный
+   цвет на разные состояния. */
+data[value="0"] {
+  color: #b45a5a;                          /* красноватый, если экземпляров нет */
+}
+
+data:not([value="0"]) {
+  color: var(--success);                   /* зелёный, если что-то доступно */
+}
+
+/* ------------------------------------------------------------------
+   Таблица истории выдач в профиле.
+
+   Заголовки — фоновый цвет из палитры, ячейки с разделителями.
+   На узком экране таблица скроллится горизонтально — это
+   единственный допустимый случай для overflow-x, данные сами
+   не «сложатся» в колонку без потерь. */
+table {
+  border-collapse: collapse;
+  margin-top: var(--sp-3);
+  font-size: var(--text-sm);
+}
+
+table th,
+table td {
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+table thead th {
+  background-color: var(--surface-2);
+  font-family: var(--font-heading);
+  color: var(--ink);
+}
+
+table caption {
+  text-align: left;
+  padding-bottom: var(--sp-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* ------------------------------------------------------------------
+   Блок aside («Похожие книги», «Правила выдачи», «Список желаемого»).
+   Визуально отделён от основного контента. */
+aside {
+  background-color: var(--surface-2);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+aside h3 {
+  margin-bottom: var(--sp-2);
+}
+
+aside ul {
+  list-style: none;                        /* маркеры в aside лишние */
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
