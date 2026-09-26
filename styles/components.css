@@ -11,35 +11,35 @@
    прижата к низу. Благодаря flex у всех карточек в ряду одинаковая
    высота, даже если у одной текст короче. */
 article {
-  background-color: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-3);
-  box-shadow: var(--shadow-sm);           /* мягкая тень, едва заметная */
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  transition: box-shadow var(--dur) var(--ease);
+  background-color: var(--surface);         /* белый фон карточки */
+  border-radius: var(--radius-lg);          /* заметное скругление углов */
+  padding: var(--sp-3);                     /* внутренние отступы 16px */
+  box-shadow: var(--shadow-sm);             /* мягкая тень, едва заметная */
+  display: flex;                            /* карточка — flex-контейнер */
+  flex-direction: column;                   /* содержимое в колонку */
+  gap: var(--sp-2);                         /* отступ между детьми 8px */
+  transition: box-shadow var(--dur) var(--ease); /* плавное изменение тени */
 }
 
 article:hover {
-  box-shadow: var(--shadow);              /* при наведении тень чуть глубже */
+  box-shadow: var(--shadow);                /* при наведении тень глубже */
 }
 
 article header h3 {
-  font-size: var(--text-lg);
-  color: var(--ink);
+  font-size: var(--text-lg);                /* заголовок книги — адаптивный */
+  color: var(--ink);                        /* основной цвет текста */
 }
 
 article p {
-  color: var(--muted);                    /* метаданные приглушённые */
-  font-size: var(--text-sm);
+  color: var(--muted);                      /* метаданные приглушённые */
+  font-size: var(--text-sm);                /* мелкий размер 14px */
 }
 
 /* Последняя ссылка внутри карточки («Подробнее») прижимается
    к низу: margin-top: auto съедает свободное место сверху. */
 article > p:last-child {
-  margin-top: auto;
-  padding-top: var(--sp-2);
+  margin-top: auto;                         /* ссылка уезжает вниз карточки */
+  padding-top: var(--sp-2);                 /* отступ от текста выше */
 }
 
 /* ------------------------------------------------------------------
@@ -49,31 +49,31 @@ article > p:last-child {
    Отдельно слежу за focus-visible — рамка должна быть видна. */
 button,
 input[type="submit"] {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--sp-2) var(--sp-4);
-  border: none;
-  border-radius: var(--radius);
-  background-color: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--dur) var(--ease);
+  display: inline-flex;                     /* кнопка растягивается по контенту */
+  align-items: center;                      /* текст по центру по вертикали */
+  justify-content: center;                  /* текст по центру по горизонтали */
+  padding: var(--sp-2) var(--sp-4);         /* отступы: 8px / 24px */
+  border: none;                             /* убираю стандартную рамку */
+  border-radius: var(--radius);             /* скругление 8px */
+  background-color: var(--accent);          /* акцентный фон */
+  color: var(--accent-ink);                 /* контрастный текст */
+  font-weight: 600;                         /* полужирный */
+  cursor: pointer;                          /* курсор-рука при наведении */
+  transition: background-color var(--dur) var(--ease); /* плавная смена фона */
 }
 
 button:hover {
-  background-color: var(--ink);            /* при наведении — темнее */
+  background-color: var(--ink);             /* при наведении фон темнее */
 }
 
 button:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: var(--focus-offset);
+  outline: var(--focus-ring);               /* рамка фокуса из токенов */
+  outline-offset: var(--focus-offset);      /* отступ рамки от края */
 }
 
 button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  opacity: 0.5;                             /* полупрозрачная, если недоступна */
+  cursor: not-allowed;                      /* курсор «запрещено» */
 }
 
 /* ------------------------------------------------------------------
@@ -85,23 +85,24 @@ button:disabled {
 input,
 select,
 textarea {
-  width: 100%;
-  padding: var(--sp-2) var(--sp-3);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background-color: var(--surface);
-  color: var(--ink);
+  width: 100%;                              /* поле растянуто по родителю */
+  padding: var(--sp-2) var(--sp-3);         /* внутренние отступы: 8 / 16 */
+  border: var(--border-width) solid var(--line); /* рамка из токенов */
+  border-radius: var(--radius);             /* скругление 8px */
+  background-color: var(--surface);         /* белый фон поля */
+  color: var(--ink);                        /* цвет вводимого текста */
   transition: border-color var(--dur) var(--ease),
-              box-shadow var(--dur) var(--ease);
+              box-shadow var(--dur) var(--ease); /* плавная смена рамки и тени */
 }
 
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: none;                           /* убираю стандартный контур,
-                                              заменяю своей рамкой ниже */
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+  outline: none;                            /* убираю стандартный контур,
+                                               заменяю своей рамкой ниже */
+  border-color: var(--accent);              /* рамка — акцентного цвета */
+  box-shadow: 0 0 0 var(--focus-width) color-mix(in srgb, var(--accent) 30%, transparent);
+                                            /* мягкое свечение вокруг поля */
 }
 
 /* Поле с ошибкой валидации (required не заполнен, email неверный).
@@ -109,39 +110,39 @@ textarea:focus-visible {
    иначе пустое поле считалось бы ошибкой по умолчанию. */
 input:invalid:not(:placeholder-shown),
 textarea:invalid:not(:placeholder-shown) {
-  border-color: #b45a5a;
+  border-color: var(--danger);              /* красная рамка при ошибке */
 }
 
 input:disabled,
 select:disabled,
 textarea:disabled {
-  background-color: var(--surface-2);
-  color: var(--muted);
-  cursor: not-allowed;
+  background-color: var(--surface-2);       /* серый фон для отключённого */
+  color: var(--muted);                      /* текст приглушённый */
+  cursor: not-allowed;                      /* курсор «запрещено» */
 }
 
 /* Подписи к полям — блок над полем, не в строке с ним. */
 label {
-  display: block;
-  margin-top: var(--sp-3);
-  margin-bottom: var(--sp-1);
-  font-size: var(--text-sm);
-  color: var(--muted);
+  display: block;                           /* подпись — отдельный блок */
+  margin-top: var(--sp-3);                  /* отступ сверху 16px */
+  margin-bottom: var(--sp-1);               /* отступ снизу 4px */
+  font-size: var(--text-sm);                /* мелкий шрифт 14px */
+  color: var(--muted);                      /* приглушённый цвет */
 }
 
 /* Группировка полей формы в fieldset — рамка и внутренние отступы. */
 fieldset {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-3);
-  background-color: var(--surface);
+  border: var(--border-width) solid var(--line); /* тонкая рамка вокруг группы */
+  border-radius: var(--radius-lg);          /* скругление 16px */
+  padding: var(--sp-3);                     /* внутренние отступы 16px */
+  background-color: var(--surface);         /* белый фон группы */
 }
 
 legend {
-  padding-inline: var(--sp-2);
-  font-family: var(--font-heading);
-  font-weight: 700;
-  color: var(--ink);
+  padding-inline: var(--sp-2);              /* отступы слева и справа 8px */
+  font-family: var(--font-heading);         /* Georgia для заголовка группы */
+  font-weight: 700;                         /* жирный */
+  color: var(--ink);                        /* основной цвет текста */
 }
 
 /* ------------------------------------------------------------------
@@ -149,11 +150,11 @@ legend {
    Через data-атрибут value у тега <data> можно навешивать разный
    цвет на разные состояния. */
 data[value="0"] {
-  color: #b45a5a;                          /* красноватый, если экземпляров нет */
+  color: var(--danger);                     /* красный, если экземпляров нет */
 }
 
 data:not([value="0"]) {
-  color: var(--success);                   /* зелёный, если что-то доступно */
+  color: var(--success);                    /* зелёный, если что-то доступно */
 }
 
 /* ------------------------------------------------------------------
@@ -164,48 +165,61 @@ data:not([value="0"]) {
    единственный допустимый случай для overflow-x, данные сами
    не «сложатся» в колонку без потерь. */
 table {
-  border-collapse: collapse;
-  margin-top: var(--sp-3);
-  font-size: var(--text-sm);
+  border-collapse: collapse;                /* границы ячеек сливаются */
+  margin-top: var(--sp-3);                  /* отступ сверху 16px */
+  font-size: var(--text-sm);                /* мелкий шрифт 14px */
 }
 
 table th,
 table td {
-  padding: var(--sp-2) var(--sp-3);
-  text-align: left;
-  border-bottom: 1px solid var(--line);
+  padding: var(--sp-2) var(--sp-3);         /* внутренние отступы 8 / 16 */
+  text-align: left;                         /* текст по левому краю */
+  border-bottom: var(--border-width) solid var(--line); /* линия под строкой */
 }
 
 table thead th {
-  background-color: var(--surface-2);
-  font-family: var(--font-heading);
-  color: var(--ink);
+  background-color: var(--surface-2);       /* вторичный фон заголовков */
+  font-family: var(--font-heading);         /* Georgia для заголовков */
+  color: var(--ink);                        /* основной цвет */
 }
 
 table caption {
-  text-align: left;
-  padding-bottom: var(--sp-2);
-  color: var(--muted);
-  font-size: var(--text-sm);
+  text-align: left;                         /* подпись по левому краю */
+  padding-bottom: var(--sp-2);              /* отступ снизу 8px */
+  color: var(--muted);                      /* приглушённый цвет */
+  font-size: var(--text-sm);                /* мелкий шрифт */
 }
 
 /* ------------------------------------------------------------------
    Блок aside («Похожие книги», «Правила выдачи», «Список желаемого»).
    Визуально отделён от основного контента. */
 aside {
-  background-color: var(--surface-2);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-3);
-  margin-top: var(--sp-4);
+  background-color: var(--surface-2);       /* вторичный фон */
+  border-radius: var(--radius-lg);          /* скругление 16px */
+  padding: var(--sp-3);                     /* внутренние отступы 16px */
+  margin-top: var(--sp-4);                  /* отступ сверху 24px */
 }
 
 aside h3 {
-  margin-bottom: var(--sp-2);
+  margin-bottom: var(--sp-2);               /* отступ под заголовком 8px */
 }
 
 aside ul {
-  list-style: none;                        /* маркеры в aside лишние */
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
+  list-style: none;                         /* маркеры в aside лишние */
+  display: flex;                            /* список — flex-контейнер */
+  flex-direction: column;                   /* пункты в колонку */
+  gap: var(--sp-1);                         /* отступ между пунктами 4px */
+}
+
+/* Подпись чекбокса стоит в строку с квадратиком, а не над ним. */
+label[for="available"] {
+  display: inline-flex;                     /* строчный flex: квадратик + текст */
+  align-items: center;                      /* выравнивание по центру */
+  gap: var(--sp-2);                         /* отступ между квадратиком и текстом */
+}
+
+/* Сам чекбокс не растягивается на всю ширину. */
+input[type="checkbox"] {
+  width: auto;                              /* натуральная ширина квадратика */
+  accent-color: var(--accent);              /* акцентный цвет галочки */
 }
