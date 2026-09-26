@@ -1,0 +1,227 @@
+/* layout.css — крупная раскладка страницы.
+   Здесь: общий каркас (шапка, main, футер), сетка каталога
+   без media queries, две точки перестроек — планшет и десктоп.
+   Компоненты (карточка, форма, кнопка) живут в components.css. */
+
+/* ------------------------------------------------------------------
+   Каркас страницы.
+
+   body становится flex-контейнером: колонка из header, main, footer.
+   main получает flex: 1 — растягивается на всё свободное место.
+   Это прижимает футер к низу, если контента мало. */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;                        /* забирает свободное место, футер уходит вниз */
+  width: 100%;
+  max-width: var(--container);    /* на широком экране контент не растягивается */
+  margin-inline: auto;            /* центрирование по горизонтали */
+  padding-inline: var(--sp-3);    /* боковые отступы, чтобы текст не лип к краю */
+  padding-block: var(--sp-4);     /* вертикальные отступы от шапки и футера */
+}
+
+/* ------------------------------------------------------------------
+   Шапка сайта.
+
+   На мобильном — колонка: логотип сверху, меню под ним.
+   Внутри шапки flex с переносом (flex-wrap), чтобы на узком экране
+   пункты меню перескочили на новую строку, а не вылезли за край. */
+header {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: var(--sp-3);
+}
+
+header h1 {
+  font-size: var(--text-xl);      /* чуть меньше, чем на карточке книги,
+                                     чтобы логотип не «давил» */
+}
+
+header > p {
+  color: var(--muted);            /* описание под логотипом — приглушённое */
+  font-size: var(--text-sm);
+}
+
+/* Главное меню: список в строку с переносом.
+   gap заменяет margin между пунктами — так не появляется
+   «двойных» промежутков, о которых говорит методичка. */
+header nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  list-style: none;               /* убираю маркеры у пунктов меню */
+  margin-top: var(--sp-2);
+}
+
+header nav a {
+  text-decoration: none;          /* в меню подчёркивание не нужно */
+  color: var(--ink);
+}
+
+header nav a:hover,
+header nav a[aria-current="page"] {
+  color: var(--accent);           /* текущая страница и наведение — акцент */
+}
+
+/* ------------------------------------------------------------------
+   Хлебные крошки — отдельный nav на странице книги.
+   Показываю их в строку с разделителем «›» между пунктами. */
+nav[aria-label="Хлебные крошки"] ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  padding-block: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+nav[aria-label="Хлебные крошки"] li + li::before {
+  content: "› ";                  /* разделитель между крошками */
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------
+   Сетка каталога — главное адаптивное решение без media queries.
+
+   auto-fit — сколько карточек поместится, столько и покажу.
+   minmax(260px, 1fr) — карточка не меньше 260px, но растягивается,
+   если есть место. На телефоне будет одна колонка, на планшете —
+   две, на десктопе — три или четыре. Без единой media query. */
+main > section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+/* Заголовок каталога растягивается на все колонки сетки. */
+main > section > h2 {
+  grid-column: 1 / -1;            /* от первой до последней колонки */
+  margin-bottom: var(--sp-2);
+}
+
+/* ------------------------------------------------------------------
+   Форма фильтров в каталоге.
+
+   На мобильном — над карточками, во всю ширину.
+   На десктопе (в media query ниже) — сайдбар слева.
+   Поля формы внутри — flex-колонка с gap. */
+form[role="search"] {
+  margin-block: var(--sp-3);
+}
+
+form[role="search"] fieldset {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  background-color: var(--surface);
+}
+
+form[role="search"] legend {
+  padding-inline: var(--sp-2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+form[role="search"] label {
+  display: block;                 /* подпись над полем, а не в строке с ним */
+  margin-top: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+form[role="search"] input,
+form[role="search"] select {
+  width: 100%;                    /* поля растянуты по ширине группы */
+}
+
+/* ------------------------------------------------------------------
+   Футер — копирайт и контакты в строку на широком экране,
+   колонкой на узком. */
+footer {
+  background-color: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: var(--sp-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+footer address {
+  font-style: normal;             /* address по умолчанию курсив,
+                                     здесь он лишний */
+}
+
+/* ==================================================================
+   MEDIA QUERY №1 — планшет от 768px.
+
+   Здесь шапка перестраивается: логотип и меню в одну строку,
+   потому что места стало больше. Больше ничего не меняем —
+   сетка каталога сама уже перестроилась через auto-fit. */
+@media (min-width: 768px) {
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+    padding-inline: var(--sp-5);
+  }
+
+  header > p {
+    margin-left: auto;            /* описание прижимается к правому краю */
+  }
+
+  header nav ul {
+    margin-top: 0;                /* в строке вертикальный отступ уже не нужен */
+  }
+
+  main {
+    padding-inline: var(--sp-5);
+  }
+
+  footer {
+    padding-inline: var(--sp-5);
+  }
+}
+
+/* ==================================================================
+   MEDIA QUERY №2 — десктоп от 1100px.
+
+   Здесь форма фильтров в каталоге превращается в сайдбар слева:
+   main становится grid из двух колонок — фильтры и каталог.
+   Так на широком экране видно всё сразу: и фильтры, и карточки.
+   Это единственное место, где layout реально меняется — потому
+   и понадобилась отдельная media query. */
+@media (min-width: 1100px) {
+  main {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    column-gap: var(--sp-5);
+    align-items: start;           /* сайдбар не растягивается по высоте каталога */
+  }
+
+  /* Заголовок каталога — над обеими колонками. */
+  main > h2 {
+    grid-column: 1 / -1;
+  }
+
+  /* Фильтры — левая колонка. */
+  form[role="search"] {
+    grid-column: 1;
+    grid-row: 2 / span 10;        /* занимает всю высоту каталога слева */
+  }
+
+  /* Каталог с карточками — правая колонка. */
+  main > section {
+    grid-column: 2;
+  }
+
+  /* Профиль и карточка книги — во всю ширину, без сайдбара. */
+  main > article,
+  main > aside {
+    grid-column: 1 / -1;
+  }
+}
