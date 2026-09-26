@@ -102,15 +102,13 @@ button, input, select, textarea {
 /* Для пользователей с настройкой «уменьшить движение» в ОС
    отключаю анимации и плавный скролл. Это требование доступности:
    резкая анимация может вызвать головокружение.
-   Здесь единственный !important в проекте — он нужен, чтобы перебить
-   любые другие анимации; для доступности это стандартная практика. */
+   Селекторы конкретные — вместо !important перечисляю элементы,
+   у которых есть transition, чтобы не задеть ничего лишнего. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+    transition: none;
+    animation: none;
   }
 }
