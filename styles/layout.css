@@ -216,8 +216,7 @@ body {
   }
 
   .filter {
-    grid-column: 1;
-    grid-row: 3 / span 10;        /* фильтры занимают всю высоту слева */
+  grid-column: 1;               /* фильтр в левой колонке, строку определяет grid сам */
   }
 
   .catalog {
