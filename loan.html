@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!-- ^ Объявление HTML5. Первая строка файла. -->
+
+<html lang="ru">
+<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
+
+<head>
+  <meta charset="UTF-8">
+  <!-- ^ Кодировка UTF-8. Для корректного отображения кириллицы. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ^ Адаптивность. Требование задания. -->
+
+  <title>Выдача книги — BookNest</title>
+  <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
+</head>
+
+<body>
+  <!-- ^ Видимое содержимое страницы. -->
+
+  <header>
+    <!-- ^ Шапка. Одинакова на всех страницах. -->
+    <h1>BookNest</h1>
+    <!-- ^ Единственный h1 на странице. -->
+    <p>Книжный клуб университета</p>
+
+    <nav>
+      <ul>
+        <li><a href="index.html">Каталог</a></li>
+        <li><a href="book.html">Книга</a></li>
+        <li><a href="loan.html" aria-current="page">Выдача</a></li>
+        <li><a href="profile.html">Профиль</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ^ Основное содержимое страницы. -->
+
+    <h2>Выдача книги</h2>
+    <!-- ^ h2 — заголовок раздела. Вложен в h1 (BookNest). -->
+
+    <p>Заполните форму для регистрации выдачи экземпляра читателю.</p>
+
+    <form method="post" action="loan.html">
+      <!-- ^ form — форма выдачи.
+           method="post" — данные отправятся в теле запроса (для будущего сервера).
+           action="loan.html" — пока отправляется на этот же файл.
+           В ЛР №1 отправка не обрабатывается — это каркас. -->
+
+      <fieldset>
+        <!-- ^ fieldset — первая группа полей: выбор книги.
+             Требование задания: не менее 3 fieldset. -->
+
+        <legend>Выбор книги</legend>
+        <!-- ^ legend — имя группы. Скринридер прочитает его перед полями. -->
+
+        <label for="book">Книга</label>
+        <select id="book" name="book_id" required>
+          <!-- ^ select — выпадающий список.
+               required — обязательное поле, без него форма не отправится. -->
+          <option value="">— Выберите книгу —</option>
+          <!-- ^ Первый option пустой: если не выбрать, поле останется пустым
+               и required сработает. -->
+          <option value="1">Тайная история — Донна Тартт (доступно: 3)</option>
+          <option value="2">Девятый дом — Ли Бардуго (доступно: 0)</option>
+          <option value="3">Институт — Стивен Кинг (доступно: 2)</option>
+          <option value="4">Безмолвный пациент — Алекс Михаэлидес (доступно: 5)</option>
+          <option value="5">Четвёртое крыло — Ребекка Яррос (доступно: 1)</option>
+          <option value="6">Неоновые боги — Кэти Роберт (доступно: 4)</option>
+        </select>
+
+        <label for="copies">Количество экземпляров</label>
+        <input type="number" id="copies" name="copies" min="1" max="3" value="1" required>
+        <!-- ^ number — числовое поле.
+             min/max — допустимый диапазон. Браузер не даст ввести меньше 1 или больше 3.
+             value="1" — значение по умолчанию. -->
+
+        <p><small>Книги без свободных экземпляров недоступны для выдачи.</small></p>
+        <!-- ^ small — мелкий текст-примечание. Семантически — уточнение. -->
+      </fieldset>
+
+      <fieldset>
+        <!-- ^ Вторая группа: данные читателя. -->
+
+        <legend>Данные читателя</legend>
+
+        <label for="reader-name">ФИО читателя</label>
+        <input type="text" id="reader-name" name="reader_name" required maxlength="150">
+        <!-- ^ text — обычное текстовое поле.
+             maxlength="150" — ограничение длины. -->
+
+        <label for="reader-email">Email</label>
+        <input type="email" id="reader-email" name="reader_email" required>
+        <!-- ^ email — браузер проверит, что введён корректный email
+             (есть @, точка и т.д.). Без JS. -->
+
+        <label for="reader-phone">Телефон</label>
+        <input type="tel" id="reader-phone" name="reader_phone"
+               pattern="[0-9+\-() ]{10,20}">
+        <!-- ^ tel — телефон. pattern — регулярное выражение для проверки.
+             [0-9+\-() ] — только цифры и символы + - ( ) и пробел.
+             {10,20} — от 10 до 20 символов.
+             Поле необязательное (нет required). -->
+      </fieldset>
+
+      <fieldset>
+        <!-- ^ Третья группа: срок выдачи. -->
+
+        <legend>Срок выдачи</legend>
+
+        <label for="due-date">Дата возврата</label>
+        <input type="date" id="due-date" name="due_date" required>
+        <!-- ^ date — выбор даты через встроенный календарь браузера. -->
+
+        <label for="notes">Примечания</label>
+        <textarea id="notes" name="notes" rows="3" maxlength="500"></textarea>
+        <!-- ^ textarea — многострочное поле.
+             rows="3" — высота в строках.
+             maxlength="500" — максимум символов. -->
+      </fieldset>
+
+      <button type="submit">Подтвердить выдачу</button>
+      <!-- ^ Кнопка отправки формы.
+           type="submit" — при нажатии браузер проверит валидацию и отправит данные. -->
+    </form>
+
+    <aside aria-labelledby="rules-heading">
+      <!-- ^ aside — дополнительный контент: правила. Не часть формы,
+           но полезная информация рядом. -->
+
+      <h3 id="rules-heading">Правила выдачи</h3>
+      <ul>
+        <li>Срок выдачи — 14 дней.</li>
+        <li>Продление возможно при отсутствии очереди.</li>
+        <li>Просрочка блокирует новые выдачи.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>
+    <p>© 2026 BookNest — книжный клуб университета</p>
+    <address>
+      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
+    </address>
+  </footer>
+
+</body>
+</html>

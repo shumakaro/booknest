@@ -1,0 +1,160 @@
+индекс.хтмл
+body
+├── header
+│   ├── h1 — BookNest
+│   ├── p — описание клуба
+│   └── nav
+│       └── ul
+│           ├── li > a — Каталог
+│           ├── li > a — Книга
+│           └── li > a — Выдача
+│
+├── main
+│   ├── h1 — Каталог книг
+│   │
+│   ├── form (role="search", method="get")
+│   │   └── fieldset
+│   │       ├── legend — Фильтры
+│   │       ├── label + input[type=search] — Поиск
+│   │       ├── label + select — Жанр
+│   │       ├── label + select — Сортировка
+│   │       ├── input[type=checkbox] + label — Только доступные
+│   │       └── button[type=submit] — Применить
+│   │
+│   └── section
+│       ├── h2 — Найдено книг: 6
+│       │
+│       └── article × 6
+│           ├── header
+│           │   └── h3 — Название книги
+│           ├── p — Автор
+│           ├── p — Жанр (a, a)
+│           ├── p — Год > time
+│           ├── p — Доступно > data
+│           └── p > a — Подробнее
+│
+└── footer
+    ├── p — © 2026 BookNest
+    └── address > a — mailto
+
+
+бук.хтмл
+body
+├── header
+│   ├── h1 — BookNest
+│   ├── p — описание клуба
+│   └── nav
+│       └── ul
+│           ├── li > a — Каталог
+│           ├── li > a — Книга
+│           └── li > a — Выдача
+│
+├── nav (aria-label="Хлебные крошки")
+│   └── ol
+│       ├── li > a — Каталог
+│       ├── li > a — Роман
+│       └── li — Мастер и Маргарита (aria-current="page")
+│
+├── main
+│   └── article
+│       │
+│       ├── header
+│       │   ├── h2 — Мастер и Маргарита
+│       │   └── figure
+│       │       ├── picture
+│       │       │   └── img (alt, width, height)
+│       │       └── figcaption — Издание 1967 года
+│       │
+│       ├── section
+│       │   ├── h3 — Характеристики
+│       │   └── dl
+│       │       ├── dt — Автор       > dd — Михаил Булгаков
+│       │       ├── dt — Жанры       > dd — (a, a)
+│       │       ├── dt — Год         > dd > time
+│       │       ├── dt — ISBN        > dd
+│       │       ├── dt — Всего       > dd > data
+│       │       └── dt — Свободно    > dd > data
+│       │
+│       ├── section
+│       │   ├── h3 — Описание
+│       │   └── p — аннотация
+│       │
+│       ├── section
+│       │   ├── h3 — Отзывы читателей
+│       │   └── article × 2
+│       │       ├── header
+│       │       │   ├── h4 — Имя читателя
+│       │       │   └── p > time
+│       │       └── p — текст отзыва
+│       │
+│       └── section
+│           ├── h3 — Оставить отзыв
+│           └── form
+│               └── fieldset
+│                   ├── legend — Ваш отзыв
+│                   ├── label + input[type=text]   — Имя
+│                   ├── label + input[type=number] — Оценка
+│                   ├── label + textarea           — Текст
+│                   └── button[type=submit]
+│
+├── aside
+│   ├── h3 — Похожие книги
+│   └── ul
+│       ├── li > a — Собачье сердце
+│       ├── li > a — Белая гвардия
+│       └── li > a — Преступление и наказание
+│
+└── footer
+    ├── p — © 2026 BookNest
+    └── address > a — mailto
+
+
+
+лоан.хтмл
+body
+├── header
+│   ├── h1 — BookNest
+│   ├── p — описание клуба
+│   └── nav
+│       └── ul
+│           ├── li > a — Каталог
+│           ├── li > a — Книга
+│           └── li > a — Выдача
+│
+├── main
+│   ├── h2 — Выдача книги
+│   ├── p — краткое пояснение
+│   │
+│   └── form (method="post")
+│       │
+│       ├── fieldset
+│       │   ├── legend — Выбор книги
+│       │   ├── label + select (id, name, required)
+│       │   │   └── option × N
+│       │   ├── label + input[type=number] (min, max, required)
+│       │   └── p > small — пояснение
+│       │
+│       ├── fieldset
+│       │   ├── legend — Данные читателя
+│       │   ├── label + input[type=text]  (required, maxlength)
+│       │   ├── label + input[type=email] (required)
+│       │   └── label + input[type=tel]   (pattern)
+│       │
+│       ├── fieldset
+│       │   ├── legend — Срок выдачи
+│       │   ├── label + input[type=date] (required)
+│       │   └── label + textarea         (maxlength)
+│       │
+│       └── button[type=submit] — Подтвердить выдачу
+│
+├── aside
+│   ├── h3 — Правила выдачи
+│   └── ul
+│       ├── li — Срок 14 дней
+│       ├── li — Продление при отсутствии очереди
+│       └── li — Просрочка блокирует выдачи
+│
+└── footer
+    ├── p — © 2026 BookNest
+    └── address > a — mailto
+
