@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <!-- ^ Объявление HTML5. -->
 
+<!-- ==========================================================================
+     ЛР №2 — адаптивная вёрстка и дизайн-токены.
+
+     Структура HTML не изменена: теги, их порядок, вложенность и содержимое
+     остались такими же, как в ЛР №1. Единственное дополнение — атрибут class
+     у части тегов. Это разрешено заданием ЛР №2: «не изменяя структуру HTML,
+     допускается только добавление классов».
+
+     Классы страницы: .profile-info — блок личных данных,
+     .history — блок истории выдач с таблицей, .wishlist — список желаемого.
+     ========================================================================== -->
+
 <html lang="ru">
 <!-- ^ Язык страницы — русский. -->
 
@@ -13,73 +25,73 @@
 
   <title>Профиль читателя — BookNest</title>
   <!-- ^ Заголовок вкладки. -->
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
 </head>
 
 <body>
 
-  <header>
-    <!-- ^ Шапка сайта, одинаковая для всех страниц. -->
+  <header class="site-header">
+    <!-- ^ site-header — БЭМ-блок: шапка сайта, одинаковая для всех страниц. -->
 
-    <h1>BookNest</h1>
-    <!-- ^ Единственный h1 на странице. -->
+    <h1 class="site-header__title">BookNest</h1>
+    <p class="site-header__tagline">Книжный клуб университета</p>
 
-    <p>Книжный клуб университета</p>
-
-    <nav>
-      <ul>
-        <li><a href="index.html">Каталог</a></li>
-        <li><a href="book.html">Книга</a></li>
-        <li><a href="loan.html">Выдача</a></li>
-        <li><a href="profile.html" aria-current="page">Профиль</a></li>
+    <nav class="site-nav">
+      <ul class="site-nav__list">
+        <li class="site-nav__item"><a class="site-nav__link" href="index.html">Каталог</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="loan.html">Выдача</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="profile.html" aria-current="page">Профиль</a></li>
         <!-- ^ aria-current="page" — эта страница текущая. -->
       </ul>
     </nav>
   </header>
 
-  <main>
-    <!-- ^ Основное содержимое. -->
+  <main class="page">
 
-    <h2>Профиль читателя</h2>
+    <h2 class="page__title">Профиль читателя</h2>
 
-    <section aria-labelledby="profile-info-heading">
-      <!-- ^ Секция с личными данными. -->
+    <section class="profile-info" aria-labelledby="profile-info-heading">
+      <!-- ^ profile-info — блок: карточка с личными данными. -->
 
-      <h3 id="profile-info-heading">Личные данные</h3>
+      <h3 class="profile-info__title" id="profile-info-heading">Личные данные</h3>
 
-      <dl>
-        <!-- ^ dl — пары "термин → значение". -->
+      <dl class="profile-info__list">
+        <!-- ^ profile-info__list — список пар «термин → значение». -->
 
-        <dt>ФИО</dt>
-        <dd>Иванов Иван Иванович</dd>
+        <dt class="profile-info__term">ФИО</dt>
+        <dd class="profile-info__value">Иванов Иван Иванович</dd>
 
-        <dt>Email</dt>
-        <dd><a href="mailto:ivanov@university.ru">ivanov@university.ru</a></dd>
+        <dt class="profile-info__term">Email</dt>
+        <dd class="profile-info__value"><a href="mailto:ivanov@university.ru">ivanov@university.ru</a></dd>
 
-        <dt>Статус</dt>
-        <dd>Студент</dd>
+        <dt class="profile-info__term">Статус</dt>
+        <dd class="profile-info__value">Студент</dd>
 
-        <dt>Дата регистрации</dt>
-        <dd><time datetime="2025-09-01">1 сентября 2025</time></dd>
-        <!-- ^ time — машиночитаемая дата. -->
+        <dt class="profile-info__term">Дата регистрации</dt>
+        <dd class="profile-info__value"><time datetime="2025-09-01">1 сентября 2025</time></dd>
 
-        <dt>Активных выдач</dt>
-        <dd><data value="2">2</data></dd>
+        <dt class="profile-info__term">Активных выдач</dt>
+        <dd class="profile-info__value"><data value="2">2</data></dd>
       </dl>
     </section>
 
-    <section aria-labelledby="history-heading">
-      <!-- ^ Секция с историей выдач в виде таблицы. -->
+    <section class="history" aria-labelledby="history-heading">
+      <!-- ^ history — блок: секция истории выдач. -->
 
-      <h3 id="history-heading">История выдач</h3>
+      <h3 class="history__title" id="history-heading">История выдач</h3>
 
-      <table>
-        <!-- ^ table — семантическая таблица для данных. -->
+      <table class="history__table">
+        <!-- ^ history__table — семантическая таблица для данных. -->
 
-        <caption>Все выдачи читателя Иванова И. И. за 2026 год</caption>
+        <caption class="history__caption">Все выдачи читателя Иванова И. И. за 2026 год</caption>
         <!-- ^ caption — подпись таблицы. Нужна для доступности. -->
 
-        <thead>
-          <!-- ^ Заголовки столбцов. -->
+        <thead class="history__head">
           <tr>
             <th scope="col">Книга</th>
             <th scope="col">Автор</th>
@@ -89,12 +101,9 @@
           </tr>
         </thead>
 
-        <tbody>
-          <!-- ^ Тело таблицы с данными. -->
-
+        <tbody class="history__body">
           <tr>
             <th scope="row">Мастер и Маргарита</th>
-            <!-- ^ scope="row" — заголовок строки. -->
             <td>Михаил Булгаков</td>
             <td><time datetime="2026-09-01">1 сентября 2026</time></td>
             <td><time datetime="2026-09-15">15 сентября 2026</time></td>
@@ -128,21 +137,21 @@
       </table>
     </section>
 
-    <aside aria-labelledby="wishlist-heading">
-      <!-- ^ aside — дополнительный контент: список желаемого. -->
+    <aside class="wishlist" aria-labelledby="wishlist-heading">
+      <!-- ^ wishlist — блок: список желаемого. -->
 
-      <h3 id="wishlist-heading">Список желаемого</h3>
-      <ul>
-        <li><a href="book.html">Девятый дом — Ли Бардуго</a></li>
-        <li><a href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
+      <h3 class="wishlist__title" id="wishlist-heading">Список желаемого</h3>
+      <ul class="wishlist__list">
+        <li class="wishlist__item"><a class="wishlist__link" href="book.html">Девятый дом — Ли Бардуго</a></li>
+        <li class="wishlist__item"><a class="wishlist__link" href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
       </ul>
     </aside>
   </main>
 
-  <footer>
-    <p>© 2026 BookNest — книжный клуб университета</p>
-    <address>
-      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
+  <footer class="site-footer">
+    <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
+    <address class="site-footer__contacts">
+      <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
 
