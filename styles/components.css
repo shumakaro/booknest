@@ -1,0 +1,380 @@
+/* components.css — стили компонентов.
+   Здесь: карточка книги, кнопки, поля форм, отзывы, таблица.
+   Всё через токены из tokens.css — ни одного пикселя или hex-кода руками.
+   Селекторы — по БЭМ-классам, вложенность не глубже двух уровней. */
+
+/* ------------------------------------------------------------------
+   Карточка книги (.book-card).
+
+   flex-колонка: заголовок сверху, метаданные посередине, ссылка
+   прижата к низу. Благодаря flex у всех карточек в ряду одинаковая
+   высота, даже если у одной текст короче. */
+.book-card {
+  background-color: var(--surface);         /* белый фон карточки */
+  border-radius: var(--radius-lg);          /* заметное скругление углов */
+  padding: var(--sp-3);                     /* внутренние отступы 16px */
+  box-shadow: var(--shadow-sm);             /* мягкая тень, едва заметная */
+  display: flex;                            /* карточка — flex-контейнер */
+  flex-direction: column;                   /* содержимое в колонку */
+  gap: var(--sp-2);                         /* отступ между детьми 8px */
+  transition: box-shadow var(--dur) var(--ease); /* плавное изменение тени */
+}
+
+.book-card:hover {
+  box-shadow: var(--shadow);                /* при наведении тень глубже */
+}
+
+.book-card__title {
+  font-size: var(--text-lg);                /* заголовок книги — адаптивный */
+  color: var(--ink);                        /* основной цвет текста */
+}
+
+.book-card__meta {
+  color: var(--muted);                      /* метаданные приглушённые */
+  font-size: var(--text-sm);                /* мелкий размер 14px */
+}
+
+/* Обёртка ссылки «Подробнее» прижимается к низу карточки:
+   margin-top: auto съедает свободное место сверху. */
+.book-card__link {
+  margin-top: auto;
+  padding-top: var(--sp-2);
+}
+
+.book-card__more {
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------------
+   Карточка книги на отдельной странице (.book).
+   Отличается от .book-card в каталоге: одна книга, больше деталей. */
+.book {
+  background-color: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.book__title {
+  font-size: var(--text-2xl);
+  color: var(--ink);
+  margin-bottom: var(--sp-2);
+}
+
+.book__cover {
+  margin-bottom: var(--sp-3);
+}
+
+.book__cover-image {
+  width: var(--cover-width);                       /* фиксированная ширина под размер файла */
+  max-width: 100%;                    /* на узком экране не вылезает за карточку */
+  height: auto;                       /* высота по пропорции */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.book__cover-caption {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  margin-top: var(--sp-1);
+}
+
+.book__section {
+  padding-block: var(--sp-3);
+  border-top: var(--border-width) solid var(--line);
+}
+
+.book__subtitle {
+  font-size: var(--text-lg);
+  color: var(--ink);
+  margin-bottom: var(--sp-2);
+}
+
+.book__text {
+  color: var(--ink);
+}
+
+/* Список характеристик (.specs) — пары «термин → значение». */
+.specs {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--sp-3);
+  row-gap: var(--sp-2);
+}
+
+.specs__term {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.specs__value {
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------
+   Отзыв (.review) — каждая единица отзыва на странице книги. */
+.review {
+  background-color: var(--surface-2);
+  border-radius: var(--radius);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.review__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: baseline;
+  margin-bottom: var(--sp-1);
+}
+
+.review__author {
+  font-size: var(--text-base);
+  color: var(--ink);
+}
+
+.review__date {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.review__text {
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------
+   Форма отзыва (.review-form). */
+.review-form__group {
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  background-color: var(--surface);
+}
+
+.review-form__legend {
+  padding-inline: var(--sp-2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.review-form__label {
+  display: block;
+  margin-top: var(--sp-2);
+  margin-bottom: var(--sp-1);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.review-form__input,
+.review-form__textarea {
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------
+   Форма выдачи (.loan-form). */
+.loan-form__group {
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  background-color: var(--surface);
+  margin-bottom: var(--sp-3);
+}
+
+.loan-form__legend {
+  padding-inline: var(--sp-2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.loan-form__label {
+  display: block;
+  margin-top: var(--sp-2);
+  margin-bottom: var(--sp-1);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.loan-form__input,
+.loan-form__select,
+.loan-form__textarea {
+  width: 100%;
+}
+
+.loan-form__hint {
+  margin-top: var(--sp-2);
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------
+   Кнопки (.btn) — общий класс для всех кнопок проекта.
+
+   Фон акцента, скруглённые углы, плавный переход при hover.
+   Focus-visible — с видимой рамкой, требование доступности. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-2) var(--sp-4);
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease);
+}
+
+.btn:hover {
+  background-color: var(--ink);             /* при наведении — темнее */
+}
+
+.btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------
+   Поля формы — общие для всех форм проекта. */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  color: var(--ink);
+  transition: border-color var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;                            /* убираю стандартный контур,
+                                               заменяю рамкой ниже */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 var(--focus-width) color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+input:invalid:not(:placeholder-shown),
+textarea:invalid:not(:placeholder-shown) {
+  border-color: var(--danger);              /* красная рамка при ошибке */
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: var(--surface-2);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------
+   Метки доступности: «доступно», «нет экземпляров», «просрочена». */
+data[value="0"] {
+  color: var(--danger);
+}
+
+data:not([value="0"]) {
+  color: var(--success);
+}
+
+/* ------------------------------------------------------------------
+   Таблица истории выдач (.history__table). */
+.history__table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: var(--sp-3);
+  font-size: var(--text-sm);
+}
+
+.history__table th,
+.history__table td {
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  border-bottom: var(--border-width) solid var(--line);
+}
+
+.history__table thead th {
+  background-color: var(--surface-2);
+  font-family: var(--font-heading);
+  color: var(--ink);
+}
+
+.history__caption {
+  text-align: left;
+  padding-bottom: var(--sp-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* ------------------------------------------------------------------
+   Блок «Похожие книги» (.related), «Правила выдачи» (.rules),
+   «Список желаемого» (.wishlist) и «Личные данные» (.profile-info). */
+.related,
+.rules,
+.wishlist,
+.profile-info {
+  background-color: var(--surface-2);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.related__title,
+.rules__title,
+.wishlist__title,
+.profile-info__title {
+  margin-bottom: var(--sp-2);
+  color: var(--ink);
+}
+
+.related__list,
+.rules__list,
+.wishlist__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+/* Список личных данных .profile-info__list — это dl, пары «термин → значение». */
+.profile-info__list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--sp-3);
+  row-gap: var(--sp-1);
+}
+
+.profile-info__term {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.profile-info__value {
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------
+   Подпись чекбокса в фильтре (.filter__label--checkbox). */
+.filter__label--checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--accent);
+}

@@ -1,0 +1,278 @@
+/* layout.css — крупная раскладка страницы.
+   Здесь: общий каркас (шапка, main, футер), сетка каталога
+   без media queries, две точки перестроек — планшет и десктоп,
+   и печатная версия карточки книги.
+   Все селекторы — по БЭМ-классам (.site-header, .page, .catalog),
+   а не по тегам. Вложенность не глубже двух уровней. */
+
+/* ------------------------------------------------------------------
+   Каркас страницы.
+   body становится flex-контейнером-колонкой, main растягивается,
+   чтобы футер прижался к низу при коротком контенте. */
+body {
+  display: flex;                  /* страница — flex-контейнер */
+  flex-direction: column;         /* шапка, main, футер — сверху вниз */
+}
+
+.page {
+  flex: 1;                        /* main забирает свободное место, футер уходит вниз */
+  width: 100%;                    /* на всю ширину родителя */
+  max-width: var(--container);    /* на широком экране не растягивается */
+  margin-inline: auto;            /* центрируется по горизонтали */
+  padding-inline: var(--sp-3);    /* боковые отступы, текст не липнет к краю */
+  padding-block: var(--sp-4);     /* отступы сверху и снизу */
+}
+
+.page__title {
+  margin-bottom: var(--sp-3);     /* отступ под заголовком страницы */
+}
+
+.page__lead {
+  color: var(--muted);            /* вводный абзац приглушённый */
+}
+
+/* ------------------------------------------------------------------
+   Шапка сайта (.site-header).
+   На мобильном — колонка, на широком — строка (см. media query).
+   Внутри меню (.site-nav) — flex с переносом, чтобы пункты
+   не вылезали за край на узком экране. */
+.site-header {
+  background-color: var(--surface);
+  border-bottom: var(--border-width) solid var(--line);
+  padding: var(--sp-3);
+}
+
+.site-header__title {
+  font-size: var(--text-xl);      /* чуть меньше, чем на карточке книги */
+}
+
+.site-header__tagline {
+  color: var(--muted);            /* описание под логотипом — приглушённое */
+  font-size: var(--text-sm);
+}
+
+/* Меню: список в строку с переносом. */
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;                /* пункты переносятся на новую строку */
+  gap: var(--sp-3);               /* gap вместо margin между сиблингами */
+  list-style: none;               /* убираю маркеры у пунктов меню */
+  margin-top: var(--sp-2);
+}
+
+.site-nav__link {
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.site-nav__link:hover {
+  color: var(--accent);           /* при наведении — акцентный цвет */
+}
+
+.site-nav__link[aria-current="page"] {
+  text-decoration: underline;             /* текущая страница — подчёркнута */
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: var(--underline-width);
+}
+
+/* ------------------------------------------------------------------
+   Хлебные крошки (.breadcrumbs) — только на странице книги. */
+.breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  padding-block: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.breadcrumbs__item + .breadcrumbs__item::before {
+  content: "› ";                  /* разделитель между крошками */
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------
+   Сетка каталога (.catalog) — главное адаптивное решение без media queries.
+
+   auto-fit — сколько карточек поместится, столько и покажу.
+   minmax(260px, 1fr) — карточка не меньше 260px, но растягивается,
+   если есть место. На телефоне одна колонка, на планшете две,
+   на десктопе три-четыре. Без единой media query.
+
+   Сравнение подходов (для отчёта по доп. заданию):
+   auto-fit + minmax компактно решает 95% адаптивности — одна строка
+   задаёт сетку для всех ширин сразу. Минус: не управляет порядком
+   элементов и не меняет расположение скачком. Там, где нужно
+   принципиально иное устройство (например, сайдбар слева), auto-fit
+   не подходит — добавляю media query. Итого: два media queries
+   на всю адаптивную раскладку, остальное — auto-fit, clamp, flex-wrap. */
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-min), 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.catalog__title {
+  grid-column: 1 / -1;            /* заголовок на все колонки сетки */
+  margin-bottom: var(--sp-2);
+}
+
+/* ------------------------------------------------------------------
+   Форма фильтров (.filter) в каталоге.
+   На мобильном — над карточками, на десктопе — сайдбар (см. media query). */
+.filter {
+  margin-block: var(--sp-3);
+}
+
+.filter__group {
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  background-color: var(--surface);
+}
+
+.filter__legend {
+  padding-inline: var(--sp-2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.filter__label {
+  display: block;                 /* подпись над полем, не в строке с ним */
+  margin-top: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.filter__input,
+.filter__select {
+  width: 100%;                    /* поля растянуты по ширине группы */
+}
+
+/* ------------------------------------------------------------------
+   Подвал (.site-footer) — копирайт и контакты, приглушённый цвет. */
+.site-footer {
+  background-color: var(--surface);
+  border-top: var(--border-width) solid var(--line);
+  padding: var(--sp-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.site-footer__contacts {
+  font-style: normal;             /* address по умолчанию курсив, здесь лишний */
+}
+
+/* ==================================================================
+   MEDIA QUERY №1 — планшет от 768px.
+
+   Шапка перестраивается: логотип и меню в одну строку. Больше ничего
+   не меняем — сетка каталога уже сама перестроилась через auto-fit. */
+@media (min-width: 768px) {
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+    padding-inline: var(--sp-5);
+  }
+
+  .site-header__tagline {
+    margin-left: auto;            /* описание прижимается к правому краю */
+  }
+
+  .site-nav__list {
+    margin-top: 0;                /* в строке вертикальный отступ уже не нужен */
+  }
+
+  .page {
+    padding-inline: var(--sp-5);
+  }
+
+  .site-footer {
+    padding-inline: var(--sp-5);
+  }
+}
+
+/* ==================================================================
+   MEDIA QUERY №2 — десктоп от 1100px.
+
+   Форма фильтров превращается в сайдбар слева: .page становится grid
+   из двух колонок — фильтры и каталог. Это единственное место, где
+   раскладка реально меняется, поэтому и нужна отдельная media query. */
+@media (min-width: 1100px) {
+  .page {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    column-gap: var(--sp-5);
+    align-items: start;           /* сайдбар не растягивается по высоте каталога */
+  }
+
+  .page__title,
+  .page__lead {
+    grid-column: 1 / -1;          /* заголовок и вводный текст над обеими колонками */
+  }
+
+  .filter {
+  grid-column: 1;               /* фильтр в левой колонке, строку определяет grid сам */
+  }
+
+  .catalog {
+    grid-column: 2;
+  }
+
+  /* Одиночные блоки (карточка книги, профиль, история, aside) — во всю ширину. */
+  .book,
+  .profile-info,
+  .history,
+  .wishlist,
+  .related,
+  .rules,
+  .loan-form {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ==================================================================
+   MEDIA QUERY №3 — печатная версия (доп. задание).
+
+   Срабатывает только при печати или сохранении в PDF, не при смене
+   ширины. В лимит «не более двух media queries для раскладки»
+   не считается. Логика: убрать всё несущественное, оставить текст. */
+@media print {
+  body {
+    background: var(--print-bg);
+    color: var(--print-ink);
+  }
+
+  .site-header,
+  .site-footer,
+  .site-nav,
+  .breadcrumbs,
+  .filter,
+  .loan-form,
+  .review-form,
+  .related,
+  .rules,
+  .wishlist {
+    display: none;                /* меню и формы на бумаге бесполезны */
+  }
+
+  .book,
+  .book__section,
+  .history,
+  .profile-info {
+    box-shadow: none;             /* тени на бумаге не нужны */
+    border: var(--border-width) solid var(--print-line);
+    border-radius: 0;
+    page-break-inside: avoid;     /* блок не разрывается между страницами */
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")"; /* адрес ссылки печатается после текста */
+    font-size: 0.8em;
+    color: var(--print-muted);
+    }
+}
