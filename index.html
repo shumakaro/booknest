@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <!-- ^ Говорит браузеру: "это HTML5". Должно быть первой строкой, без пробелов выше. -->
 
+<!-- ==========================================================================
+     ЛР №2 — адаптивная вёрстка и дизайн-токены.
+
+     Структура HTML не изменена: теги, их порядок, вложенность и содержимое
+     остались такими же, как в ЛР №1. Единственное дополнение — атрибут class
+     у части тегов. Это разрешено заданием ЛР №2: «не изменяя структуру HTML,
+     допускается только добавление классов».
+
+     Что дают классы: CSS-селекторы теперь обращаются к БЭМ-классам
+     (.site-header, .catalog, .book-card), а не к тегам напрямую.
+     Вложенность селекторов — не глубже двух уровней, как требует методичка.
+     ========================================================================== -->
+
 <html lang="ru">
 <!-- ^ Корневой элемент. lang="ru" — язык страницы: русский.
      Это важно для скринридеров и поисковиков. -->
@@ -14,82 +27,67 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- ^ Сообщает браузеру: страница адаптивна, ширина = ширина экрана устройства.
-       Без этого на телефонах страница открывается уменьшенной.
-       В ЛР №1 визуально не влияет, но требование задания — ставить всегда. -->
+       Без этого на телефонах страница открывается уменьшенной. -->
 
   <title>Каталог книг — BookNest</title>
-  <!-- ^ Заголовок вкладки браузера. Уникален для каждой страницы.
-       Именно его видит пользователь в списке вкладок. -->
+  <!-- ^ Заголовок вкладки браузера. Уникален для каждой страницы. -->
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
 </head>
 
 <body>
-  <!-- ^ "Тело" документа. Всё, что видно на странице, находится здесь. -->
 
-  <header>
-    <!-- ^ Шапка страницы. Обычно: логотип, название, навигация.
-         Семантически говорит: "это вводная часть страницы". -->
+  <header class="site-header">
+    <!-- ^ site-header — БЭМ-блок: шапка сайта.
+         CSS теперь пишет .site-header, а не обращается к тегу header. -->
 
-    <h1>BookNest</h1>
-    <!-- ^ h1 — главный заголовок страницы. Должен быть ОДИН на весь документ.
-         Здесь это название клуба. -->
+    <h1 class="site-header__title">BookNest</h1>
+    <!-- ^ site-header__title — элемент блока: название клуба. -->
 
-    <p>Книжный клуб университета</p>
-    <!-- ^ p — абзац текста. Короткое описание под логотипом. -->
+    <p class="site-header__tagline">Книжный клуб университета</p>
+    <!-- ^ site-header__tagline — элемент: короткое описание под логотипом. -->
 
-    <nav>
-      <!-- ^ nav — навигационный блок. Основное меню сайта.
-           Не все ссылки надо пихать в nav — только основные. -->
+    <nav class="site-nav">
+      <!-- ^ site-nav — блок: основное меню. Отдельный класс,
+           чтобы стилизовать именно это меню, не задевая другие nav. -->
 
-      <ul>
-        <!-- ^ ul — неупорядоченный список. Здесь — список пунктов меню. -->
+      <ul class="site-nav__list">
+        <!-- ^ site-nav__list — элемент блока site-nav: список пунктов. -->
 
-        <li><a href="index.html" aria-current="page">Каталог</a></li>
-        <!-- ^ li — элемент списка. a — ссылка. href — куда ведёт. -->
+        <li class="site-nav__item"><a class="site-nav__link" href="index.html" aria-current="page">Каталог</a></li>
+        <!-- ^ site-nav__item — пункт, site-nav__link — ссылка.
+             aria-current="page" оставили: это про доступность, не про стили. -->
 
-        <li><a href="book.html">Книга</a></li>
-        <li><a href="loan.html">Выдача</a></li>
-        <li><a href="profile.html">Профиль</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="loan.html">Выдача</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="profile.html">Профиль</a></li>
       </ul>
     </nav>
   </header>
 
-  <main>
-    <!-- ^ main — основное содержимое страницы. Один на документ.
-         Внутри — уникальный контент этой страницы (не шапка и не подвал). -->
+  <main class="page">
+    <!-- ^ page — блок: основное содержимое страницы. -->
 
-    <h2>Каталог книг</h2>
-    <!-- ^ h2 — заголовок второго уровня. Вложен в h1 по смыслу:
-         "BookNest" — это сайт, "Каталог книг" — раздел сайта. -->
+    <h2 class="page__title">Каталог книг</h2>
+    <!-- ^ page__title — элемент: главный заголовок страницы. -->
 
-    <form role="search" method="get" action="index.html">
-      <!-- ^ form — форма. role="search" — подсказка браузеру и скринридерам,
-           что это поиск. method="get" — данные уйдут в URL.
-           action="index.html" — куда отправить при нажатии кнопки.
-           В ЛР №1 фильтрация не работает — это каркас для будущего. -->
+    <form class="filter" role="search" method="get" action="index.html">
+      <!-- ^ filter — блок: форма фильтров. Все стили формы — через этот класс. -->
 
-      <fieldset>
-        <!-- ^ fieldset — группирует связанные поля формы.
-             Рисует рамку вокруг группы. Это НЕ оформление, а семантика. -->
+      <fieldset class="filter__group">
+        <!-- ^ filter__group — элемент: группа полей внутри фильтра. -->
 
-        <legend>Фильтры</legend>
-        <!-- ^ legend — заголовок группы fieldset. "Имя" рамки. -->
+        <legend class="filter__legend">Фильтры</legend>
 
-        <label for="search">Поиск по названию или автору</label>
-        <!-- ^ label — подпись к полю. for="search" связывает её с input id="search".
-             Клик по подписи фокусирует поле. Скринридер читает её вслух. -->
+        <label class="filter__label" for="search">Поиск по названию или автору</label>
+        <input class="filter__input" type="search" id="search" name="q" placeholder="Например, Тартт">
 
-        <input type="search" id="search" name="q" placeholder="Например, Тартт">
-        <!-- ^ input — поле ввода. type="search" — поисковое поле.
-             id="search" — связка с label. name="q" — имя параметра в URL (?q=...).
-             placeholder — серая подсказка внутри поля. НЕ заменяет label! -->
-
-        <label for="genre">Жанр</label>
-        <select id="genre" name="genre">
-          <!-- ^ select — выпадающий список. name="genre" — имя параметра. -->
-
+        <label class="filter__label" for="genre">Жанр</label>
+        <select class="filter__select" id="genre" name="genre">
           <option value="">Все жанры</option>
-          <!-- ^ option — пункт списка. value="" — пустое значение = "не фильтровать". -->
-
           <option value="triller">Триллер</option>
           <option value="fentezi">Фэнтези</option>
           <option value="detektiv">Детектив</option>
@@ -98,131 +96,106 @@
           <option value="fantastika">Фантастика</option>
         </select>
 
-        <label for="sort">Сортировка</label>
-        <select id="sort" name="sort">
+        <label class="filter__label" for="sort">Сортировка</label>
+        <select class="filter__select" id="sort" name="sort">
           <option value="title">По названию</option>
           <option value="author">По автору</option>
           <option value="year">По году издания</option>
         </select>
 
-        <input type="checkbox" id="available" name="available" value="1">
-        <!-- ^ checkbox — галочка. id связывает с label. name+value = что отправится. -->
+        <input class="filter__checkbox" type="checkbox" id="available" name="available" value="1">
+        <label class="filter__label filter__label--checkbox" for="available">Только доступные</label>
+        <!-- ^ filter__label--checkbox — модификатор: подпись чекбокса
+             стоит в строку с квадратиком, а не над ним. -->
 
-        <label for="available">Только доступные</label>
-        <!-- ^ label ПОСЛЕ input — так галочка стоит слева, а подпись справа.
-             Тоже работает: for="available" привязывает к полю. -->
-
-        <button type="submit">Применить фильтры</button>
-        <!-- ^ button type="submit" — кнопка, которая отправляет форму. -->
+        <button class="btn" type="submit">Применить фильтры</button>
+        <!-- ^ btn — блок: кнопка. Один класс на все кнопки проекта. -->
       </fieldset>
     </form>
 
-    <section>
-      <!-- ^ section — логический раздел страницы. Здесь: список книг.
-           Отличается от div тем, что это осмысленная часть контента. -->
+    <section class="catalog">
+      <!-- ^ catalog — блок: сетка карточек книг. -->
 
-      <h2>Найдено книг: 6</h2>
-      <!-- ^ Второй h2 на странице — но это нормально.
-           Каждая section может иметь свой h2. Главное — не пропускать уровни. -->
+      <h2 class="catalog__title">Найдено книг: 6</h2>
 
-      <article>
-        <!-- ^ article — самодостаточная единица контента. Карточка книги.
-             Её можно вырвать со страницы — смысл сохранится. Это НЕ div. -->
+      <article class="book-card">
+        <!-- ^ book-card — блок: карточка книги. Один класс на все шесть карточек. -->
 
-        <header>
-          <!-- ^ header внутри article — вводная часть карточки: название. -->
-
-          <h3>Тайная история</h3>
-          <!-- ^ h3 — заголовок третьего уровня. Вложен в h2 "Найдено книг".
-               Иерархия: h1 → h2 → h3, без пропусков. -->
+        <header class="book-card__header">
+          <h3 class="book-card__title">Тайная история</h3>
         </header>
-
-        <p>Автор: Донна Тартт</p>
-        <!-- ^ Обычный абзац с автором. -->
-
-        <p>Жанр: триллер, роман</p>
-
-        <p>Год издания: <time datetime="1992">1992</time></p>
-        <!-- ^ time — семантический тег для дат.
-             datetime="1992" — машиночитаемое значение (ISO).
-             "1992" в тексте — человекочитаемое. Машина читает атрибут. -->
-
-        <p>Доступно: <data value="3">3 экземпляра</data></p>
-        <!-- ^ data — связывает машиночитаемое значение (value="3")
-             с текстом ("3 экземпляра"). -->
-
-        <p><a href="book.html">Подробнее о книге</a></p>
-        <!-- ^ Ссылка на карточку. В ЛР №1 все шесть книг ведут на один book.html. -->
+        <p class="book-card__meta">Автор: Донна Тартт</p>
+        <p class="book-card__meta">Жанр: триллер, роман</p>
+        <p class="book-card__meta">Год издания: <time datetime="1992">1992</time></p>
+        <p class="book-card__meta">Доступно: <data value="3">3 экземпляра</data></p>
+        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
+        <!-- ^ book-card__link — обёртка для ссылки, чтобы через margin-top: auto
+             прижать её к низу карточки. book-card__more — сама ссылка. -->
       </article>
 
-      <article>
-        <header>
-          <h3>Девятый дом</h3>
+      <article class="book-card">
+        <header class="book-card__header">
+          <h3 class="book-card__title">Девятый дом</h3>
         </header>
-        <p>Автор: Ли Бардуго</p>
-        <p>Жанр: фэнтези, мистика</p>
-        <p>Год издания: <time datetime="2019">2019</time></p>
-        <p>Доступно: <data value="0">нет свободных экземпляров</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
+        <p class="book-card__meta">Автор: Ли Бардуго</p>
+        <p class="book-card__meta">Жанр: фэнтези, мистика</p>
+        <p class="book-card__meta">Год издания: <time datetime="2019">2019</time></p>
+        <p class="book-card__meta">Доступно: <data value="0">нет свободных экземпляров</data></p>
+        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
       </article>
 
-      <article>
-        <header>
-          <h3>Институт</h3>
+      <article class="book-card">
+        <header class="book-card__header">
+          <h3 class="book-card__title">Институт</h3>
         </header>
-        <p>Автор: Стивен Кинг</p>
-        <p>Жанр: триллер, фантастика</p>
-        <p>Год издания: <time datetime="2019">2019</time></p>
-        <p>Доступно: <data value="2">2 экземпляра</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
+        <p class="book-card__meta">Автор: Стивен Кинг</p>
+        <p class="book-card__meta">Жанр: триллер, фантастика</p>
+        <p class="book-card__meta">Год издания: <time datetime="2019">2019</time></p>
+        <p class="book-card__meta">Доступно: <data value="2">2 экземпляра</data></p>
+        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
       </article>
 
-      <article>
-        <header>
-          <h3>Безмолвный пациент</h3>
+      <article class="book-card">
+        <header class="book-card__header">
+          <h3 class="book-card__title">Безмолвный пациент</h3>
         </header>
-        <p>Автор: Алекс Михаэлидес</p>
-        <p>Жанр: триллер, детектив</p>
-        <p>Год издания: <time datetime="2019">2019</time></p>
-        <p>Доступно: <data value="5">5 экземпляров</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
+        <p class="book-card__meta">Автор: Алекс Михаэлидес</p>
+        <p class="book-card__meta">Жанр: триллер, детектив</p>
+        <p class="book-card__meta">Год издания: <time datetime="2019">2019</time></p>
+        <p class="book-card__meta">Доступно: <data value="5">5 экземпляров</data></p>
+        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
       </article>
 
-      <article>
-        <header>
-          <h3>Четвёртое крыло</h3>
+      <article class="book-card">
+        <header class="book-card__header">
+          <h3 class="book-card__title">Четвёртое крыло</h3>
         </header>
-        <p>Автор: Ребекка Яррос</p>
-        <p>Жанр: фэнтези, роман</p>
-        <p>Год издания: <time datetime="2023">2023</time></p>
-        <p>Доступно: <data value="1">1 экземпляр</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
+        <p class="book-card__meta">Автор: Ребекка Яррос</p>
+        <p class="book-card__meta">Жанр: фэнтези, роман</p>
+        <p class="book-card__meta">Год издания: <time datetime="2023">2023</time></p>
+        <p class="book-card__meta">Доступно: <data value="1">1 экземпляр</data></p>
+        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
       </article>
 
-      <article>
-        <header>
-          <h3>Неоновые боги</h3>
+      <article class="book-card">
+        <header class="book-card__header">
+          <h3 class="book-card__title">Неоновые боги</h3>
         </header>
-        <p>Автор: Кэти Роберт</p>
-        <p>Жанр: роман, фэнтези</p>
-        <p>Год издания: <time datetime="2021">2021</time></p>
-        <p>Доступно: <data value="4">4 экземпляра</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
+        <p class="book-card__meta">Автор: Кэти Роберт</p>
+        <p class="book-card__meta">Жанр: роман, фэнтези</p>
+        <p class="book-card__meta">Год издания: <time datetime="2021">2021</time></p>
+        <p class="book-card__meta">Доступно: <data value="4">4 экземпляра</data></p>
+        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
       </article>
     </section>
   </main>
 
-  <footer>
-    <!-- ^ footer — подвал страницы. Контакты, копирайт, служебные ссылки. -->
+  <footer class="site-footer">
+    <!-- ^ site-footer — блок: подвал. -->
 
-    <p>© 2026 BookNest — книжный клуб университета</p>
-
-    <address>
-      <!-- ^ address — семантический тег для контактных данных.
-           Не для домашнего адреса, а для связи с автором/организацией. -->
-
-      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
-      <!-- ^ mailto: — при клике откроется почтовый клиент с готовым адресом. -->
+    <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
+    <address class="site-footer__contacts">
+      <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
 
