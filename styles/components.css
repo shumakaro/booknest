@@ -69,6 +69,9 @@
 }
 
 .book__cover-image {
+  width: var(--cover-width);                       /* фиксированная ширина под размер файла */
+  max-width: 100%;                    /* на узком экране не вылезает за карточку */
+  height: auto;                       /* высота по пропорции */
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }

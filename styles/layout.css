@@ -72,7 +72,7 @@ body {
 .site-nav__link[aria-current="page"] {
   text-decoration: underline;             /* текущая страница — подчёркнута */
   text-decoration-color: var(--accent);
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: var(--underline-width);
 }
 
 /* ------------------------------------------------------------------
@@ -109,7 +109,7 @@ body {
    на всю адаптивную раскладку, остальное — auto-fit, clamp, flex-wrap. */
 .catalog {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-min), 1fr));
   gap: var(--sp-3);
   margin-top: var(--sp-4);
 }
@@ -205,7 +205,7 @@ body {
 @media (min-width: 1100px) {
   .page {
     display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
     column-gap: var(--sp-5);
     align-items: start;           /* сайдбар не растягивается по высоте каталога */
   }
@@ -243,8 +243,8 @@ body {
    не считается. Логика: убрать всё несущественное, оставить текст. */
 @media print {
   body {
-    background: white;            /* белый фон для печати, экономия краски */
-    color: black;
+    background: var(--print-bg);
+    color: var(--print-ink);
   }
 
   .site-header,
@@ -265,7 +265,7 @@ body {
   .history,
   .profile-info {
     box-shadow: none;             /* тени на бумаге не нужны */
-    border: var(--border-width) solid #ccc;
+    border: var(--border-width) solid var(--print-line);
     border-radius: 0;
     page-break-inside: avoid;     /* блок не разрывается между страницами */
   }
@@ -273,6 +273,6 @@ body {
   a[href]::after {
     content: " (" attr(href) ")"; /* адрес ссылки печатается после текста */
     font-size: 0.8em;
-    color: #555;
-  }
+    color: var(--print-muted);
+    }
 }

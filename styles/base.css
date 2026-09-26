@@ -62,11 +62,11 @@ p {
 a {
   color: var(--accent);
   text-decoration: underline;
-  text-underline-offset: 2px;         /* отступ линии от текста, буквы не липнут */
+  text-underline-offset: var(--underline-offset);      /* отступ линии от текста, буквы не липнут */
 }
 
 a:hover {
-  text-decoration-thickness: 2px;     /* жирнее подчёркивание при наведении */
+text-decoration-thickness: var(--underline-width);     /* жирнее подчёркивание при наведении */
 }
 
 /* Видимый фокус для клавиатурной навигации.
