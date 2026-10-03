@@ -240,13 +240,18 @@ function applyStateToForm() {
   if (sortSelect)     sortSelect.value = state.sort;
   if (availableCheck) availableCheck.checked = state.onlyAvailable;
 }
-
 /* ------------------------------------------------------------------
-   render — ЕДИНСТВЕННАЯ функция, которая перерисовывает интерфейс.
+   render — основная функция отрисовки интерфейса.
 
-   ВАЖНО (для защиты): никакой другой код не должен трогать DOM.
-   Если что-то поменялось в состоянии — вызываем render(), и он
-   целиком обновляет страницу.
+   ВАЖНО (для защиты): в приложении используется одна центральная
+   функция render(), которая на основе текущего state обновляет
+   основное содержимое интерфейса: карточки книг, список желаемого
+   и счётчики.
+
+   Вспомогательные функции тоже могут работать с DOM. Например,
+   applyStateToForm() синхронизирует поля формы с состоянием,
+   а обработчики импорта и экспорта работают с элементами страницы.
+   При этом основная отрисовка интерфейса централизована в render().
 
    Логика зависит от страницы:
      - на профиле рисуем список желаемого и обновляем счётчик;
@@ -254,30 +259,29 @@ function applyStateToForm() {
    ------------------------------------------------------------------ */
 function render() {
   // Если мы на странице профиля — отдельная ветка.
-  // На профиле нет формы фильтров и каталога, там только «Мой список».
   if (isProfilePage) {
     renderWishlistCount(wishlistCountEl, state.wishlist.size);
     renderWishlistPage(wishlistListEl, books, state.wishlist);
-    return;   // выходим из функции, дальше код для каталога не нужен
+    saveState();
+    return;
   }
 
-  // 1. Фильтр. filterBooks вернёт НОВЫЙ массив, исходный books не меняется.
+  // 1. Фильтрация.
   const filtered = filterBooks(books, {
     query: state.query,
     genre: state.genre,
     onlyAvailable: state.onlyAvailable,
   });
 
-  // 2. Сортировка. sortBooks тоже вернёт НОВЫЙ массив.
+  // 2. Сортировка.
   const sorted = sortBooks(filtered, state.sort);
 
-  // 3. Отрисовка. Передаём Set со списком желаемого, чтобы renderBooks
-  //    знал, у каких книг кнопка должна быть в состоянии «В списке».
+  // 3. Отрисовка.
   renderBooks(listEl, sorted, state.wishlist);
   renderCounter(counterEl, sorted.length);
   renderWishlistCount(wishlistCountEl, state.wishlist.size);
 
-  // 4. Синхронизируем URL и сохраняем состояние.
+  // 4. Синхронизация URL и сохранение состояния.
   syncHashFromState();
   saveState();
 }

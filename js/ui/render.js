@@ -117,7 +117,66 @@ export function renderCounter(element, count) {
      count   — сколько книг в списке желаемого.
    ------------------------------------------------------------------ */
 export function renderWishlistCount(element, count) {
+  // Если элемента нет на странице — ничего не делаем.
+  // Так функция безопасна для любой страницы: например, profile.html
+  // может не содержать счётчик в шапке.
+  if (!element) return;
   element.textContent = `Мой список: ${count}`;
+}
+
+/* ------------------------------------------------------------------
+   renderWishlistPage — отрисовать полный список желаемого на странице профиля.
+
+   Принимает:
+     container — DOM-элемент, куда вставлять карточки (наш #wishlist-list);
+     books     — массив ВСЕХ книг (нам нужны данные: название, автор);
+     wishlist  — Set с id книг в списке желаемого.
+
+   Используется на profile.html: показывает не только те книги,
+   что пользователь отметил, но и даёт кнопку «Удалить» рядом с каждой.
+
+   ВАЖНО: если список пуст, показываем подсказку «вы ещё ничего
+   не добавили». Это то же пустое состояние, что и в каталоге,
+   только с другим текстом.
+   ------------------------------------------------------------------ */
+export function renderWishlistPage(container, books, wishlist) {
+  // Оставляем только те книги, id которых есть в списке желаемого.
+  // filter не мутирует исходный массив books.
+  const wishlistBooks = books.filter((book) => wishlist.has(book.id));
+
+  // Пустое состояние.
+  if (wishlistBooks.length === 0) {
+    container.innerHTML = "";
+    const empty = document.createElement("p");
+    empty.className = "wishlist__empty";
+    empty.textContent = "В вашем списке пока нет книг. Добавьте их из каталога.";
+    container.appendChild(empty);
+    return;
+  }
+
+  // Собираем разметку для каждой книги.
+  // Кнопка «Удалить» получает тот же класс js-wish, что и в каталоге,
+  // чтобы обрабатывать клики через тот же делегированный обработчик
+  // в main.js.
+  const html = wishlistBooks
+    .map((book) => `
+      <li class="wishlist__item" data-id="${book.id}">
+        <div class="wishlist__info">
+          <h3 class="wishlist__title">${book.title}</h3>
+          <p class="wishlist__meta">Автор: ${book.author}</p>
+          <p class="wishlist__meta">Год: ${book.year}</p>
+        </div>
+        <button
+          type="button"
+          class="btn btn--ghost js-wish"
+          data-id="${book.id}"
+          aria-label="Удалить книгу ${book.title} из списка"
+        >Удалить</button>
+      </li>
+    `)
+    .join("");
+
+  container.innerHTML = html;
 }
 
 /* ------------------------------------------------------------------
