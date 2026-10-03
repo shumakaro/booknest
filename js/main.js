@@ -7,8 +7,13 @@
      3. обработчики событий — реагируют на клики и ввод пользователя.
 
    ВАЖНО (для защиты): ровно один объект state и ровно одна функция render().
-   Это не случайно: любое изменение в приложении — это изменение state,
-   после которого вызывается render(). Никакой другой код не трогает DOM.
+   Любое изменение в приложении — это изменение state, после которого
+   вызывается render(). render() — основная функция отрисовки: она берёт
+   текущий state и полностью обновляет карточки и счётчики.
+   Отдельные вспомогательные функции (applyStateToForm, обработчики
+   экспорта/импорта) тоже касаются DOM — например, чтобы синхронизировать
+   поля формы с состоянием или создать временную ссылку для скачивания
+   файла. Но вся отрисовка каталога централизована в render().
    ========================================================================== */
 
 // Импортируем данные о книгах из модуля data/books.js.
@@ -16,12 +21,14 @@
 // не угадывает расширения, как это делает Node.js.
 import { books } from "./data/books.js";
 
-// Импортируем чистые функции из lib/books.js.
+// Импортируем только те функции, которые реально используем в этом файле.
+// GENRE_LABELS нужны в render.js, а countAvailable у нас нигде не вызывается —
+// в renderBooks мы считаем количество отфильтрованных книг через length,
+// поэтому отдельная функция countAvailable остаётся в lib/books.js
+// как готовая утилита, но здесь не импортируется.
 import {
-  GENRE_LABELS,
   filterBooks,
   sortBooks,
-  countAvailable,
   getBookById,
 } from "./lib/books.js";
 
@@ -302,10 +309,13 @@ listEl.addEventListener("click", (event) => {
   // и результат closest в панели Scope.
   // debugger;
 
-  // closest ищет ближайший родительский элемент (или сам элемент)
-  // по CSS-селектору. Если пользователь кликнул по тексту кнопки,
-  // target будет текстовым узлом внутри button, а closest поднимется
-  // до самой кнопки.
+  // event.target — элемент, по которому произошёл клик. У обычного
+  // события click это всегда DOM-элемент (не текстовый узел), поэтому
+  // если кликнули по кнопке, target — сама кнопка.
+  // closest(".js-wish") ищет ближайший родительский элемент (или сам
+  // target), подходящий под селектор. Это защищает нас от случаев,
+  // когда кнопка содержит вложенные теги и клик пришёлся по ним:
+  // closest всё равно поднимется до кнопки.
   const button = event.target.closest(".js-wish");
 
   // Если клик был не по кнопке «Хочу прочитать» — ничего не делаем.
@@ -417,11 +427,29 @@ importInput.addEventListener("change", async (event) => {
 state.wishlist = new Set(readWishlistFromStorage());
 
 // 2. Читаем сохранённые фильтры из localStorage.
+// Списки допустимых значений. Нужны, чтобы защититься от испорченного
+// localStorage: если кто-то вручную подложит жанр "abracadabra",
+// приложение не станет с ним работать, а просто проигнорирует.
+const VALID_GENRES = ["all", "roman", "scifi", "detective", "fantasy", "nonfiction"];
+const VALID_SORTS  = ["title", "year", "rating"];
+
 const savedFilters = readFiltersFromStorage();
-if (typeof savedFilters.query === "string")       state.query = savedFilters.query;
-if (typeof savedFilters.genre === "string")       state.genre = savedFilters.genre;
-if (typeof savedFilters.sort === "string")        state.sort = savedFilters.sort;
-if (typeof savedFilters.onlyAvailable === "boolean") state.onlyAvailable = savedFilters.onlyAvailable;
+
+if (typeof savedFilters.query === "string") {
+  state.query = savedFilters.query;
+}
+
+if (VALID_GENRES.includes(savedFilters.genre)) {
+  state.genre = savedFilters.genre;
+}
+
+if (VALID_SORTS.includes(savedFilters.sort)) {
+  state.sort = savedFilters.sort;
+}
+
+if (typeof savedFilters.onlyAvailable === "boolean") {
+  state.onlyAvailable = savedFilters.onlyAvailable;
+}
 
 // 3. Читаем фильтры из URL. Если они там есть — они приоритетнее localStorage,
 //    потому что пользователь явно перешёл по ссылке с параметрами.
