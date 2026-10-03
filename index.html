@@ -1,36 +1,42 @@
 <!DOCTYPE html>
-<!-- ^ Говорит браузеру: "это HTML5". Должно быть первой строкой, без пробелов выше. -->
+<!-- ^ Объявление HTML5. Первая строка файла. -->
 
 <!-- ==========================================================================
-     ЛР №2 — адаптивная вёрстка и дизайн-токены.
+     ЛР №3 — JavaScript-приложение: каталог с фильтрами.
 
-     Структура HTML не изменена: теги, их порядок, вложенность и содержимое
-     остались такими же, как в ЛР №1. Единственное дополнение — атрибут class
-     у части тегов. Это разрешено заданием ЛР №2: «не изменяя структуру HTML,
-     допускается только добавление классов».
+     Что изменилось по сравнению с ЛР №2 (структура HTML впервые меняется,
+     это разрешено заданием третьей лабы):
 
-     Что дают классы: CSS-селекторы теперь обращаются к БЭМ-классам
-     (.site-header, .catalog, .book-card), а не к тегам напрямую.
-     Вложенность селекторов — не глубже двух уровней, как требует методичка.
+     1. Секция каталога: шесть статичных <article> удалены. Вместо них
+        пустой <ul id="book-list">, который наполняет JavaScript из модуля
+        js/ui/render.js.
+
+     2. Форма фильтров: получила id="filters". Полям добавлены id (search,
+        genre, sort, available), чтобы JavaScript мог их найти и слушать
+        изменения. Появилась кнопка сброса id="reset".
+
+     3. Шапка: добавлен счётчик «Мой список: N» (id="wishlist-count"),
+        кнопки «Экспорт» (id="export") и «Импорт» (id="import").
+
+     4. В конце body подключён модуль main.js через
+        <script type="module" src="js/main.js"></script>.
+
+     Стили, классы БЭМ, тёмная тема, адаптивность — всё осталось из ЛР №2.
+     Добавились только новые элементы под JavaScript.
      ========================================================================== -->
 
 <html lang="ru">
-<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский.
-     Это важно для скринридеров и поисковиков. -->
+<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
 
 <head>
-  <!-- ^ "Голова" документа. Здесь метаданные — они не видны на странице, но нужны браузеру. -->
-
   <meta charset="UTF-8">
-  <!-- ^ Кодировка. UTF-8 — универсальная, поддерживает кириллицу и все символы.
-       Без неё русский текст может отобразиться "кракозябрами". -->
+  <!-- ^ Кодировка UTF-8. Универсальная, поддерживает кириллицу. -->
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- ^ Сообщает браузеру: страница адаптивна, ширина = ширина экрана устройства.
-       Без этого на телефонах страница открывается уменьшенной. -->
+  <!-- ^ Адаптивность. Требование задания — ставить на каждой странице. -->
 
   <title>Каталог книг — BookNest</title>
-  <!-- ^ Заголовок вкладки браузера. Уникален для каждой страницы. -->
+  <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
 
   <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/base.css">
@@ -41,163 +47,123 @@
 <body>
 
   <header class="site-header">
-    <!-- ^ site-header — БЭМ-блок: шапка сайта.
-         CSS теперь пишет .site-header, а не обращается к тегу header. -->
+    <!-- ^ site-header — БЭМ-блок: шапка сайта. -->
 
     <h1 class="site-header__title">BookNest</h1>
-    <!-- ^ site-header__title — элемент блока: название клуба. -->
-
     <p class="site-header__tagline">Книжный клуб университета</p>
-    <!-- ^ site-header__tagline — элемент: короткое описание под логотипом. -->
 
     <nav class="site-nav">
-      <!-- ^ site-nav — блок: основное меню. Отдельный класс,
-           чтобы стилизовать именно это меню, не задевая другие nav. -->
-
       <ul class="site-nav__list">
-        <!-- ^ site-nav__list — элемент блока site-nav: список пунктов. -->
-
         <li class="site-nav__item"><a class="site-nav__link" href="index.html" aria-current="page">Каталог</a></li>
-        <!-- ^ site-nav__item — пункт, site-nav__link — ссылка.
-             aria-current="page" оставили: это про доступность, не про стили. -->
-
         <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
         <li class="site-nav__item"><a class="site-nav__link" href="loan.html">Выдача</a></li>
         <li class="site-nav__item"><a class="site-nav__link" href="profile.html">Профиль</a></li>
       </ul>
     </nav>
+
+    <div class="site-header__actions">
+      <!-- ^ site-header__actions — блок управления в шапке.
+           Добавлен в ЛР №3 под JavaScript-приложение. -->
+
+      <span class="site-header__wishlist" id="wishlist-count">Мой список: 0</span>
+      <!-- ^ Счётчик книг в списке желаемого. Обновляет renderWishlistCount
+           из ui/render.js. id="wishlist-count" — на него ссылается main.js. -->
+
+      <button class="btn btn--ghost" type="button" id="export">Экспорт</button>
+      <!-- ^ Кнопка экспорта списка желаемого в JSON (доп. задание). -->
+
+      <label class="btn btn--ghost" for="import">
+        <!-- ^ Кнопка импорта — это label для скрытого input[type=file].
+             Так выглядит как кнопка, а внутри работает нативный file input. -->
+        Импорт
+        <input class="site-header__file" type="file" id="import" accept=".json,application/json" hidden>
+        <!-- ^ Скрытый input для выбора JSON-файла. hidden — чтобы не показывать
+             стандартный браузерный вид, а стилизовать через label. -->
+      </label>
+    </div>
   </header>
 
   <main class="page">
-    <!-- ^ page — блок: основное содержимое страницы. -->
 
     <h2 class="page__title">Каталог книг</h2>
-    <!-- ^ page__title — элемент: главный заголовок страницы. -->
 
-    <form class="filter" role="search" method="get" action="index.html">
-      <!-- ^ filter — блок: форма фильтров. Все стили формы — через этот класс. -->
+    <form class="filter" id="filters" role="search">
+      <!-- ^ Форма фильтров. id="filters" — на него вешает слушатель main.js.
+           role="search" — подсказка для скринридеров.
+           Атрибуты action и method убраны: форма теперь чисто клиентская,
+           она не отправляется на сервер, поэтому preventDefault не нужен,
+           но мы всё равно его делаем на всякий случай. -->
 
       <fieldset class="filter__group">
-        <!-- ^ filter__group — элемент: группа полей внутри фильтра. -->
-
         <legend class="filter__legend">Фильтры</legend>
 
         <label class="filter__label" for="search">Поиск по названию или автору</label>
-        <input class="filter__input" type="search" id="search" name="q" placeholder="Например, Тартт">
+        <input class="filter__input" type="search" id="search" placeholder="Например, Тартт" value="">
+        <!-- ^ Поле поиска. id="search" — на него ссылается main.js.
+             value="" — пустое по умолчанию, восстановится из localStorage. -->
 
         <label class="filter__label" for="genre">Жанр</label>
-        <select class="filter__select" id="genre" name="genre">
-          <option value="">Все жанры</option>
-          <option value="triller">Триллер</option>
-          <option value="fentezi">Фэнтези</option>
-          <option value="detektiv">Детектив</option>
-          <option value="mistika">Мистика</option>
+        <select class="filter__select" id="genre">
+          <!-- ^ Выпадающий список жанров. Значения value — на английском
+               (совпадают с полем genre в data/books.js). Подписи — на русском. -->
+          <option value="all">Все жанры</option>
           <option value="roman">Роман</option>
-          <option value="fantastika">Фантастика</option>
+          <option value="scifi">Фантастика</option>
+          <option value="detective">Детектив</option>
+          <option value="fantasy">Фэнтези</option>
+          <option value="nonfiction">Нон-фикшн</option>
         </select>
 
         <label class="filter__label" for="sort">Сортировка</label>
-        <select class="filter__select" id="sort" name="sort">
-          <option value="title">По названию</option>
-          <option value="author">По автору</option>
-          <option value="year">По году издания</option>
+        <select class="filter__select" id="sort">
+          <option value="title">По названию (А–Я)</option>
+          <option value="year">По году (новые сначала)</option>
+          <option value="rating">По рейтингу</option>
         </select>
 
-        <input class="filter__checkbox" type="checkbox" id="available" name="available" value="1">
+        <input class="filter__checkbox" type="checkbox" id="available">
+        <!-- ^ Чекбокс «только доступные». id="available" — на него смотрит main.js.
+             Атрибут name убран: форма не отправляется на сервер, name не нужен. -->
+
         <label class="filter__label filter__label--checkbox" for="available">Только доступные</label>
-        <!-- ^ filter__label--checkbox — модификатор: подпись чекбокса
-             стоит в строку с квадратиком, а не над ним. -->
 
         <button class="btn" type="submit">Применить фильтры</button>
-        <!-- ^ btn — блок: кнопка. Один класс на все кнопки проекта. -->
+        <!-- ^ Кнопка оставлена для полноты формы, но фактически фильтрация
+             происходит мгновенно при вводе. Кнопка нужна как страховка
+             для пользователей, которые ожидают submit. -->
+
+        <button class="btn btn--ghost" type="button" id="reset">Сбросить</button>
+        <!-- ^ Кнопка сброса фильтров (доп. функционал из требований).
+             type="button" — важно, иначе она попытается отправить форму. -->
       </fieldset>
     </form>
 
+    <p class="catalog__counter" id="counter">Найдено: 0 книг</p>
+    <!-- ^ Счётчик найденных книг. Обновляет renderCounter из ui/render.js. -->
+
     <section class="catalog">
-      <!-- ^ catalog — блок: сетка карточек книг. -->
-
-      <h2 class="catalog__title">Найдено книг: 6</h2>
-
-      <article class="book-card">
-        <!-- ^ book-card — блок: карточка книги. Один класс на все шесть карточек. -->
-
-        <header class="book-card__header">
-          <h3 class="book-card__title">Тайная история</h3>
-        </header>
-        <p class="book-card__meta">Автор: Донна Тартт</p>
-        <p class="book-card__meta">Жанр: триллер, роман</p>
-        <p class="book-card__meta">Год издания: <time datetime="1992">1992</time></p>
-        <p class="book-card__meta">Доступно: <data value="3">3 экземпляра</data></p>
-        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
-        <!-- ^ book-card__link — обёртка для ссылки, чтобы через margin-top: auto
-             прижать её к низу карточки. book-card__more — сама ссылка. -->
-      </article>
-
-      <article class="book-card">
-        <header class="book-card__header">
-          <h3 class="book-card__title">Девятый дом</h3>
-        </header>
-        <p class="book-card__meta">Автор: Ли Бардуго</p>
-        <p class="book-card__meta">Жанр: фэнтези, мистика</p>
-        <p class="book-card__meta">Год издания: <time datetime="2019">2019</time></p>
-        <p class="book-card__meta">Доступно: <data value="0">нет свободных экземпляров</data></p>
-        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article class="book-card">
-        <header class="book-card__header">
-          <h3 class="book-card__title">Институт</h3>
-        </header>
-        <p class="book-card__meta">Автор: Стивен Кинг</p>
-        <p class="book-card__meta">Жанр: триллер, фантастика</p>
-        <p class="book-card__meta">Год издания: <time datetime="2019">2019</time></p>
-        <p class="book-card__meta">Доступно: <data value="2">2 экземпляра</data></p>
-        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article class="book-card">
-        <header class="book-card__header">
-          <h3 class="book-card__title">Безмолвный пациент</h3>
-        </header>
-        <p class="book-card__meta">Автор: Алекс Михаэлидес</p>
-        <p class="book-card__meta">Жанр: триллер, детектив</p>
-        <p class="book-card__meta">Год издания: <time datetime="2019">2019</time></p>
-        <p class="book-card__meta">Доступно: <data value="5">5 экземпляров</data></p>
-        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article class="book-card">
-        <header class="book-card__header">
-          <h3 class="book-card__title">Четвёртое крыло</h3>
-        </header>
-        <p class="book-card__meta">Автор: Ребекка Яррос</p>
-        <p class="book-card__meta">Жанр: фэнтези, роман</p>
-        <p class="book-card__meta">Год издания: <time datetime="2023">2023</time></p>
-        <p class="book-card__meta">Доступно: <data value="1">1 экземпляр</data></p>
-        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article class="book-card">
-        <header class="book-card__header">
-          <h3 class="book-card__title">Неоновые боги</h3>
-        </header>
-        <p class="book-card__meta">Автор: Кэти Роберт</p>
-        <p class="book-card__meta">Жанр: роман, фэнтези</p>
-        <p class="book-card__meta">Год издания: <time datetime="2021">2021</time></p>
-        <p class="book-card__meta">Доступно: <data value="4">4 экземпляра</data></p>
-        <p class="book-card__link"><a class="book-card__more" href="book.html">Подробнее о книге</a></p>
-      </article>
+      <ul class="catalog__list" id="book-list">
+        <!-- ^ Пустой контейнер для карточек. Заполняет JavaScript.
+             Раньше здесь были шесть статичных <article> из ЛР №1 и №2,
+             теперь их создаёт renderBooks из ui/render.js по данным
+             из data/books.js. Каждая книга превращается в <li class="book-card">. -->
+      </ul>
     </section>
+
   </main>
 
   <footer class="site-footer">
-    <!-- ^ site-footer — блок: подвал. -->
-
     <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
     <address class="site-footer__contacts">
       <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
+
+  <script type="module" src="js/main.js"></script>
+  <!-- ^ Подключение главного модуля. type="module" обязателен для ESM:
+       только с ним работают import/export. Скрипт в конце body — чтобы
+       DOM был построен к моменту его выполнения. Если бы поставили
+       в head, document.querySelector вернул бы null. -->
 
 </body>
 </html>
