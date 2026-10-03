@@ -107,11 +107,24 @@ body {
    принципиально иное устройство (например, сайдбар слева), auto-fit
    не подходит — добавляю media query. Итого: два media queries
    на всю адаптивную раскладку, остальное — auto-fit, clamp, flex-wrap. */
+/* Секция каталога — просто обёртка, сетка будет на уровне списка карточек.
+   Раньше (в ЛР №2) секция сама была сеткой, потому что карточки лежали
+   внутри неё напрямую. Сейчас между секцией и карточками появился ul
+   (его наполняет JavaScript), поэтому сетку переносим на .catalog__list. */
 .catalog {
+  margin-top: var(--sp-4);
+}
+
+/* Сетка карточек — auto-fit + minmax без media queries.
+   Именно здесь карточки автоматически перестраиваются с 1 колонки
+   на 2, 3 или 4 в зависимости от ширины экрана. */
+.catalog__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--card-min), 1fr));
   gap: var(--sp-3);
-  margin-top: var(--sp-4);
 }
 
 .catalog__title {
@@ -199,31 +212,48 @@ body {
 /* ==================================================================
    MEDIA QUERY №2 — десктоп от 1100px.
 
-   Форма фильтров превращается в сайдбар слева: .page становится grid
-   из двух колонок — фильтры и каталог. Это единственное место, где
-   раскладка реально меняется, поэтому и нужна отдельная media query. */
+   Двухколоночный макет: слева сайдбар с фильтрами, справа каталог.
+   Использую grid-template-areas — так явно видно, какой элемент
+   в какой ячейке находится, и grid не разбрасывает элементы по строкам.
+   Раскладка:
+     ┌───────────────┬──────────────────┐
+     │ title (на всю ширину)             │
+     ├───────────────┼──────────────────┤
+     │ filter        │ counter          │
+     │               ├──────────────────┤
+     │               │ catalog          │
+     └───────────────┴──────────────────┘
+   ================================================================== */
 @media (min-width: 1100px) {
   .page {
     display: grid;
     grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    grid-template-areas:
+      "title title"
+      "filter counter"
+      "filter catalog";
     column-gap: var(--sp-5);
-    align-items: start;           /* сайдбар не растягивается по высоте каталога */
+    align-items: start;
   }
 
-  .page__title,
-  .page__lead {
-    grid-column: 1 / -1;          /* заголовок и вводный текст над обеими колонками */
+  .page__title {
+    grid-area: title;
   }
 
   .filter {
-  grid-column: 1;               /* фильтр в левой колонке, строку определяет grid сам */
+    grid-area: filter;
+  }
+
+  .catalog__counter {
+    grid-area: counter;
+    align-self: end;
   }
 
   .catalog {
-    grid-column: 2;
+    grid-area: catalog;
+    margin-top: var(--sp-2);
   }
 
-  /* Одиночные блоки (карточка книги, профиль, история, aside) — во всю ширину. */
   .book,
   .profile-info,
   .history,
@@ -234,7 +264,6 @@ body {
     grid-column: 1 / -1;
   }
 }
-
 /* ==================================================================
    MEDIA QUERY №3 — печатная версия (доп. задание).
 
