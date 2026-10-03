@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <!-- ^ Объявление HTML5. Первая строка файла. -->
 
+<!-- ==========================================================================
+     ЛР №2 — адаптивная вёрстка и дизайн-токены.
+
+     Структура HTML не изменена: теги, их порядок, вложенность и содержимое
+     остались такими же, как в ЛР №1. Единственное дополнение — атрибут class
+     у части тегов. Это разрешено заданием ЛР №2: «не изменяя структуру HTML,
+     допускается только добавление классов».
+
+     Классы здесь отличаются от index.html только в блоках страницы:
+     вместо .catalog и .book-card используется .book (одна книга)
+     и .review (для каждого отзыва).
+     ========================================================================== -->
+
 <html lang="ru">
 <!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
 
 <head>
-  <!-- ^ Метаданные. Не видны на странице, но нужны браузеру. -->
-
   <meta charset="UTF-8">
   <!-- ^ Кодировка UTF-8. Без неё русский текст может отобразиться кракозябрами. -->
 
@@ -15,216 +26,187 @@
 
   <title>Тайная история — BookNest</title>
   <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
 </head>
 
 <body>
-  <!-- ^ Всё, что видно на странице. -->
 
-  <header>
-    <!-- ^ Шапка. Одинакова на всех страницах сайта. -->
+  <header class="site-header">
+    <!-- ^ site-header — БЭМ-блок: шапка сайта. Одинакова для всех страниц. -->
 
-    <h1>BookNest</h1>
-    <!-- ^ Единственный h1 на странице. -->
+    <h1 class="site-header__title">BookNest</h1>
+    <!-- ^ site-header__title — элемент блока: название клуба. -->
 
-    <p>Книжный клуб университета</p>
+    <p class="site-header__tagline">Книжный клуб университета</p>
 
-    <nav>
-      <!-- ^ Основное меню. -->
-      <ul>
-        <li><a href="index.html">Каталог</a></li>
-        <li><a href="book.html" aria-current="page">Книга</a></li>
+    <nav class="site-nav">
+      <!-- ^ site-nav — блок: основное меню. -->
+      <ul class="site-nav__list">
+        <li class="site-nav__item"><a class="site-nav__link" href="index.html">Каталог</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="book.html" aria-current="page">Книга</a></li>
         <!-- ^ aria-current="page" — подсказка скринридерам, что это текущая страница. -->
-        <li><a href="loan.html">Выдача</a></li>
-        <li><a href="profile.html">Профиль</a></li>
-        <!-- ^ Пункт «Профиль» добавлен в доп. задании — четвёртый экран. -->
+        <li class="site-nav__item"><a class="site-nav__link" href="loan.html">Выдача</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="profile.html">Профиль</a></li>
       </ul>
     </nav>
   </header>
 
-  <nav aria-label="Хлебные крошки">
-    <!-- ^ Второй nav — для навигации по разделу.
-         aria-label отличает его от главного меню (для скринридеров). -->
-    <ol>
-      <!-- ^ ol — упорядоченный список. Крошки идут по порядку вложенности. -->
-      <li><a href="index.html">Каталог</a></li>
-      <li><a href="index.html">Триллер</a></li>
-      <li aria-current="page">Тайная история</li>
+  <nav class="breadcrumbs" aria-label="Хлебные крошки">
+    <!-- ^ breadcrumbs — блок: навигация по разделу.
+         aria-label отличает её от главного меню (для скринридеров). -->
+    <ol class="breadcrumbs__list">
+      <li class="breadcrumbs__item"><a class="breadcrumbs__link" href="index.html">Каталог</a></li>
+      <li class="breadcrumbs__item"><a class="breadcrumbs__link" href="index.html">Триллер</a></li>
+      <li class="breadcrumbs__item" aria-current="page">Тайная история</li>
       <!-- ^ aria-current="page" — текущая страница, не ссылка. -->
     </ol>
   </nav>
 
-  <main>
-    <!-- ^ Основное содержимое страницы. -->
+  <main class="page">
 
-    <article itemscope itemtype="https://schema.org/Book">
-      <!-- ^ Вся карточка книги — одна самодостаточная единица.
-           ДОП. ЗАДАНИЕ 1: Microdata.
-           itemscope — «внутри этого элемента описан один объект».
-           itemtype="https://schema.org/Book" — тип объекта: книга.
-           Это чистый HTML-атрибут, без <script>, валидатор W3C его принимает. -->
+    <article class="book" itemscope itemtype="https://schema.org/Book">
+      <!-- ^ book — блок: карточка одной книги. itemscope/itemtype — Microdata
+           из ЛР №1, атрибуты для поисковиков, оставлены без изменений. -->
 
-      <header>
-        <!-- ^ Вводная часть: название + обложка. -->
+      <header class="book__header">
+        <!-- ^ book__header — элемент: вводная часть карточки. -->
 
-        <h2 itemprop="name">Тайная история</h2>
-        <!-- ^ h2 — заголовок книги. Вложен в h1 (BookNest) по смыслу.
-             itemprop="name" — связывает этот текст со свойством name объекта Book. -->
+        <h2 class="book__title" itemprop="name">Тайная история</h2>
+        <!-- ^ book__title — элемент, заголовок книги.
+             itemprop="name" — Microdata, оставлен. -->
 
-        <figure>
-          <!-- ^ figure — картинка с подписью, самостоятельная единица. -->
+        <figure class="book__cover">
+          <!-- ^ book__cover — элемент: обложка с подписью. -->
 
           <picture>
-            <!-- ^ ДОП. ЗАДАНИЕ 3: <picture> с srcset.
-                 <picture> — контейнер для нескольких вариантов изображения.
-                 Браузер сам выберет подходящий файл по плотности экрана. -->
-
+            <!-- ^ picture — из ЛР №1, оставлен: три варианта изображения под три плотности. -->
             <source
               srcset="images/cover-1x.jpg 1x,
                       images/cover-2x.jpg 2x,
                       images/cover-3x.jpg 3x"
               type="image/jpeg">
-            <!-- ^ <source> описывает доступные варианты.
-                 srcset — список путей с дескрипторами плотности:
-                   1x — обычный экран,
-                   2x — Retina,
-                   3x — экран с высокой плотностью.
-                 type — MIME-тип файла. -->
-
-            <img itemprop="image"
+            <img class="book__cover-image"
+                 itemprop="image"
                  src="images/cover-1x.jpg"
                  alt="Обложка романа «Тайная история» Донны Тартт"
                  width="300" height="450">
-            <!-- ^ <img> внутри <picture> обязателен — это fallback
-                 для браузеров без поддержки <picture> и место для alt/width/height.
-                 itemprop="image" — связывает картинку со свойством image объекта Book. -->
+            <!-- ^ book__cover-image — класс для самой картинки. -->
           </picture>
 
-          <figcaption>Обложка издания 1992 года</figcaption>
-          <!-- ^ Подпись под картинкой. -->
+          <figcaption class="book__cover-caption">Обложка издания 1992 года</figcaption>
+          <!-- ^ book__cover-caption — подпись под картинкой. -->
         </figure>
       </header>
 
-      <section aria-labelledby="details-heading">
-        <!-- ^ section — логический раздел. aria-labelledby связывает его с заголовком. -->
+      <section class="book__section" aria-labelledby="details-heading">
+        <!-- ^ book__section — общий класс для всех секций карточки,
+             чтобы задать отступы между ними. -->
 
-        <h3 id="details-heading">Характеристики</h3>
-        <!-- ^ id нужен для связи с aria-labelledby на section. -->
+        <h3 class="book__subtitle" id="details-heading">Характеристики</h3>
+        <!-- ^ book__subtitle — подзаголовок внутри карточки. -->
 
-        <dl>
-          <!-- ^ dl — список определений. Для пар "термин → значение".
-               Внутри — Microdata-свойства книги. -->
+        <dl class="specs">
+          <!-- ^ specs — блок: список характеристик. -->
+          <dt class="specs__term">Автор</dt>
+          <dd class="specs__value" itemprop="author">Донна Тартт</dd>
 
-          <dt>Автор</dt>
-          <dd itemprop="author">Донна Тартт</dd>
-          <!-- ^ itemprop="author" — автор книги. -->
-
-          <dt>Жанры</dt>
-          <dd>
+          <dt class="specs__term">Жанры</dt>
+          <dd class="specs__value">
             <a itemprop="genre" href="index.html?genre=triller">триллер</a>,
             <a itemprop="genre" href="index.html?genre=roman">роман</a>
-            <!-- ^ itemprop="genre" можно повторять — машина соберёт массив жанров. -->
           </dd>
 
-          <dt>Год издания</dt>
-          <dd><time itemprop="datePublished" datetime="1992">1992</time></dd>
-          <!-- ^ itemprop="datePublished" — дата первой публикации книги. -->
+          <dt class="specs__term">Год издания</dt>
+          <dd class="specs__value"><time itemprop="datePublished" datetime="1992">1992</time></dd>
 
-          <dt>ISBN</dt>
-          <dd itemprop="isbn">978-5-17-123456-7</dd>
-          <!-- ^ itemprop="isbn" — международный номер книги. -->
+          <dt class="specs__term">ISBN</dt>
+          <dd class="specs__value" itemprop="isbn">978-5-17-123456-7</dd>
 
-          <dt>Страниц</dt>
-          <dd><data itemprop="numberOfPages" value="592">592</data></dd>
-          <!-- ^ itemprop="numberOfPages" — количество страниц.
-               data сохраняет машиночитаемое value="592". -->
+          <dt class="specs__term">Страниц</dt>
+          <dd class="specs__value"><data itemprop="numberOfPages" value="592">592</data></dd>
 
-          <dt>Всего экземпляров</dt>
-          <dd><data value="5">5</data></dd>
-          <!-- ^ Не размечено: в schema.org/Book такого свойства нет,
-               это библиотечный учёт, а не характеристика самой книги. -->
+          <dt class="specs__term">Всего экземпляров</dt>
+          <dd class="specs__value"><data value="5">5</data></dd>
 
-          <dt>Свободно сейчас</dt>
-          <dd><data value="3">3</data></dd>
-          <!-- ^ То же — не часть schema.org/Book. -->
+          <dt class="specs__term">Свободно сейчас</dt>
+          <dd class="specs__value"><data value="3">3</data></dd>
         </dl>
       </section>
 
-      <section aria-labelledby="description-heading">
-        <h3 id="description-heading">Описание</h3>
-        <p itemprop="description">Роман Донны Тартт, опубликованный в 1992 году.
+      <section class="book__section" aria-labelledby="description-heading">
+        <h3 class="book__subtitle" id="description-heading">Описание</h3>
+        <p class="book__text" itemprop="description">Роман Донны Тартт, опубликованный в 1992 году.
         История о группе студентов колледжа, изучающих древнегреческий язык,
         и о том, как их закрытый мир приводит к трагедии. Книга сочетает
         интеллектуальную прозу, психологическую драму и элементы детектива.</p>
-        <!-- ^ itemprop="description" — краткое описание книги для машин. -->
       </section>
 
-      <section aria-labelledby="reviews-heading">
-        <h3 id="reviews-heading">Отзывы читателей</h3>
+      <section class="book__section" aria-labelledby="reviews-heading">
+        <h3 class="book__subtitle" id="reviews-heading">Отзывы читателей</h3>
 
-        <article>
-          <!-- ^ Каждый отзыв — отдельный article. -->
-          <header>
-            <h4>Анна Петрова</h4>
-            <!-- ^ h4 — четвёртый уровень. Вложен в h3 "Отзывы читателей". -->
-            <p><time datetime="2026-09-10">10 сентября 2026</time></p>
+        <article class="review">
+          <!-- ^ review — блок: один отзыв читателя. -->
+          <header class="review__header">
+            <h4 class="review__author">Анна Петрова</h4>
+            <p class="review__date"><time datetime="2026-09-10">10 сентября 2026</time></p>
           </header>
-          <p>Одна из тех книг, после которых долго не можешь начать читать что-то другое.
+          <p class="review__text">Одна из тех книг, после которых долго не можешь начать читать что-то другое.
           Атмосфера колледжа передана идеально.</p>
         </article>
 
-        <article>
-          <header>
-            <h4>Иван Смирнов</h4>
-            <p><time datetime="2026-08-22">22 августа 2026</time></p>
+        <article class="review">
+          <header class="review__header">
+            <h4 class="review__author">Иван Смирнов</h4>
+            <p class="review__date"><time datetime="2026-08-22">22 августа 2026</time></p>
           </header>
-          <p>Первая половина показалась медленной, но вторая всё оправдывает.
+          <p class="review__text">Первая половина показалась медленной, но вторая всё оправдывает.
           Концовка — сильная.</p>
         </article>
       </section>
 
-      <section aria-labelledby="new-review-heading">
-        <h3 id="new-review-heading">Оставить отзыв</h3>
+      <section class="book__section" aria-labelledby="new-review-heading">
+        <h3 class="book__subtitle" id="new-review-heading">Оставить отзыв</h3>
 
-        <form method="post" action="book.html">
-          <!-- ^ Форма отзыва. Отправляется на этот же файл (каркас для будущего). -->
+        <form class="review-form" method="post" action="book.html">
+          <!-- ^ review-form — блок: форма нового отзыва. -->
+          <fieldset class="review-form__group">
+            <legend class="review-form__legend">Ваш отзыв</legend>
 
-          <fieldset>
-            <legend>Ваш отзыв</legend>
+            <label class="review-form__label" for="review-author">Ваше имя</label>
+            <input class="review-form__input" type="text" id="review-author" name="author" required maxlength="100">
 
-            <label for="review-author">Ваше имя</label>
-            <input type="text" id="review-author" name="author" required maxlength="100">
-            <!-- ^ required — браузер не отправит форму без этого поля. -->
+            <label class="review-form__label" for="review-rating">Оценка (1–10)</label>
+            <input class="review-form__input" type="number" id="review-rating" name="rating" min="1" max="10" required>
 
-            <label for="review-rating">Оценка (1–10)</label>
-            <input type="number" id="review-rating" name="rating" min="1" max="10" required>
-            <!-- ^ min/max — ограничения на число. -->
+            <label class="review-form__label" for="review-text">Текст отзыва</label>
+            <textarea class="review-form__textarea" id="review-text" name="text" rows="5" required maxlength="2000"></textarea>
 
-            <label for="review-text">Текст отзыва</label>
-            <textarea id="review-text" name="text" rows="5" required maxlength="2000"></textarea>
-            <!-- ^ textarea — многострочное поле. rows — высота в строках. -->
-
-            <button type="submit">Отправить отзыв</button>
+            <button class="btn" type="submit">Отправить отзыв</button>
+            <!-- ^ btn — общий класс кнопок, как на других страницах. -->
           </fieldset>
         </form>
       </section>
     </article>
 
-    <aside aria-labelledby="similar-heading">
-      <!-- ^ aside — дополнительный контент, не основной. -->
-
-      <h3 id="similar-heading">Похожие книги</h3>
-      <ul>
-        <li><a href="book.html">Девятый дом — Ли Бардуго</a></li>
-        <li><a href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
-        <li><a href="book.html">Институт — Стивен Кинг</a></li>
+    <aside class="related" aria-labelledby="similar-heading">
+      <!-- ^ related — блок: блок похожих книг. -->
+      <h3 class="related__title" id="similar-heading">Похожие книги</h3>
+      <ul class="related__list">
+        <li class="related__item"><a class="related__link" href="book.html">Девятый дом — Ли Бардуго</a></li>
+        <li class="related__item"><a class="related__link" href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
+        <li class="related__item"><a class="related__link" href="book.html">Институт — Стивен Кинг</a></li>
       </ul>
     </aside>
   </main>
 
-  <footer>
-    <p>© 2026 BookNest — книжный клуб университета</p>
-    <address>
-      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
+  <footer class="site-footer">
+    <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
+    <address class="site-footer__contacts">
+      <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
 
