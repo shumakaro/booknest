@@ -1,87 +1,149 @@
 /* ==========================================================================
-   ui/render.js — отрисовка интерфейса.
+   ui/render.js — отрисовка интерфейса и управление состояниями.
 
-   Этот модуль знает о DOM, но НЕ знает о данных и правилах фильтрации.
-   Его задача: получить готовый массив книг и показать его на странице.
-   Всё, что связано с логикой (поиск, фильтр, сортировка), живёт в lib/books.js.
+   Этот модуль знает о DOM, но НЕ знает о сети и логике запросов.
+   Задача: получить готовые данные и показать их, либо показать,
+   что мы в состоянии loading / empty / error.
 
-   ВАЖНО (для защиты): интерфейс — это функция состояния. То есть
-   единственное, что делает этот модуль — берёт текущее состояние
-   и полностью перерисовывает то, что нужно. Никаких «точечных правок» —
-   если что-то поменялось, вызываем render() и он всё перерисовывает заново.
+   ВАЖНО (для защиты): четыре состояния — loading, success, empty, error —
+   взаимоисключающие. На экране всегда видно РОВНО ОДНО. Это требование
+   задания: пользователь никогда не должен видеть «Загрузка…» и «Ошибка»
+   одновременно. Реализуется через единую функцию showState, которая
+   сначала скрывает все блоки, потом показывает нужный.
    ========================================================================== */
 
-// Импортируем словарь жанров из lib/books.js. Нужен, чтобы подписать
-// жанр по-русски в карточке: в данных жанр лежит как "scifi", а показать
-// надо «Фантастика».
-import { GENRE_LABELS } from "../lib/books.js";
+/* ------------------------------------------------------------------
+   Ссылки на блоки состояний в HTML.
+
+   Эти элементы должны быть в index.html. Если какого-то нет —
+   функция showState тихо выйдет и приложение не упадёт.
+   ------------------------------------------------------------------ */
+const stateEls = {
+  loading: document.querySelector("#state-loading"),
+  error:   document.querySelector("#state-error"),
+  empty:   document.querySelector("#state-empty"),
+  success: document.querySelector("#state-success"),
+};
 
 /* ------------------------------------------------------------------
-   renderBooks — отрисовать список карточек в контейнере.
+   Ссылка на контейнер с результатами (список книг).
+   ------------------------------------------------------------------ */
+const resultsEl = document.querySelector("#book-list");
+
+/* ------------------------------------------------------------------
+   Ссылки на элементы пагинации и сообщения об ошибке.
+   ------------------------------------------------------------------ */
+const errorTextEl   = document.querySelector("#state-error-text");
+const prevBtn       = document.querySelector("#pagination-prev");
+const nextBtn       = document.querySelector("#pagination-next");
+const pageInfoEl    = document.querySelector("#pagination-info");
+
+/* ------------------------------------------------------------------
+   showState — показать одно из четырёх состояний и скрыть остальные.
 
    Принимает:
-     container — DOM-элемент, куда вставлять карточки (например, <ul>);
-     books     — массив книг, который нужно показать;
-     wishlist  — Set с id книг, которые пользователь добавил в список желаемого.
+     name  — "loading" | "success" | "empty" | "error";
+     text  — текст для состояния error (или пусто).
 
-   Ничего не возвращает, только меняет содержимое container.
+   Логика:
+     1. Скрываем все блоки состояний через атрибут hidden.
+     2. Показываем нужный блок.
+     3. Если это error — записываем текст.
+
+   ВАЖНО (для защиты): именно здесь выполняется требование
+   «одновременно только одно состояние». Всегда одна точка входа.
    ------------------------------------------------------------------ */
-export function renderBooks(container, books, wishlist) {
-  // Если книг нет — показываем пустое состояние с подсказкой
-  // и выходим из функции. Это требование задания: «корректное пустое
-  // состояние с подсказкой».
+export function showState(name, text = "") {
+  // Шаг 1: скрыть все блоки. Object.values получает массив значений
+  // объекта stateEls, forEach проходит по нему.
+  Object.values(stateEls).forEach((el) => {
+    if (el) el.hidden = true;
+  });
+
+  // Шаг 2: показать нужный. Если элемента нет — тихо выходим,
+  // чтобы приложение не упало в неожиданной ситуации.
+  const target = stateEls[name];
+  if (!target) return;
+  target.hidden = false;
+
+  // Шаг 3: для состояния error подставляем текст ошибки.
+  if (name === "error" && errorTextEl) {
+    errorTextEl.textContent = text;
+  }
+}
+
+/* ------------------------------------------------------------------
+   renderSearchResults — отрисовать карточки найденных книг.
+
+   Принимает:
+     books    — массив из поля docs ответа Open Library;
+     wishlist — Set с id книг в списке желаемого (у нас id = OLID).
+
+   Формат книги из Open Library:
+     {
+       key: "/works/OL27448W",
+       title: "The Lord of the Rings",
+       author_name: ["Tolkien"],
+       first_publish_year: 1954,
+       cover_i: 12345,
+       edition_count: 42,
+       language: ["eng"]
+     }
+
+   Обрати внимание: author_name — массив, а не строка. Может быть пустым.
+   Это надо учесть при выводе, иначе на экране появится "undefined".
+   ------------------------------------------------------------------ */
+export function renderSearchResults(books, wishlist) {
+  if (!resultsEl) return;
+
+  // Если книг нет — эту ситуацию обрабатывает showState("empty"),
+  // поэтому здесь мы её не дублируем.
   if (books.length === 0) {
-    container.innerHTML = ""; // очищаем контейнер
-    const empty = document.createElement("p");
-    empty.className = "catalog__empty";
-    empty.textContent = "Ничего не найдено. Попробуйте изменить фильтры.";
-    container.appendChild(empty);
+    resultsEl.innerHTML = "";
     return;
   }
 
-  // Собираем карточки в массив строк. Используем map, чтобы не писать
-  // цикл for вручную. Потом склеим через join("") и один раз вставим
-  // в container — это быстрее и безопаснее, чем innerHTML += в цикле.
+  // Собираем карточки через map. Все данные берём из ответа API,
+  // пользовательских данных тут нет, поэтому innerHTML безопасен.
   const html = books
     .map((book) => {
+      // Вырезаем OLID из ключа "/works/OL27448W" → "OL27448W".
+      // Это нужно для ссылки на страницу деталей и для wishlist.
+      const olid = book.key.replace("/works/", "");
+
+      // Автор может быть массивом, может отсутствовать, может быть пустым.
+      // Здесь — защита от всех трёх случаев.
+      const author = Array.isArray(book.author_name) && book.author_name.length > 0
+        ? book.author_name[0]
+        : "Автор неизвестен";
+
+      // Год публикации — тоже может быть пустым.
+      const year = book.first_publish_year ? book.first_publish_year : "—";
+
+      // Обложка. У Open Library формат URL для обложек такой:
+      // https://covers.openlibrary.org/b/id/{id}-M.jpg
+      // M — размер Medium. Если cover_i нет, ставим заглушку.
+      const coverUrl = book.cover_i
+        ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+        : "";
+
       // Проверяем, в списке желаемого ли эта книга.
-      // wishlist — это Set, у него есть метод has(id).
-      const inWishlist = wishlist.has(book.id);
-
-      // Класс для метки «доступно / нет экземпляров».
-      const availabilityClass = book.available
-        ? "book-card__available book-card__available--yes"
-        : "book-card__available book-card__available--no";
-
-      // Текст метки доступности.
-      const availabilityText = book.available
-        ? "Доступно"
-        : "Нет свободных экземпляров";
-
-      // Текст и aria-pressed для кнопки «Хочу прочитать».
-      // aria-pressed — атрибут доступности, он говорит скринридеру,
-      // что кнопка сейчас нажата.
+      const inWishlist = wishlist.has(olid);
       const buttonText = inWishlist ? "В списке" : "Хочу прочитать";
       const pressed = inWishlist ? "true" : "false";
 
-      // Формируем разметку карточки. Здесь вставляем только те данные,
-      // которые не приходят от пользователя: id, год, рейтинг, жанр.
-      // Название и автор тоже наши — они из data/books.js, пользователь
-      // их не редактирует. Всё это безопасно для innerHTML.
-      // Если бы мы вставляли поисковый запрос пользователя, то обязаны
-      // были бы использовать textContent, иначе можно получить XSS-атаку.
       return `
-        <li class="book-card" data-id="${book.id}">
+        <li class="book-card" data-olid="${olid}">
+          ${coverUrl ? `<img class="book-card__cover" src="${coverUrl}" alt="Обложка ${book.title}" width="120" height="180">` : ""}
           <h3 class="book-card__title">${book.title}</h3>
-          <p class="book-card__meta">Автор: ${book.author}</p>
-          <p class="book-card__meta">Жанр: ${GENRE_LABELS[book.genre] ?? book.genre}</p>
-          <p class="book-card__meta">Год: ${book.year}</p>
-          <p class="book-card__meta">Рейтинг: ${book.rating.toFixed(1)}</p>
-          <p class="${availabilityClass}">${availabilityText}</p>
+          <p class="book-card__meta">Автор: ${author}</p>
+          <p class="book-card__meta">Год: ${year}</p>
+          <p class="book-card__meta">Изданий: ${book.edition_count ?? "—"}</p>
+          <a class="book-card__details" href="book.html?id=${olid}">Подробнее</a>
           <button
             type="button"
             class="book-card__wish js-wish"
-            data-id="${book.id}"
+            data-olid="${olid}"
             aria-pressed="${pressed}"
           >${buttonText}</button>
         </li>
@@ -89,113 +151,59 @@ export function renderBooks(container, books, wishlist) {
     })
     .join("");
 
-  // Один раз вставляем все карточки. innerHTML полностью перезаписывает
-  // содержимое контейнера — это то, что нам нужно, потому что при
-  // каждом изменении состояния мы перерисовываем список с нуля.
-  container.innerHTML = html;
+  resultsEl.innerHTML = html;
 }
 
 /* ------------------------------------------------------------------
-   renderCounter — обновить счётчик найденных книг.
+   renderPagination — обновить состояние кнопок пагинации.
 
    Принимает:
-     element — DOM-элемент, куда писать текст (например, <p> или <span>);
-     count   — число найденных книг.
+     currentPage — текущая страница (1-based);
+     totalPages  — всего страниц (может быть null, если неизвестно).
+
+   Логика:
+     - на первой странице кнопка «Назад» заблокирована;
+     - на последней — «Вперёд»;
+     - если totalPages неизвестно — блокируем только по границам.
    ------------------------------------------------------------------ */
-export function renderCounter(element, count) {
-  // Формируем текст со склонением: 1 книга, 2 книги, 5 книг.
-  // Это мелочь, но выглядит аккуратно.
-  const word = pluralize(count, "книга", "книги", "книг");
-  element.textContent = `Найдено: ${count} ${word}`;
+export function renderPagination(currentPage, totalPages) {
+  if (pageInfoEl) {
+    pageInfoEl.textContent = `Страница ${currentPage}${totalPages ? ` из ${totalPages}` : ""}`;
+  }
+
+  if (prevBtn) {
+    // disabled у кнопки — стандартное свойство. Если true, кнопка
+    // становится неактивной, пользователь не может кликнуть.
+    prevBtn.disabled = currentPage <= 1;
+  }
+
+  if (nextBtn) {
+    // Если totalPages неизвестно (null) — считаем, что не последняя.
+    // Клик сделает запрос, и если книг нет, сервер сам вернёт пусто.
+    nextBtn.disabled = totalPages !== null && currentPage >= totalPages;
+  }
 }
 
 /* ------------------------------------------------------------------
-   renderWishlistCount — обновить счётчик в шапке («Мой список: N»).
+   renderWishlistCount — счётчик в шапке («Мой список: N»).
 
-   Принимает:
-     element — DOM-элемент счётчика в шапке;
-     count   — сколько книг в списке желаемого.
+   Оставили из ЛР №3, функция работает как раньше.
    ------------------------------------------------------------------ */
 export function renderWishlistCount(element, count) {
-  // Если элемента нет на странице — ничего не делаем.
-  // Так функция безопасна для любой страницы: например, profile.html
-  // может не содержать счётчик в шапке.
   if (!element) return;
   element.textContent = `Мой список: ${count}`;
 }
 
 /* ------------------------------------------------------------------
-   renderWishlistPage — отрисовать полный список желаемого на странице профиля.
+   pluralize — склонение слова «книга» по числам.
 
-   Принимает:
-     container — DOM-элемент, куда вставлять карточки (наш #wishlist-list);
-     books     — массив ВСЕХ книг (нам нужны данные: название, автор);
-     wishlist  — Set с id книг в списке желаемого.
-
-   Используется на profile.html: показывает не только те книги,
-   что пользователь отметил, но и даёт кнопку «Удалить» рядом с каждой.
-
-   ВАЖНО: если список пуст, показываем подсказку «вы ещё ничего
-   не добавили». Это то же пустое состояние, что и в каталоге,
-   только с другим текстом.
+   Вспомогательная функция, оставили из ЛР №3.
    ------------------------------------------------------------------ */
-export function renderWishlistPage(container, books, wishlist) {
-  // Оставляем только те книги, id которых есть в списке желаемого.
-  // filter не мутирует исходный массив books.
-  const wishlistBooks = books.filter((book) => wishlist.has(book.id));
-
-  // Пустое состояние.
-  if (wishlistBooks.length === 0) {
-    container.innerHTML = "";
-    const empty = document.createElement("p");
-    empty.className = "wishlist__empty";
-    empty.textContent = "В вашем списке пока нет книг. Добавьте их из каталога.";
-    container.appendChild(empty);
-    return;
-  }
-
-  // Собираем разметку для каждой книги.
-  // Кнопка «Удалить» получает тот же класс js-wish, что и в каталоге,
-  // чтобы обрабатывать клики через тот же делегированный обработчик
-  // в main.js.
-  const html = wishlistBooks
-    .map((book) => `
-      <li class="wishlist__item" data-id="${book.id}">
-        <div class="wishlist__info">
-          <h3 class="wishlist__title">${book.title}</h3>
-          <p class="wishlist__meta">Автор: ${book.author}</p>
-          <p class="wishlist__meta">Год: ${book.year}</p>
-        </div>
-        <button
-          type="button"
-          class="btn btn--ghost js-wish"
-          data-id="${book.id}"
-          aria-label="Удалить книгу ${book.title} из списка"
-        >Удалить</button>
-      </li>
-    `)
-    .join("");
-
-  container.innerHTML = html;
-}
-
-/* ------------------------------------------------------------------
-   pluralize — вспомогательная функция для правильной формы слова.
-
-   Русский язык — сложный для склонений. Здесь простое правило:
-   числа, оканчивающиеся на 1 (кроме 11) — первая форма;
-   оканчивающиеся на 2, 3, 4 (кроме 12, 13, 14) — вторая;
-   остальные — третья.
-   ------------------------------------------------------------------ */
-function pluralize(n, one, few, many) {
+export function pluralize(n, one, few, many) {
   const mod10 = n % 10;
   const mod100 = n % 100;
 
-  if (mod10 === 1 && mod100 !== 11) {
-    return one;
-  }
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
-    return few;
-  }
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
   return many;
 }
