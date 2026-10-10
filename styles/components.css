@@ -498,3 +498,91 @@ input[type="checkbox"] {
 .site-header__file {
   display: none;
 }
+
+/* ==========================================================================
+   ЛР №4: стили для состояний интерфейса и пагинации.
+
+   Что здесь:
+     - .state — общий контейнер для loading / empty / error;
+     - .state--error — модификатор для состояния ошибки;
+     - .state__text — текст внутри состояния;
+     - .pagination — блок с кнопками «Назад / Вперёд»;
+     - .pagination__info — счётчик «Страница N из M».
+
+   Блок .state мы показываем/скрываем через атрибут hidden (main.js
+   вызывает showState). Стили только оформляют его, когда он виден.
+   ========================================================================== */
+
+/* Общий вид блока состояния. */
+.state {
+  padding: var(--sp-4);
+  margin-block: var(--sp-4);
+  background-color: var(--surface-2);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--text-base);
+}
+
+/* Модификатор состояния ошибки — красная рамка. */
+.state--error {
+  border: var(--border-width) solid var(--danger);
+  color: var(--danger);
+}
+
+/* Текст внутри состояния. */
+.state__text {
+  margin: 0;
+}
+
+/* Кнопка «Повторить» внутри ошибки — отступ сверху. */
+.state--error .btn {
+  margin-top: var(--sp-3);
+}
+
+/* Блок пагинации. Flex-строка с кнопками по краям
+   и счётчиком по центру. */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--sp-4);
+}
+
+/* Счётчик страниц. */
+.pagination__info {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Заблокированная кнопка пагинации — визуально приглушена.
+   disabled уже ставит браузер, но нам надо подсветить, что она
+   действительно неактивна. */
+.pagination .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Обложки карточек. Добавлены из-за того, что теперь у книг
+   есть картинки из Open Library. Раньше карточек с картинками не было. */
+.book-card__cover {
+  display: block;
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: var(--sp-2);
+}
+
+/* Ссылка «Подробнее» внутри карточки. */
+.book-card__details {
+  display: inline-block;
+  margin-top: var(--sp-1);
+  margin-bottom: var(--sp-2);
+  color: var(--accent);
+  font-size: var(--text-sm);
+}

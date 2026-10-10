@@ -24,7 +24,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- ^ Адаптивность. Требование задания — ставить на каждой странице. -->
 
-  <title>Тайная история — BookNest</title>
+  <title>Книга — BookNest</title>
   <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
 
   <link rel="stylesheet" href="styles/tokens.css">
@@ -55,152 +55,28 @@
     </nav>
   </header>
 
-  <nav class="breadcrumbs" aria-label="Хлебные крошки">
-    <!-- ^ breadcrumbs — блок: навигация по разделу.
-         aria-label отличает её от главного меню (для скринридеров). -->
-    <ol class="breadcrumbs__list">
-      <li class="breadcrumbs__item"><a class="breadcrumbs__link" href="index.html">Каталог</a></li>
-      <li class="breadcrumbs__item"><a class="breadcrumbs__link" href="index.html">Триллер</a></li>
-      <li class="breadcrumbs__item" aria-current="page">Тайная история</li>
-      <!-- ^ aria-current="page" — текущая страница, не ссылка. -->
-    </ol>
-  </nav>
-
   <main class="page">
 
-    <article class="book" itemscope itemtype="https://schema.org/Book">
-      <!-- ^ book — блок: карточка одной книги. itemscope/itemtype — Microdata
-           из ЛР №1, атрибуты для поисковиков, оставлены без изменений. -->
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+      <ol class="breadcrumbs__list">
+        <li class="breadcrumbs__item"><a class="breadcrumbs__link" href="index.html">Каталог</a></li>
+        <li class="breadcrumbs__item" aria-current="page">Книга</li>
+      </ol>
+    </nav>
 
-      <header class="book__header">
-        <!-- ^ book__header — элемент: вводная часть карточки. -->
+    <div class="state" id="details-loading" hidden>
+      <p class="state__text">Загрузка…</p>
+    </div>
 
-        <h2 class="book__title" itemprop="name">Тайная история</h2>
-        <!-- ^ book__title — элемент, заголовок книги.
-             itemprop="name" — Microdata, оставлен. -->
+    <div class="state state--error" id="details-error" hidden>
+      <p class="state__text" id="details-error-text"></p>
+      <button class="btn btn--ghost" type="button" id="details-error-retry">Повторить</button>
+    </div>
 
-        <figure class="book__cover">
-          <!-- ^ book__cover — элемент: обложка с подписью. -->
-
-          <picture>
-            <!-- ^ picture — из ЛР №1, оставлен: три варианта изображения под три плотности. -->
-            <source
-              srcset="images/cover-1x.jpg 1x,
-                      images/cover-2x.jpg 2x,
-                      images/cover-3x.jpg 3x"
-              type="image/jpeg">
-            <img class="book__cover-image"
-                 itemprop="image"
-                 src="images/cover-1x.jpg"
-                 alt="Обложка романа «Тайная история» Донны Тартт"
-                 width="300" height="450">
-            <!-- ^ book__cover-image — класс для самой картинки. -->
-          </picture>
-
-          <figcaption class="book__cover-caption">Обложка издания 1992 года</figcaption>
-          <!-- ^ book__cover-caption — подпись под картинкой. -->
-        </figure>
-      </header>
-
-      <section class="book__section" aria-labelledby="details-heading">
-        <!-- ^ book__section — общий класс для всех секций карточки,
-             чтобы задать отступы между ними. -->
-
-        <h3 class="book__subtitle" id="details-heading">Характеристики</h3>
-        <!-- ^ book__subtitle — подзаголовок внутри карточки. -->
-
-        <dl class="specs">
-          <!-- ^ specs — блок: список характеристик. -->
-          <dt class="specs__term">Автор</dt>
-          <dd class="specs__value" itemprop="author">Донна Тартт</dd>
-
-          <dt class="specs__term">Жанры</dt>
-          <dd class="specs__value">
-            <a itemprop="genre" href="index.html?genre=triller">триллер</a>,
-            <a itemprop="genre" href="index.html?genre=roman">роман</a>
-          </dd>
-
-          <dt class="specs__term">Год издания</dt>
-          <dd class="specs__value"><time itemprop="datePublished" datetime="1992">1992</time></dd>
-
-          <dt class="specs__term">ISBN</dt>
-          <dd class="specs__value" itemprop="isbn">978-5-17-123456-7</dd>
-
-          <dt class="specs__term">Страниц</dt>
-          <dd class="specs__value"><data itemprop="numberOfPages" value="592">592</data></dd>
-
-          <dt class="specs__term">Всего экземпляров</dt>
-          <dd class="specs__value"><data value="5">5</data></dd>
-
-          <dt class="specs__term">Свободно сейчас</dt>
-          <dd class="specs__value"><data value="3">3</data></dd>
-        </dl>
-      </section>
-
-      <section class="book__section" aria-labelledby="description-heading">
-        <h3 class="book__subtitle" id="description-heading">Описание</h3>
-        <p class="book__text" itemprop="description">Роман Донны Тартт, опубликованный в 1992 году.
-        История о группе студентов колледжа, изучающих древнегреческий язык,
-        и о том, как их закрытый мир приводит к трагедии. Книга сочетает
-        интеллектуальную прозу, психологическую драму и элементы детектива.</p>
-      </section>
-
-      <section class="book__section" aria-labelledby="reviews-heading">
-        <h3 class="book__subtitle" id="reviews-heading">Отзывы читателей</h3>
-
-        <article class="review">
-          <!-- ^ review — блок: один отзыв читателя. -->
-          <header class="review__header">
-            <h4 class="review__author">Анна Петрова</h4>
-            <p class="review__date"><time datetime="2026-09-10">10 сентября 2026</time></p>
-          </header>
-          <p class="review__text">Одна из тех книг, после которых долго не можешь начать читать что-то другое.
-          Атмосфера колледжа передана идеально.</p>
-        </article>
-
-        <article class="review">
-          <header class="review__header">
-            <h4 class="review__author">Иван Смирнов</h4>
-            <p class="review__date"><time datetime="2026-08-22">22 августа 2026</time></p>
-          </header>
-          <p class="review__text">Первая половина показалась медленной, но вторая всё оправдывает.
-          Концовка — сильная.</p>
-        </article>
-      </section>
-
-      <section class="book__section" aria-labelledby="new-review-heading">
-        <h3 class="book__subtitle" id="new-review-heading">Оставить отзыв</h3>
-
-        <form class="review-form" method="post" action="book.html">
-          <!-- ^ review-form — блок: форма нового отзыва. -->
-          <fieldset class="review-form__group">
-            <legend class="review-form__legend">Ваш отзыв</legend>
-
-            <label class="review-form__label" for="review-author">Ваше имя</label>
-            <input class="review-form__input" type="text" id="review-author" name="author" required maxlength="100">
-
-            <label class="review-form__label" for="review-rating">Оценка (1–10)</label>
-            <input class="review-form__input" type="number" id="review-rating" name="rating" min="1" max="10" required>
-
-            <label class="review-form__label" for="review-text">Текст отзыва</label>
-            <textarea class="review-form__textarea" id="review-text" name="text" rows="5" required maxlength="2000"></textarea>
-
-            <button class="btn" type="submit">Отправить отзыв</button>
-            <!-- ^ btn — общий класс кнопок, как на других страницах. -->
-          </fieldset>
-        </form>
-      </section>
+    <article class="book" id="details-content" hidden>
+      <!-- Данные заполнит js/pages/book.js -->
     </article>
 
-    <aside class="related" aria-labelledby="similar-heading">
-      <!-- ^ related — блок: блок похожих книг. -->
-      <h3 class="related__title" id="similar-heading">Похожие книги</h3>
-      <ul class="related__list">
-        <li class="related__item"><a class="related__link" href="book.html">Девятый дом — Ли Бардуго</a></li>
-        <li class="related__item"><a class="related__link" href="book.html">Безмолвный пациент — Алекс Михаэлидес</a></li>
-        <li class="related__item"><a class="related__link" href="book.html">Институт — Стивен Кинг</a></li>
-      </ul>
-    </aside>
   </main>
 
   <footer class="site-footer">
@@ -209,6 +85,8 @@
       <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
+    <script type="module" src="js/main.js"></script>
+   <script type="module" src="js/pages/book.js"></script>
 
 </body>
 </html>
