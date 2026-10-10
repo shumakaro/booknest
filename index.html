@@ -2,27 +2,29 @@
 <!-- ^ Объявление HTML5. Первая строка файла. -->
 
 <!-- ==========================================================================
-     ЛР №3 — JavaScript-приложение: каталог с фильтрами.
+     ЛР №4 — интеграция с внешним REST API (Open Library).
 
-     Что изменилось по сравнению с ЛР №2 (структура HTML впервые меняется,
-     это разрешено заданием третьей лабы):
+     Что изменилось по сравнению с ЛР №3:
 
-     1. Секция каталога: шесть статичных <article> удалены. Вместо них
-        пустой <ul id="book-list">, который наполняет JavaScript из модуля
-        js/ui/render.js.
+     1. Убрана форма фильтров (жанр, сортировка, чекбокс «только доступные»).
+        В ЛР №4 данные приходят из Open Library, и фильтры по жанру/доступности
+        там не поддерживаются так, как у нас было на локальных данных.
+        Задача теперь — поиск с debounce и пагинация.
 
-     2. Форма фильтров: получила id="filters". Полям добавлены id (search,
-        genre, sort, available), чтобы JavaScript мог их найти и слушать
-        изменения. Появилась кнопка сброса id="reset".
+     2. Добавлены четыре блока состояний интерфейса:
+          #state-loading — показывается во время запроса;
+          #state-empty   — показывается, когда ничего не найдено;
+          #state-error   — показывается при ошибке (с текстом и кнопкой «Повторить»);
+          #state-success — обёртка вокруг списка результатов.
 
-     3. Шапка: добавлен счётчик «Мой список: N» (id="wishlist-count"),
-        кнопки «Экспорт» (id="export") и «Импорт» (id="import").
+        ВАЖНО: одновременно видно ровно одно из этих состояний.
+        Управляет этим функция showState из js/ui/render.js.
 
-     4. В конце body подключён модуль main.js через
-        <script type="module" src="js/main.js"></script>.
+     3. Добавлена пагинация под списком: кнопки «Назад» / «Вперёд»
+        и счётчик страниц.
 
-     Стили, классы БЭМ, тёмная тема, адаптивность — всё осталось из ЛР №2.
-     Добавились только новые элементы под JavaScript.
+     4. Список желаемого из localStorage остаётся, но теперь хранит
+        не числовые id, а строковые OLID из Open Library.
      ========================================================================== -->
 
 <html lang="ru">
@@ -47,7 +49,7 @@
 <body>
 
   <header class="site-header">
-    <!-- ^ site-header — БЭМ-блок: шапка сайта. -->
+    <!-- ^ Шапка сайта с навигацией и счётчиком списка желаемого. -->
 
     <h1 class="site-header__title">BookNest</h1>
     <p class="site-header__tagline">Книжный клуб университета</p>
@@ -62,23 +64,15 @@
     </nav>
 
     <div class="site-header__actions">
-      <!-- ^ site-header__actions — блок управления в шапке.
-           Добавлен в ЛР №3 под JavaScript-приложение. -->
-
       <span class="site-header__wishlist" id="wishlist-count">Мой список: 0</span>
-      <!-- ^ Счётчик книг в списке желаемого. Обновляет renderWishlistCount
-           из ui/render.js. id="wishlist-count" — на него ссылается main.js. -->
+      <!-- ^ Счётчик книг в списке желаемого. Обновляет main.js. -->
 
       <button class="btn btn--ghost" type="button" id="export">Экспорт</button>
       <!-- ^ Кнопка экспорта списка желаемого в JSON (доп. задание). -->
 
       <label class="btn btn--ghost" for="import">
-        <!-- ^ Кнопка импорта — это label для скрытого input[type=file].
-             Так выглядит как кнопка, а внутри работает нативный file input. -->
         Импорт
         <input class="site-header__file" type="file" id="import" accept=".json,application/json" hidden>
-        <!-- ^ Скрытый input для выбора JSON-файла. hidden — чтобы не показывать
-             стандартный браузерный вид, а стилизовать через label. -->
       </label>
     </div>
   </header>
@@ -88,66 +82,74 @@
     <h2 class="page__title">Каталог книг</h2>
 
     <form class="filter" id="filters" role="search">
-      <!-- ^ Форма фильтров. id="filters" — на него вешает слушатель main.js.
-           role="search" — подсказка для скринридеров.
-           Атрибуты action и method убраны: форма теперь чисто клиентская,
-           она не отправляется на сервер, поэтому preventDefault не нужен,
-           но мы всё равно его делаем на всякий случай. -->
-
+      <!-- ^ Форма поиска. Оставлен только один input — текстовый запрос.
+           Фильтр по жанру и чекбокс «только доступные» убраны:
+           в Open Library нет простого способа фильтровать по ним,
+           а задание ЛР №4 этого и не требует. -->
       <fieldset class="filter__group">
-        <legend class="filter__legend">Фильтры</legend>
+        <legend class="filter__legend">Поиск книг</legend>
 
-        <label class="filter__label" for="search">Поиск по названию или автору</label>
-        <input class="filter__input" type="search" id="search" placeholder="Например, Тартт" value="">
+        <label class="filter__label" for="search">Введите название или автора (минимум 3 символа)</label>
+        <input
+          class="filter__input"
+          type="search"
+          id="search"
+          placeholder="Например, Tolkien"
+          autocomplete="off"
+        >
         <!-- ^ Поле поиска. id="search" — на него ссылается main.js.
-             value="" — пустое по умолчанию, восстановится из localStorage. -->
-
-        <label class="filter__label" for="genre">Жанр</label>
-        <select class="filter__select" id="genre">
-          <!-- ^ Выпадающий список жанров. Значения value — на английском
-               (совпадают с полем genre в data/books.js). Подписи — на русском. -->
-          <option value="all">Все жанры</option>
-          <option value="roman">Роман</option>
-          <option value="scifi">Фантастика</option>
-          <option value="detective">Детектив</option>
-          <option value="fantasy">Фэнтези</option>
-          <option value="nonfiction">Нон-фикшн</option>
-        </select>
-
-        <label class="filter__label" for="sort">Сортировка</label>
-        <select class="filter__select" id="sort">
-          <option value="title">По названию (А–Я)</option>
-          <option value="year">По году (новые сначала)</option>
-          <option value="rating">По рейтингу</option>
-        </select>
-
-        <input class="filter__checkbox" type="checkbox" id="available">
-        <!-- ^ Чекбокс «только доступные». id="available" — на него смотрит main.js.
-             Атрибут name убран: форма не отправляется на сервер, name не нужен. -->
-
-        <label class="filter__label filter__label--checkbox" for="available">Только доступные</label>
-
-        <button class="btn" type="submit">Применить фильтры</button>
-        <!-- ^ Кнопка оставлена для полноты формы, но фактически фильтрация
-             происходит мгновенно при вводе. Кнопка нужна как страховка
-             для пользователей, которые ожидают submit. -->
-
-        <button class="btn btn--ghost" type="button" id="reset">Сбросить</button>
-        <!-- ^ Кнопка сброса фильтров (доп. функционал из требований).
-             type="button" — важно, иначе она попытается отправить форму. -->
+             autocomplete="off" — чтобы браузер не подставлял прошлые запросы
+             в выпадающем списке, это мешает при демонстрации. -->
       </fieldset>
     </form>
 
-    <p class="catalog__counter" id="counter">Найдено: 0 книг</p>
-    <!-- ^ Счётчик найденных книг. Обновляет renderCounter из ui/render.js. -->
+    <p class="catalog__counter" id="counter"></p>
+    <!-- ^ Счётчик найденных книг. Обновляет main.js после успешного запроса. -->
 
-    <section class="catalog">
+    <!-- ================================================================
+         ЧЕТЫРЕ СОСТОЯНИЯ ИНТЕРФЕЙСА.
+
+         Каждый блок скрыт по умолчанию (атрибут hidden). В нужный момент
+         main.js вызывает showState("loading"), showState("success") и т. д.,
+         которая скрывает все блоки и показывает только один.
+         ================================================================ -->
+
+    <div class="state" id="state-loading" hidden>
+      <!-- ^ Состояние loading. Показывается, пока идёт запрос к API. -->
+      <p class="state__text">Загрузка…</p>
+    </div>
+
+    <div class="state" id="state-empty" hidden>
+      <!-- ^ Состояние empty. Показывается, когда запрос успешен,
+           но результатов нет, либо запрос короче 3 символов. -->
+      <p class="state__text">Ничего не найдено. Введите минимум 3 символа и попробуйте другой запрос.</p>
+    </div>
+
+    <div class="state state--error" id="state-error" hidden>
+      <!-- ^ Состояние error. Показывается при сетевой ошибке или HTTP-ошибке.
+           Текст разный для разных случаев (см. humanizeError в main.js). -->
+      <p class="state__text" id="state-error-text"></p>
+      <button class="btn btn--ghost" type="button" id="state-error-retry">Повторить</button>
+      <!-- ^ Кнопка «Повторить» — перезапускает последний запрос.
+           Это требование задания: в состоянии ошибки пользователь
+           должен иметь возможность повторить. -->
+    </div>
+
+    <section class="catalog" id="state-success" hidden>
+      <!-- ^ Состояние success. Показывается, когда данные успешно загружены.
+           Обёртка вокруг списка: одна команда скрывает/показывает весь
+           результат вместе с пагинацией. -->
       <ul class="catalog__list" id="book-list">
-        <!-- ^ Пустой контейнер для карточек. Заполняет JavaScript.
-             Раньше здесь были шесть статичных <article> из ЛР №1 и №2,
-             теперь их создаёт renderBooks из ui/render.js по данным
-             из data/books.js. Каждая книга превращается в <li class="book-card">. -->
+        <!-- ^ Контейнер для карточек. Наполняет renderSearchResults
+             из js/ui/render.js. Каждая книга превращается в <li class="book-card">. -->
       </ul>
+
+      <div class="pagination">
+        <!-- ^ Пагинация по 20 записей. Кнопки блокируются на границах. -->
+        <button class="btn btn--ghost" type="button" id="pagination-prev">← Назад</button>
+        <span class="pagination__info" id="pagination-info"></span>
+        <button class="btn btn--ghost" type="button" id="pagination-next">Вперёд →</button>
+      </div>
     </section>
 
   </main>
@@ -160,10 +162,10 @@
   </footer>
 
   <script type="module" src="js/main.js"></script>
-  <!-- ^ Подключение главного модуля. type="module" обязателен для ESM:
-       только с ним работают import/export. Скрипт в конце body — чтобы
-       DOM был построен к моменту его выполнения. Если бы поставили
-       в head, document.querySelector вернул бы null. -->
+  <!-- ^ Подключение главного модуля. type="module" обязателен для ESM.
+       Скрипт в конце body — чтобы DOM был построен к моменту
+       его выполнения. Если бы поставили в head, document.querySelector
+       вернул бы null. -->
 
 </body>
 </html>

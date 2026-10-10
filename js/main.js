@@ -21,7 +21,8 @@
 
 // Импортируем функции запросов из слоя API.
 // Обрати внимание: fetch здесь НЕ вызывается — только наши обёртки.
-import { searchBooks, ApiError } from "./api/books.js";
+import { searchBooks } from "../api/books.js";
+import { ApiError } from "../api/client.js";
 import { debounce } from "./lib/debounce.js";
 
 import {
