@@ -1,230 +1,171 @@
 <!DOCTYPE html>
-<!-- ^ Говорит браузеру: "это HTML5". Должно быть первой строкой, без пробелов выше. -->
+<!-- ^ Объявление HTML5. Первая строка файла. -->
+
+<!-- ==========================================================================
+     ЛР №4 — интеграция с внешним REST API (Open Library).
+
+     Что изменилось по сравнению с ЛР №3:
+
+     1. Убрана форма фильтров (жанр, сортировка, чекбокс «только доступные»).
+        В ЛР №4 данные приходят из Open Library, и фильтры по жанру/доступности
+        там не поддерживаются так, как у нас было на локальных данных.
+        Задача теперь — поиск с debounce и пагинация.
+
+     2. Добавлены четыре блока состояний интерфейса:
+          #state-loading — показывается во время запроса;
+          #state-empty   — показывается, когда ничего не найдено;
+          #state-error   — показывается при ошибке (с текстом и кнопкой «Повторить»);
+          #state-success — обёртка вокруг списка результатов.
+
+        ВАЖНО: одновременно видно ровно одно из этих состояний.
+        Управляет этим функция showState из js/ui/render.js.
+
+     3. Добавлена пагинация под списком: кнопки «Назад» / «Вперёд»
+        и счётчик страниц.
+
+     4. Список желаемого из localStorage остаётся, но теперь хранит
+        не числовые id, а строковые OLID из Open Library.
+     ========================================================================== -->
 
 <html lang="ru">
-<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский.
-     Это важно для скринридеров и поисковиков. -->
+<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
 
 <head>
-  <!-- ^ "Голова" документа. Здесь метаданные — они не видны на странице, но нужны браузеру. -->
-
   <meta charset="UTF-8">
-  <!-- ^ Кодировка. UTF-8 — универсальная, поддерживает кириллицу и все символы.
-       Без неё русский текст может отобразиться "кракозябрами". -->
+  <!-- ^ Кодировка UTF-8. Универсальная, поддерживает кириллицу. -->
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- ^ Сообщает браузеру: страница адаптивна, ширина = ширина экрана устройства.
-       Без этого на телефонах страница открывается уменьшенной.
-       В ЛР №1 визуально не влияет, но требование задания — ставить всегда. -->
+  <!-- ^ Адаптивность. Требование задания — ставить на каждой странице. -->
 
   <title>Каталог книг — BookNest</title>
-  <!-- ^ Заголовок вкладки браузера. Уникален для каждой страницы.
-       Именно его видит пользователь в списке вкладок. -->
+  <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
 </head>
 
 <body>
-  <!-- ^ "Тело" документа. Всё, что видно на странице, находится здесь. -->
 
-  <header>
-    <!-- ^ Шапка страницы. Обычно: логотип, название, навигация.
-         Семантически говорит: "это вводная часть страницы". -->
+  <header class="site-header">
+    <!-- ^ Шапка сайта с навигацией и счётчиком списка желаемого. -->
 
-    <h1>BookNest</h1>
-    <!-- ^ h1 — главный заголовок страницы. Должен быть ОДИН на весь документ.
-         Здесь это название клуба. -->
+    <h1 class="site-header__title">BookNest</h1>
+    <p class="site-header__tagline">Книжный клуб университета</p>
 
-    <p>Книжный клуб университета</p>
-    <!-- ^ p — абзац текста. Короткое описание под логотипом. -->
-
-    <nav>
-      <!-- ^ nav — навигационный блок. Основное меню сайта.
-           Не все ссылки надо пихать в nav — только основные. -->
-
-      <ul>
-        <!-- ^ ul — неупорядоченный список. Здесь — список пунктов меню. -->
-
-        <li><a href="index.html" aria-current="page">Каталог</a></li>
-        <!-- ^ li — элемент списка. a — ссылка. href — куда ведёт. -->
-
-        <li><a href="book.html">Книга</a></li>
-        <li><a href="loan.html">Выдача</a></li>
-        <li><a href="profile.html">Профиль</a></li>
+    <nav class="site-nav">
+      <ul class="site-nav__list">
+        <li class="site-nav__item"><a class="site-nav__link" href="index.html" aria-current="page">Каталог</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="loan.html">Выдача</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="profile.html">Профиль</a></li>
       </ul>
     </nav>
+
+    <div class="site-header__actions">
+      <span class="site-header__wishlist" id="wishlist-count">Мой список: 0</span>
+      <!-- ^ Счётчик книг в списке желаемого. Обновляет main.js. -->
+
+      <button class="btn btn--ghost" type="button" id="export">Экспорт</button>
+      <!-- ^ Кнопка экспорта списка желаемого в JSON (доп. задание). -->
+
+      <label class="btn btn--ghost" for="import">
+        Импорт
+        <input class="site-header__file" type="file" id="import" accept=".json,application/json" hidden>
+      </label>
+    </div>
   </header>
 
-  <main>
-    <!-- ^ main — основное содержимое страницы. Один на документ.
-         Внутри — уникальный контент этой страницы (не шапка и не подвал). -->
+  <main class="page">
 
-    <h2>Каталог книг</h2>
-    <!-- ^ h2 — заголовок второго уровня. Вложен в h1 по смыслу:
-         "BookNest" — это сайт, "Каталог книг" — раздел сайта. -->
+    <h2 class="page__title">Каталог книг</h2>
 
-    <form role="search" method="get" action="index.html">
-      <!-- ^ form — форма. role="search" — подсказка браузеру и скринридерам,
-           что это поиск. method="get" — данные уйдут в URL.
-           action="index.html" — куда отправить при нажатии кнопки.
-           В ЛР №1 фильтрация не работает — это каркас для будущего. -->
+    <form class="filter" id="filters" role="search">
+      <!-- ^ Форма поиска. Оставлен только один input — текстовый запрос.
+           Фильтр по жанру и чекбокс «только доступные» убраны:
+           в Open Library нет простого способа фильтровать по ним,
+           а задание ЛР №4 этого и не требует. -->
+      <fieldset class="filter__group">
+        <legend class="filter__legend">Поиск книг</legend>
 
-      <fieldset>
-        <!-- ^ fieldset — группирует связанные поля формы.
-             Рисует рамку вокруг группы. Это НЕ оформление, а семантика. -->
-
-        <legend>Фильтры</legend>
-        <!-- ^ legend — заголовок группы fieldset. "Имя" рамки. -->
-
-        <label for="search">Поиск по названию или автору</label>
-        <!-- ^ label — подпись к полю. for="search" связывает её с input id="search".
-             Клик по подписи фокусирует поле. Скринридер читает её вслух. -->
-
-        <input type="search" id="search" name="q" placeholder="Например, Тартт">
-        <!-- ^ input — поле ввода. type="search" — поисковое поле.
-             id="search" — связка с label. name="q" — имя параметра в URL (?q=...).
-             placeholder — серая подсказка внутри поля. НЕ заменяет label! -->
-
-        <label for="genre">Жанр</label>
-        <select id="genre" name="genre">
-          <!-- ^ select — выпадающий список. name="genre" — имя параметра. -->
-
-          <option value="">Все жанры</option>
-          <!-- ^ option — пункт списка. value="" — пустое значение = "не фильтровать". -->
-
-          <option value="triller">Триллер</option>
-          <option value="fentezi">Фэнтези</option>
-          <option value="detektiv">Детектив</option>
-          <option value="mistika">Мистика</option>
-          <option value="roman">Роман</option>
-          <option value="fantastika">Фантастика</option>
-        </select>
-
-        <label for="sort">Сортировка</label>
-        <select id="sort" name="sort">
-          <option value="title">По названию</option>
-          <option value="author">По автору</option>
-          <option value="year">По году издания</option>
-        </select>
-
-        <input type="checkbox" id="available" name="available" value="1">
-        <!-- ^ checkbox — галочка. id связывает с label. name+value = что отправится. -->
-
-        <label for="available">Только доступные</label>
-        <!-- ^ label ПОСЛЕ input — так галочка стоит слева, а подпись справа.
-             Тоже работает: for="available" привязывает к полю. -->
-
-        <button type="submit">Применить фильтры</button>
-        <!-- ^ button type="submit" — кнопка, которая отправляет форму. -->
+        <label class="filter__label" for="search">Введите название или автора (минимум 3 символа)</label>
+        <input
+          class="filter__input"
+          type="search"
+          id="search"
+          placeholder="Например, Tolkien"
+          autocomplete="off"
+        >
+        <!-- ^ Поле поиска. id="search" — на него ссылается main.js.
+             autocomplete="off" — чтобы браузер не подставлял прошлые запросы
+             в выпадающем списке, это мешает при демонстрации. -->
       </fieldset>
     </form>
 
-    <section>
-      <!-- ^ section — логический раздел страницы. Здесь: список книг.
-           Отличается от div тем, что это осмысленная часть контента. -->
+    <p class="catalog__counter" id="counter"></p>
+    <!-- ^ Счётчик найденных книг. Обновляет main.js после успешного запроса. -->
 
-      <h2>Найдено книг: 6</h2>
-      <!-- ^ Второй h2 на странице — но это нормально.
-           Каждая section может иметь свой h2. Главное — не пропускать уровни. -->
+    <!-- ================================================================
+         ЧЕТЫРЕ СОСТОЯНИЯ ИНТЕРФЕЙСА.
 
-      <article>
-        <!-- ^ article — самодостаточная единица контента. Карточка книги.
-             Её можно вырвать со страницы — смысл сохранится. Это НЕ div. -->
+         Каждый блок скрыт по умолчанию (атрибут hidden). В нужный момент
+         main.js вызывает showState("loading"), showState("success") и т. д.,
+         которая скрывает все блоки и показывает только один.
+         ================================================================ -->
 
-        <header>
-          <!-- ^ header внутри article — вводная часть карточки: название. -->
+    <div class="state" id="state-loading" hidden>
+      <!-- ^ Состояние loading. Показывается, пока идёт запрос к API. -->
+      <p class="state__text">Загрузка…</p>
+    </div>
 
-          <h3>Тайная история</h3>
-          <!-- ^ h3 — заголовок третьего уровня. Вложен в h2 "Найдено книг".
-               Иерархия: h1 → h2 → h3, без пропусков. -->
-        </header>
+    <div class="state" id="state-empty" hidden>
+      <!-- ^ Состояние empty. Показывается, когда запрос успешен,
+           но результатов нет, либо запрос короче 3 символов. -->
+      <p class="state__text">Ничего не найдено. Введите минимум 3 символа и попробуйте другой запрос.</p>
+    </div>
 
-        <p>Автор: Донна Тартт</p>
-        <!-- ^ Обычный абзац с автором. -->
+    <div class="state state--error" id="state-error" hidden>
+      <!-- ^ Состояние error. Показывается при сетевой ошибке или HTTP-ошибке.
+           Текст разный для разных случаев (см. humanizeError в main.js). -->
+      <p class="state__text" id="state-error-text"></p>
+      <button class="btn btn--ghost" type="button" id="state-error-retry">Повторить</button>
+      <!-- ^ Кнопка «Повторить» — перезапускает последний запрос.
+           Это требование задания: в состоянии ошибки пользователь
+           должен иметь возможность повторить. -->
+    </div>
 
-        <p>Жанр: триллер, роман</p>
+    <section class="catalog" id="state-success" hidden>
+      <!-- ^ Состояние success. Показывается, когда данные успешно загружены.
+           Обёртка вокруг списка: одна команда скрывает/показывает весь
+           результат вместе с пагинацией. -->
+      <ul class="catalog__list" id="book-list">
+        <!-- ^ Контейнер для карточек. Наполняет renderSearchResults
+             из js/ui/render.js. Каждая книга превращается в <li class="book-card">. -->
+      </ul>
 
-        <p>Год издания: <time datetime="1992">1992</time></p>
-        <!-- ^ time — семантический тег для дат.
-             datetime="1992" — машиночитаемое значение (ISO).
-             "1992" в тексте — человекочитаемое. Машина читает атрибут. -->
-
-        <p>Доступно: <data value="3">3 экземпляра</data></p>
-        <!-- ^ data — связывает машиночитаемое значение (value="3")
-             с текстом ("3 экземпляра"). -->
-
-        <p><a href="book.html">Подробнее о книге</a></p>
-        <!-- ^ Ссылка на карточку. В ЛР №1 все шесть книг ведут на один book.html. -->
-      </article>
-
-      <article>
-        <header>
-          <h3>Девятый дом</h3>
-        </header>
-        <p>Автор: Ли Бардуго</p>
-        <p>Жанр: фэнтези, мистика</p>
-        <p>Год издания: <time datetime="2019">2019</time></p>
-        <p>Доступно: <data value="0">нет свободных экземпляров</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article>
-        <header>
-          <h3>Институт</h3>
-        </header>
-        <p>Автор: Стивен Кинг</p>
-        <p>Жанр: триллер, фантастика</p>
-        <p>Год издания: <time datetime="2019">2019</time></p>
-        <p>Доступно: <data value="2">2 экземпляра</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article>
-        <header>
-          <h3>Безмолвный пациент</h3>
-        </header>
-        <p>Автор: Алекс Михаэлидес</p>
-        <p>Жанр: триллер, детектив</p>
-        <p>Год издания: <time datetime="2019">2019</time></p>
-        <p>Доступно: <data value="5">5 экземпляров</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article>
-        <header>
-          <h3>Четвёртое крыло</h3>
-        </header>
-        <p>Автор: Ребекка Яррос</p>
-        <p>Жанр: фэнтези, роман</p>
-        <p>Год издания: <time datetime="2023">2023</time></p>
-        <p>Доступно: <data value="1">1 экземпляр</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
-      </article>
-
-      <article>
-        <header>
-          <h3>Неоновые боги</h3>
-        </header>
-        <p>Автор: Кэти Роберт</p>
-        <p>Жанр: роман, фэнтези</p>
-        <p>Год издания: <time datetime="2021">2021</time></p>
-        <p>Доступно: <data value="4">4 экземпляра</data></p>
-        <p><a href="book.html">Подробнее о книге</a></p>
-      </article>
+      <div class="pagination">
+        <!-- ^ Пагинация по 20 записей. Кнопки блокируются на границах. -->
+        <button class="btn btn--ghost" type="button" id="pagination-prev">← Назад</button>
+        <span class="pagination__info" id="pagination-info"></span>
+        <button class="btn btn--ghost" type="button" id="pagination-next">Вперёд →</button>
+      </div>
     </section>
+
   </main>
 
-  <footer>
-    <!-- ^ footer — подвал страницы. Контакты, копирайт, служебные ссылки. -->
-
-    <p>© 2026 BookNest — книжный клуб университета</p>
-
-    <address>
-      <!-- ^ address — семантический тег для контактных данных.
-           Не для домашнего адреса, а для связи с автором/организацией. -->
-
-      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
-      <!-- ^ mailto: — при клике откроется почтовый клиент с готовым адресом. -->
+  <footer class="site-footer">
+    <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
+    <address class="site-footer__contacts">
+      <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
+
+  <script type="module" src="js/main.js"></script>
+  <!-- ^ Подключение главного модуля. type="module" обязателен для ESM.
+       Скрипт в конце body — чтобы DOM был построен к моменту
+       его выполнения. Если бы поставили в head, document.querySelector
+       вернул бы null. -->
 
 </body>
 </html>
