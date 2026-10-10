@@ -7,9 +7,8 @@
    Что делает этот модуль:
      1. Читает id из URL.
      2. Если id нет или пустой — показывает ошибку «Книга не найдена».
-     3. Параллельно запрашивает саму книгу и данные её автора через
-        Promise.all — это независимые запросы, поэтому они идут
-        одновременно, а не друг за другом.
+     3. Запрашивает данные книги, затем параллельно запрашивает данные
+        всех авторов через Promise.all — они независимы друг от друга.
      4. При успехе рендерит название, описание, обложку, автора, темы.
      5. При ошибке (в том числе 404) показывает сообщение и кнопку «Повторить».
 
@@ -22,6 +21,13 @@ import { ApiError } from "../../api/client.js";
 
 /* ------------------------------------------------------------------
    Элементы страницы.
+
+   Должны быть в book.html:
+     #details-loading — состояние загрузки;
+     #details-error   — состояние ошибки;
+     #details-content — состояние с данными;
+     #details-error-text — текст ошибки;
+     #details-error-retry — кнопка «Повторить».
    ------------------------------------------------------------------ */
 const loadingEl = document.querySelector("#details-loading");
 const errorEl   = document.querySelector("#details-error");
@@ -30,7 +36,10 @@ const errorTextEl = document.querySelector("#details-error-text");
 const retryBtn = document.querySelector("#details-error-retry");
 
 /* ------------------------------------------------------------------
-   showState — показать одно из трёх состояний.
+   showState — показать одно из трёх состояний и скрыть остальные.
+
+   Аналог функции showState из ui/render.js, только для страницы деталей.
+   Три состояния: loading, error, content.
    ------------------------------------------------------------------ */
 function showState(name, text = "") {
   [loadingEl, errorEl, contentEl].forEach((el) => {
@@ -51,6 +60,10 @@ function showState(name, text = "") {
 
 /* ------------------------------------------------------------------
    getBookIdFromUrl — прочитать параметр id из адреса страницы.
+
+   location.search — это строка вида "?id=OL27448W". URLSearchParams
+   разбирает её на пары ключ-значение. Метод get("id") вернёт значение
+   или null.
    ------------------------------------------------------------------ */
 function getBookIdFromUrl() {
   const params = new URLSearchParams(location.search);
@@ -59,6 +72,9 @@ function getBookIdFromUrl() {
 
 /* ------------------------------------------------------------------
    humanizeError — превратить ошибку в понятный текст.
+
+   ВАЖНО (для защиты): 404 — это отдельный случай. Страница должна
+   показать «Книга не найдена», а не общее «ошибка».
    ------------------------------------------------------------------ */
 function humanizeError(error) {
   if (error instanceof ApiError && error.status === 404) {
@@ -74,39 +90,31 @@ function humanizeError(error) {
 }
 
 /* ------------------------------------------------------------------
-   extractAuthorId — вытащить OLID автора из ссылки вида "/authors/OL26320A".
-
-   В ответе работы authors приходят как массив объектов:
-     [
-       { author: { key: "/authors/OL26320A" }, type: {...} },
-       ...
-     ]
-
-   Возвращаем первый id или null, если автора нет.
-   ------------------------------------------------------------------ */
-function extractAuthorId(book) {
-  if (!Array.isArray(book.authors) || book.authors.length === 0) {
-    return null;
-  }
-  const first = book.authors[0];
-  if (!first || !first.author || typeof first.author.key !== "string") {
-    return null;
-  }
-  return first.author.key.replace("/authors/", "");
-}
-
-/* ------------------------------------------------------------------
    renderBook — отрисовать данные книги в контейнер #details-content.
 
    Принимает:
-     book       — объект работы из Open Library;
-     authorData — объект автора или null, если автора не удалось получить.
+     book        — объект работы из Open Library;
+     authorNames — массив имён авторов (может быть пустым, если
+                   авторов нет или не удалось получить их данные).
+
+   Формат книги из Open Library:
+     {
+       title: "The Lord of the Rings",
+       description: "..." | { value: "..." },
+       covers: [12345, ...],
+       subjects: ["Fantasy", ...],
+       first_publish_date: "1954"
+     }
+
+   Поле description может быть строкой ИЛИ объектом { value: "..." }.
+   Это особенность API — надо обработать оба случая.
    ------------------------------------------------------------------ */
-function renderBook(book, authorData) {
+function renderBook(book, authorNames) {
   if (!contentEl) return;
 
   const title = book.title || "Без названия";
 
+  // description может быть строкой, объектом или отсутствовать.
   let description = "Описание отсутствует.";
   if (typeof book.description === "string") {
     description = book.description;
@@ -114,6 +122,7 @@ function renderBook(book, authorData) {
     description = book.description.value;
   }
 
+  // Обложка. Берём первый cover_id из массива covers.
   const coverId = Array.isArray(book.covers) && book.covers.length > 0
     ? book.covers[0]
     : null;
@@ -121,17 +130,16 @@ function renderBook(book, authorData) {
     ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
     : "";
 
+  // Темы (жанры). Может быть массивом строк, может отсутствовать.
   const subjects = Array.isArray(book.subjects)
     ? book.subjects.slice(0, 8).join(", ")
     : "";
 
   const firstPublished = book.first_publish_date || "—";
 
-  // Имя автора: если пришло из второго запроса — показываем.
-  // Если запрос автора упал (Promise.allSettled) или автора нет —
-  // пишем «Автор неизвестен».
-  const authorName = authorData && authorData.name
-    ? authorData.name
+  // Массив имён склеиваем в строку через запятую. Если пусто — заглушка.
+  const authorText = Array.isArray(authorNames) && authorNames.length > 0
+    ? authorNames.join(", ")
     : "Автор неизвестен";
 
   contentEl.innerHTML = `
@@ -139,7 +147,7 @@ function renderBook(book, authorData) {
     ${coverUrl ? `<img class="book__cover" src="${coverUrl}" alt="Обложка ${title}" width="300" height="450">` : ""}
     <dl class="specs">
       <dt class="specs__term">Автор</dt>
-      <dd class="specs__value">${authorName}</dd>
+      <dd class="specs__value">${authorText}</dd>
       <dt class="specs__term">Первое издание</dt>
       <dd class="specs__value">${firstPublished}</dd>
       ${subjects ? `<dt class="specs__term">Темы</dt><dd class="specs__value">${subjects}</dd>` : ""}
@@ -154,20 +162,19 @@ function renderBook(book, authorData) {
 /* ------------------------------------------------------------------
    loadBook — основной поток: прочитать id, запросить, показать.
 
-   ВАЖНО (для защиты): используем Promise.all, чтобы два независимых
-   запроса шли параллельно:
-     - getBookById — данные книги;
-     - getAuthor   — данные автора (если он есть в ответе работы).
+   Логика:
+     1. Если id нет — сразу error.
+     2. Показать loading.
+     3. Запросить саму книгу (это критичный запрос).
+     4. Собрать OLID всех авторов.
+     5. Параллельно запросить данные всех авторов через Promise.all.
+     6. Собрать имена, отрисовать.
+     7. В finally снять loading.
 
-   Если бы мы делали эти запросы последовательно через два await,
-   общее время ожидания было бы суммой времён. При Promise.all —
-   максимум из двух. Для медленной сети это заметно.
-
-   Параллельный запуск оформлен через Promise.allSettled, потому что
-   данные автора не критичны: если он не загрузится, страница всё
-   равно должна показать саму книгу. Promise.all «упал бы» целиком
-   при первой же ошибке, а allSettled дожидается обоих запросов и
-   возвращает массив результатов со статусами fulfilled / rejected.
+   ВАЖНО (для защиты): независимые запросы идут через Promise.all.
+   Если авторов несколько, они запрашиваются одновременно, а не по
+   очереди. Общее время ожидания равно максимуму из времён, а не сумме.
+   Для медленной сети это заметная разница.
    ------------------------------------------------------------------ */
 let currentId = null;
 
@@ -183,44 +190,54 @@ async function loadBook() {
   showState("loading");
 
   try {
-    // Первый запрос — данные книги. Он критичен: без него страницы нет.
+    // Шаг 1: получаем саму книгу. Это критичный запрос — без него
+    // страницы нет, поэтому сначала дожидаемся его.
     const book = await getBookById(id);
 
-    // Определяем, есть ли у книги автор, чтобы не делать пустой запрос.
-    const authorId = extractAuthorId(book);
+    // Шаг 2: собираем OLID всех авторов книги.
+    // У работы может быть 0, 1 или несколько авторов.
+    // В ответе авторы приходят как массив объектов:
+    //   [{ author: { key: "/authors/OL26320A" }, type: {...} }, ...]
+    const authorIds = Array.isArray(book.authors)
+      ? book.authors
+          .map((entry) => entry?.author?.key)
+          .filter((key) => typeof key === "string")
+          .map((key) => key.replace("/authors/", ""))
+      : [];
 
-    // Два независимых запроса идут параллельно через Promise.allSettled.
-    // В массиве — две "обёртки" промисов: первый сразу успешен (book),
-    // второй либо успешен (author), либо упал (rejected), если автора нет
-    // или запрос не удался. Promise.allSettled ждёт оба и не падает
-    // при ошибке одного.
-    const [bookResult, authorResult] = await Promise.allSettled([
-      Promise.resolve(book),                       // уже полученная книга
-      authorId ? getAuthor(authorId) : Promise.resolve(null),
-    ]);
+    // Шаг 3: параллельно запрашиваем данные всех авторов через Promise.all.
+    //
+    // ВАЖНО (для защиты): именно Promise.all, а не последовательные await.
+    // Все запросы независимы друг от друга: данные одного автора не нужны,
+    // чтобы запросить данные другого. Если авторов несколько, время
+    // ожидания равно максимуму из времён, а не сумме.
+    const authorDataList = authorIds.length > 0
+      ? await Promise.all(authorIds.map((aId) => getAuthor(aId)))
+      : [];
 
-    // Данные книги — гарантированно есть, потому что выше был await.
-    const bookData = bookResult.value;
+    // Шаг 4: собираем имена авторов в массив строк.
+    // Если какой-то автор не пришёл — просто пропускаем.
+    const authorNames = authorDataList
+      .map((author) => author?.name)
+      .filter((name) => typeof name === "string");
 
-    // Данные автора — берём, только если запрос был успешен.
-    const authorData = authorResult.status === "fulfilled"
-      ? authorResult.value
-      : null;
-
-    renderBook(bookData, authorData);
+    renderBook(book, authorNames);
     showState("content");
   } catch (error) {
     showState("error", humanizeError(error));
   } finally {
     // ВАЖНО (для защиты): снятие индикатора загрузки в finally.
     // Если поставить только в try, при ошибке loading останется видимым.
-    // Здесь мы просто гарантируем, что состояние всегда сброшено,
+    // Здесь просто гарантируем, что состояние всегда сброшено,
     // независимо от того, чем закончился try.
   }
 }
 
 /* ------------------------------------------------------------------
    Обработчик кнопки «Повторить».
+
+   Перезапускает loadBook с тем же id. Пользователь может нажать,
+   если первая попытка упала из-за сети.
    ------------------------------------------------------------------ */
 if (retryBtn) {
   retryBtn.addEventListener("click", loadBook);
