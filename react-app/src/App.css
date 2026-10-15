@@ -1,0 +1,575 @@
+/* ==========================================================================
+   Основной контейнер и цветовые переменные
+   ========================================================================== */
+
+/* Цвета вынесены в CSS-переменные.
+   Благодаря этому тему можно менять без повторения всех стилей. */
+.app {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --text: #1f2937;
+  --muted: #64748b;
+  --border: #dbe3ee;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #dbeafe;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+
+  /* Общая тень карточек и блоков. */
+  --shadow: 0 10px 30px rgb(15 23 42 / 8%);
+
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+
+  /* Переключение темы становится плавным. */
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+/* При data-theme="dark" меняем только значения переменных.
+   Компоненты автоматически получают новые цвета. */
+.app[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #172033;
+  --surface-soft: #1e293b;
+  --text: #f1f5f9;
+  --muted: #a8b3c7;
+  --border: #334155;
+  --primary: #60a5fa;
+  --primary-hover: #93c5fd;
+  --primary-soft: #1e3a5f;
+  --danger: #fca5a5;
+  --danger-soft: #451a1a;
+  --shadow: 0 10px 30px rgb(0 0 0 / 20%);
+}
+
+/* ==========================================================================
+   Шапка сайта
+   ========================================================================== */
+
+.site-header {
+  display: flex;
+  align-items: center;
+
+  /* Название остаётся слева,
+     а кнопки управления уходят вправо. */
+  justify-content: space-between;
+
+  gap: 24px;
+
+  /* calc позволяет сохранить одинаковый отступ
+     относительно основного контейнера. */
+  padding: 24px max(24px, calc((100% - 1200px) / 2));
+
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.site-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   Основной контейнер страницы
+   ========================================================================== */
+
+.page {
+  /* Контент ограничен шириной 1200px,
+     но на маленьком экране остаются боковые отступы. */
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+/* ==========================================================================
+   Кнопки
+   ========================================================================== */
+
+/* Общий компонент Button использует один базовый класс. */
+.btn {
+  min-height: 42px;
+  padding: 9px 16px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+/* Небольшое визуальное поднятие кнопки при наведении. */
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Основная кнопка. */
+.btn--primary {
+  color: #ffffff;
+  background: var(--primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+/* Второстепенная кнопка. */
+.btn--ghost {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--surface-soft);
+}
+
+/* ==========================================================================
+   Badge
+   ========================================================================== */
+
+/* Badge используется повторно:
+   например для wishlist и информации о книге. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 10px;
+
+  border-radius: 999px;
+
+  color: var(--primary);
+  background: var(--primary-soft);
+
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Поиск
+   ========================================================================== */
+
+.search-panel {
+  padding: 24px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.search-panel > label {
+  display: block;
+  margin-bottom: 10px;
+
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Поле поиска занимает всё свободное пространство,
+   а кнопка остаётся по ширине своего содержимого. */
+.search-panel__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.search-panel input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+
+  color: var(--text);
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  outline: none;
+}
+
+.search-panel input:focus {
+  border-color: var(--primary);
+}
+
+/* ==========================================================================
+   Фильтры
+   ========================================================================== */
+
+.filters-panel {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  margin: 20px 0;
+  padding: 18px 20px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.filters-panel > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.filters-panel label {
+  font-weight: 600;
+}
+
+.filters-panel select {
+  min-height: 40px;
+  padding: 8px 10px;
+
+  color: var(--text);
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ==========================================================================
+   Состояния приложения
+   ========================================================================== */
+
+/* EmptyState и ErrorBox используют общий внешний вид состояния. */
+.state-box {
+  margin: 24px 0;
+  padding: 32px;
+
+  text-align: center;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.state-box h2 {
+  margin-top: 0;
+}
+
+.state-box p {
+  color: var(--muted);
+}
+
+/* Ошибка выделяется отдельным цветом. */
+.state-box--error {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* ==========================================================================
+   Spinner
+   ========================================================================== */
+
+.spinner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 16px;
+
+  color: var(--muted);
+}
+
+/* Круг вращается за счёт изменения transform. */
+.spinner__circle {
+  width: 20px;
+  height: 20px;
+
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+
+  animation: spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Сетка книг
+   ========================================================================== */
+
+/* auto-fill автоматически создаёт столько колонок,
+   сколько помещается на текущей ширине экрана. */
+.book-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fill, minmax(245px, 1fr));
+
+  gap: 20px;
+
+  margin: 24px 0;
+}
+
+/* ==========================================================================
+   Карточка книги
+   ========================================================================== */
+
+.book-card {
+  overflow: hidden;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.book-card__cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 280px;
+
+  background: var(--surface-soft);
+}
+
+/* object-fit сохраняет нормальное заполнение области обложки. */
+.book-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-card__placeholder {
+  color: var(--muted);
+}
+
+.book-card__content {
+  padding: 18px;
+}
+
+.book-card__content h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.book-card__content p {
+  min-height: 42px;
+  margin: 0 0 14px;
+
+  color: var(--muted);
+}
+
+.book-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+
+  margin-bottom: 16px;
+}
+
+.book-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   Показать ещё
+   ========================================================================== */
+
+.load-more {
+  display: flex;
+  justify-content: center;
+
+  margin: 30px 0;
+}
+
+/* ==========================================================================
+   Модальное окно
+   ========================================================================== */
+
+/* Затемняет страницу и располагается поверх всего интерфейса. */
+.modal-backdrop {
+  position: fixed;
+
+  /* inset: 0 заменяет top/right/bottom/left: 0. */
+  inset: 0;
+
+  z-index: 100;
+
+  display: grid;
+  place-items: center;
+
+  padding: 20px;
+
+  background: rgb(15 23 42 / 65%);
+}
+
+.modal {
+  width: min(600px, 100%);
+  max-height: 85vh;
+
+  /* Если содержимого много,
+     прокрутка появляется внутри окна. */
+  overflow: auto;
+
+  background: var(--surface);
+  border-radius: 18px;
+
+  box-shadow:
+    0 24px 70px rgb(0 0 0 / 30%);
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 20px 22px;
+
+  border-bottom:
+    1px solid var(--border);
+}
+
+.modal__header h2 {
+  margin: 0;
+}
+
+.modal__close {
+  width: 40px;
+  height: 40px;
+
+  color: var(--text);
+  background: transparent;
+
+  border: 0;
+  border-radius: 50%;
+
+  font-size: 1.7rem;
+}
+
+.modal__close:hover {
+  background: var(--surface-soft);
+}
+
+.modal__body {
+  padding: 22px;
+}
+
+/* ==========================================================================
+   DataTable<T>
+   ========================================================================== */
+
+/* На маленьком экране таблицу можно прокручивать горизонтально. */
+.data-table-wrapper {
+  overflow-x: auto;
+
+  margin: 24px 0;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 14px;
+
+  text-align: left;
+
+  border-bottom:
+    1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--surface-soft);
+}
+
+/* Заголовок сортируемого столбца является кнопкой,
+   но визуально остаётся похожим на обычный заголовок. */
+.data-table th button {
+  padding: 0;
+
+  color: var(--text);
+  background: transparent;
+
+  border: 0;
+
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Адаптивная версия
+   ========================================================================== */
+
+@media (max-width: 700px) {
+  /* На маленьком экране элементы шапки размещаются вертикально. */
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-header__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  /* Поиск становится одной колонкой. */
+  .search-panel__row {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  /* На телефоне показываем одну карточку в строке. */
+  .book-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Если пользователь включил в системе уменьшение движения,
+   почти полностью отключаем анимации. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

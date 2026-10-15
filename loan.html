@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <!-- ^ Объявление HTML5. Первая строка файла. -->
 
+<!-- ==========================================================================
+     ЛР №2 — адаптивная вёрстка и дизайн-токены.
+
+     Структура HTML не изменена: теги, их порядок, вложенность и содержимое
+     остались такими же, как в ЛР №1. Единственное дополнение — атрибут class
+     у части тегов. Это разрешено заданием ЛР №2: «не изменяя структуру HTML,
+     допускается только добавление классов».
+
+     Классы страницы: .loan-form — форма выдачи, .loan-form__group — каждая
+     группа полей, .loan-form__label, .loan-form__input и так далее.
+     ========================================================================== -->
+
 <html lang="ru">
 <!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
 
@@ -13,55 +25,52 @@
 
   <title>Выдача книги — BookNest</title>
   <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
 </head>
 
 <body>
-  <!-- ^ Видимое содержимое страницы. -->
 
-  <header>
-    <!-- ^ Шапка. Одинакова на всех страницах. -->
-    <h1>BookNest</h1>
-    <!-- ^ Единственный h1 на странице. -->
-    <p>Книжный клуб университета</p>
+  <header class="site-header">
+    <!-- ^ site-header — БЭМ-блок: шапка сайта. Одинакова для всех страниц. -->
 
-    <nav>
-      <ul>
-        <li><a href="index.html">Каталог</a></li>
-        <li><a href="book.html">Книга</a></li>
-        <li><a href="loan.html" aria-current="page">Выдача</a></li>
-        <li><a href="profile.html">Профиль</a></li>
+    <h1 class="site-header__title">BookNest</h1>
+    <p class="site-header__tagline">Книжный клуб университета</p>
+
+    <nav class="site-nav">
+      <ul class="site-nav__list">
+        <li class="site-nav__item"><a class="site-nav__link" href="index.html">Каталог</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="loan.html" aria-current="page">Выдача</a></li>
+        <li class="site-nav__item"><a class="site-nav__link" href="profile.html">Профиль</a></li>
       </ul>
     </nav>
   </header>
 
-  <main>
-    <!-- ^ Основное содержимое страницы. -->
+  <main class="page">
 
-    <h2>Выдача книги</h2>
-    <!-- ^ h2 — заголовок раздела. Вложен в h1 (BookNest). -->
+    <h2 class="page__title">Выдача книги</h2>
 
-    <p>Заполните форму для регистрации выдачи экземпляра читателю.</p>
+    <p class="page__lead">Заполните форму для регистрации выдачи экземпляра читателю.</p>
+    <!-- ^ page__lead — вводный абзац страницы. -->
 
-    <form method="post" action="loan.html">
-      <!-- ^ form — форма выдачи.
+    <form class="loan-form" method="post" action="loan.html">
+      <!-- ^ loan-form — блок: форма выдачи.
            method="post" — данные отправятся в теле запроса (для будущего сервера).
-           action="loan.html" — пока отправляется на этот же файл.
-           В ЛР №1 отправка не обрабатывается — это каркас. -->
+           action="loan.html" — пока отправляется на этот же файл. -->
 
-      <fieldset>
-        <!-- ^ fieldset — первая группа полей: выбор книги.
-             Требование задания: не менее 3 fieldset. -->
+      <fieldset class="loan-form__group">
+        <!-- ^ loan-form__group — элемент: одна из трёх групп полей. -->
 
-        <legend>Выбор книги</legend>
-        <!-- ^ legend — имя группы. Скринридер прочитает его перед полями. -->
+        <legend class="loan-form__legend">Выбор книги</legend>
 
-        <label for="book">Книга</label>
-        <select id="book" name="book_id" required>
-          <!-- ^ select — выпадающий список.
-               required — обязательное поле, без него форма не отправится. -->
+        <label class="loan-form__label" for="book">Книга</label>
+        <select class="loan-form__select" id="book" name="book_id" required>
+          <!-- ^ required — обязательное поле, без него форма не отправится. -->
           <option value="">— Выберите книгу —</option>
-          <!-- ^ Первый option пустой: если не выбрать, поле останется пустым
-               и required сработает. -->
           <option value="1">Тайная история — Донна Тартт (доступно: 3)</option>
           <option value="2">Девятый дом — Ли Бардуго (доступно: 0)</option>
           <option value="3">Институт — Стивен Кинг (доступно: 2)</option>
@@ -70,78 +79,58 @@
           <option value="6">Неоновые боги — Кэти Роберт (доступно: 4)</option>
         </select>
 
-        <label for="copies">Количество экземпляров</label>
-        <input type="number" id="copies" name="copies" min="1" max="3" value="1" required>
-        <!-- ^ number — числовое поле.
-             min/max — допустимый диапазон. Браузер не даст ввести меньше 1 или больше 3.
-             value="1" — значение по умолчанию. -->
+        <label class="loan-form__label" for="copies">Количество экземпляров</label>
+        <input class="loan-form__input" type="number" id="copies" name="copies" min="1" max="3" value="1" required>
+        <!-- ^ number — числовое поле. min/max — допустимый диапазон. -->
 
-        <p><small>Книги без свободных экземпляров недоступны для выдачи.</small></p>
-        <!-- ^ small — мелкий текст-примечание. Семантически — уточнение. -->
+        <p class="loan-form__hint"><small>Книги без свободных экземпляров недоступны для выдачи.</small></p>
+        <!-- ^ loan-form__hint — мелкое примечание под полем. -->
       </fieldset>
 
-      <fieldset>
-        <!-- ^ Вторая группа: данные читателя. -->
+      <fieldset class="loan-form__group">
+        <legend class="loan-form__legend">Данные читателя</legend>
 
-        <legend>Данные читателя</legend>
+        <label class="loan-form__label" for="reader-name">ФИО читателя</label>
+        <input class="loan-form__input" type="text" id="reader-name" name="reader_name" required maxlength="150">
 
-        <label for="reader-name">ФИО читателя</label>
-        <input type="text" id="reader-name" name="reader_name" required maxlength="150">
-        <!-- ^ text — обычное текстовое поле.
-             maxlength="150" — ограничение длины. -->
+        <label class="loan-form__label" for="reader-email">Email</label>
+        <input class="loan-form__input" type="email" id="reader-email" name="reader_email" required>
 
-        <label for="reader-email">Email</label>
-        <input type="email" id="reader-email" name="reader_email" required>
-        <!-- ^ email — браузер проверит, что введён корректный email
-             (есть @, точка и т.д.). Без JS. -->
-
-        <label for="reader-phone">Телефон</label>
-        <input type="tel" id="reader-phone" name="reader_phone"
+        <label class="loan-form__label" for="reader-phone">Телефон</label>
+        <input class="loan-form__input" type="tel" id="reader-phone" name="reader_phone"
                pattern="[0-9+\-() ]{10,20}">
-        <!-- ^ tel — телефон. pattern — регулярное выражение для проверки.
-             [0-9+\-() ] — только цифры и символы + - ( ) и пробел.
-             {10,20} — от 10 до 20 символов.
-             Поле необязательное (нет required). -->
+        <!-- ^ pattern — проверка телефона регулярным выражением. -->
       </fieldset>
 
-      <fieldset>
-        <!-- ^ Третья группа: срок выдачи. -->
+      <fieldset class="loan-form__group">
+        <legend class="loan-form__legend">Срок выдачи</legend>
 
-        <legend>Срок выдачи</legend>
+        <label class="loan-form__label" for="due-date">Дата возврата</label>
+        <input class="loan-form__input" type="date" id="due-date" name="due_date" required>
 
-        <label for="due-date">Дата возврата</label>
-        <input type="date" id="due-date" name="due_date" required>
-        <!-- ^ date — выбор даты через встроенный календарь браузера. -->
-
-        <label for="notes">Примечания</label>
-        <textarea id="notes" name="notes" rows="3" maxlength="500"></textarea>
-        <!-- ^ textarea — многострочное поле.
-             rows="3" — высота в строках.
-             maxlength="500" — максимум символов. -->
+        <label class="loan-form__label" for="notes">Примечания</label>
+        <textarea class="loan-form__textarea" id="notes" name="notes" rows="3" maxlength="500"></textarea>
       </fieldset>
 
-      <button type="submit">Подтвердить выдачу</button>
-      <!-- ^ Кнопка отправки формы.
-           type="submit" — при нажатии браузер проверит валидацию и отправит данные. -->
+      <button class="btn" type="submit">Подтвердить выдачу</button>
+      <!-- ^ btn — общий класс кнопок, как на других страницах. -->
     </form>
 
-    <aside aria-labelledby="rules-heading">
-      <!-- ^ aside — дополнительный контент: правила. Не часть формы,
-           но полезная информация рядом. -->
-
-      <h3 id="rules-heading">Правила выдачи</h3>
-      <ul>
-        <li>Срок выдачи — 14 дней.</li>
-        <li>Продление возможно при отсутствии очереди.</li>
-        <li>Просрочка блокирует новые выдачи.</li>
+    <aside class="rules" aria-labelledby="rules-heading">
+      <!-- ^ rules — блок: правила выдачи. -->
+      <h3 class="rules__title" id="rules-heading">Правила выдачи</h3>
+      <ul class="rules__list">
+        <li class="rules__item">Срок выдачи — 14 дней.</li>
+        <li class="rules__item">Продление возможно при отсутствии очереди.</li>
+        <li class="rules__item">Просрочка блокирует новые выдачи.</li>
       </ul>
     </aside>
   </main>
 
-  <footer>
-    <p>© 2026 BookNest — книжный клуб университета</p>
-    <address>
-      <a href="mailto:booknest@university.ru">booknest@university.ru</a>
+  <footer class="site-footer">
+    <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
+    <address class="site-footer__contacts">
+      <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
     </address>
   </footer>
 
