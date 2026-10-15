@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!-- Страница для дополнительного задания по виртуализации. -->
+
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- Кодировка для русского текста. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Адаптивность страницы. -->
+
+  <title>Виртуализация — BookNest</title>
+
+  <!-- Подключаю те же стили, что используются в основном проекте. -->
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <!-- Шапка страницы. -->
+
+    <h1 class="site-header__title">BookNest</h1>
+
+    <p class="site-header__tagline">
+      Тест виртуализации списка
+    </p>
+  </header>
+
+  <main class="page">
+
+    <h2 class="page__title">
+      Виртуализация 5000 книг
+    </h2>
+
+    <p class="page__lead">
+      На этой странице сравнивается обычная отрисовка большого списка
+      и виртуализированная отрисовка.
+    </p>
+
+    <section>
+      <h3>Обычная отрисовка</h3>
+
+      <!-- Кнопка запуска обычного способа. -->
+      <button class="btn" type="button" id="render-normal">
+        Показать 5000 книг обычным способом
+      </button>
+
+      <!-- Здесь будет время обычной отрисовки. -->
+      <p id="normal-time">
+        Время: —
+      </p>
+
+      <!-- Контейнер для обычного списка. -->
+      <ul id="normal-list"></ul>
+    </section>
+
+    <section>
+      <h3>Виртуализированная отрисовка</h3>
+
+      <!-- Кнопка запуска виртуализации. -->
+      <button class="btn" type="button" id="render-virtual">
+        Показать 5000 книг с виртуализацией
+      </button>
+
+      <!-- Здесь будет время виртуализированной отрисовки. -->
+      <p id="virtual-time">
+        Время: —
+      </p>
+
+      <!--
+        Контейнер с ограниченной высотой.
+        Пользователь будет прокручивать его,
+        а JavaScript будет показывать только часть книг.
+      -->
+      <div id="virtual-window">
+
+        <!--
+          Внутренний контейнер.
+          Его высота будет равна высоте всех 5000 элементов,
+          чтобы scrollbar выглядел так, будто все книги реально есть.
+        -->
+        <div id="virtual-list"></div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      © 2026 BookNest — книжный клуб университета
+    </p>
+  </footer>
+
+  <!-- Подключаю JavaScript дополнительного задания. -->
+  <script type="module" src="js/virtualization.js"></script>
+
+</body>
+
+</html>

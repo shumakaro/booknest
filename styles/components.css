@@ -506,3 +506,32 @@ mark {
   border-radius: var(--radius-sm);
   padding-inline: var(--sp-1);
 }
+
+/* Окно виртуализированного списка. */
+#virtual-window {
+  height: 500px;
+  overflow-y: auto;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  margin-top: var(--sp-3);
+  position: relative;
+  background-color: var(--surface);
+}
+
+/* Внутренний контейнер виртуального списка. */
+#virtual-list {
+  position: relative;
+}
+
+/* Простая строка книги для теста виртуализации. */
+.virtual-book {
+  height: 70px;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: var(--border-width) solid var(--line);
+  background-color: var(--surface);
+}
+
+/* Обычный список 5000 книг. */
+#normal-list {
+  margin-top: var(--sp-3);
+}
