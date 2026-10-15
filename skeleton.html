@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- Страница для показа дополнительного задания со скелетонами. -->
+
+<html lang="ru">
+<!-- Указываю русский язык страницы. -->
+
+<head>
+  <!-- Служебная часть страницы. -->
+
+  <meta charset="UTF-8">
+  <!-- Кодировка UTF-8 для русского текста. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Нужна для правильного отображения на телефонах. -->
+
+  <title>Скелетоны — BookNest</title>
+  <!-- Название вкладки браузера. -->
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <!-- Подключаю дизайн-токены. -->
+
+  <link rel="stylesheet" href="styles/base.css">
+  <!-- Подключаю базовые стили. -->
+
+  <link rel="stylesheet" href="styles/layout.css">
+  <!-- Подключаю стили раскладки. -->
+
+  <link rel="stylesheet" href="styles/components.css">
+  <!-- Подключаю стили компонентов, где находятся скелетоны. -->
+</head>
+
+<body>
+
+  <header class="site-header">
+    <!-- Шапка сайта. -->
+
+    <h1 class="site-header__title">BookNest</h1>
+    <!-- Главный заголовок страницы. -->
+
+    <p class="site-header__tagline">Книжный клуб университета</p>
+    <!-- Короткое описание сайта. -->
+
+    <nav class="site-nav">
+      <!-- Навигация по страницам. -->
+
+      <ul class="site-nav__list">
+
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="index.html">Каталог</a>
+        </li>
+
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="book.html">Книга</a>
+        </li>
+
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="loan.html">Выдача</a>
+        </li>
+
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="profile.html">Профиль</a>
+        </li>
+
+      </ul>
+    </nav>
+
+    <!-- Кнопка ручного переключения темы. -->
+    <button type="button" class="btn" id="theme-toggle">
+      Сменить тему
+    </button>
+  </header>
+
+  <main class="page">
+    <!-- Основное содержимое страницы. -->
+
+    <h2 class="page__title">Загрузка книг</h2>
+    <!-- Заголовок блока со скелетонами. -->
+
+    <p class="page__lead">
+      Скелетоны показываются на месте карточек, пока данные ещё загружаются.
+    </p>
+    <!-- Короткое объяснение для дополнительного задания. -->
+
+    <section class="catalog">
+      <!-- Использую ту же сетку, что и в обычном каталоге. -->
+
+      <article class="skeleton-card" aria-hidden="true">
+        <!-- Первая карточка-заглушка.
+             aria-hidden скрывает декоративный скелетон от скринридера. -->
+
+        <div class="skeleton skeleton__title"></div>
+        <!-- Заглушка вместо названия книги. -->
+
+        <div class="skeleton skeleton__text"></div>
+        <!-- Заглушка вместо строки с автором. -->
+
+        <div class="skeleton skeleton__text"></div>
+        <!-- Заглушка вместо строки с жанром. -->
+
+        <div class="skeleton skeleton__text skeleton__text--short"></div>
+        <!-- Более короткая строка. -->
+
+        <div class="skeleton skeleton__button"></div>
+        <!-- Заглушка вместо кнопки. -->
+      </article>
+
+      <article class="skeleton-card" aria-hidden="true">
+        <!-- Вторая карточка-заглушка. -->
+
+        <div class="skeleton skeleton__title"></div>
+
+        <div class="skeleton skeleton__text"></div>
+
+        <div class="skeleton skeleton__text"></div>
+
+        <div class="skeleton skeleton__text skeleton__text--short"></div>
+
+        <div class="skeleton skeleton__button"></div>
+      </article>
+
+      <article class="skeleton-card" aria-hidden="true">
+        <!-- Третья карточка-заглушка. -->
+
+        <div class="skeleton skeleton__title"></div>
+
+        <div class="skeleton skeleton__text"></div>
+
+        <div class="skeleton skeleton__text"></div>
+
+        <div class="skeleton skeleton__text skeleton__text--short"></div>
+
+        <div class="skeleton skeleton__button"></div>
+      </article>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <!-- Подвал страницы. -->
+
+    <p class="site-footer__copy">
+      © 2026 BookNest — книжный клуб университета
+    </p>
+  </footer>
+
+  <!-- Подключаю JavaScript для переключения темы. -->
+  <script src="js/theme.js"></script>
+
+</body>
+</html>

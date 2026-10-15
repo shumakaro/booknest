@@ -378,3 +378,62 @@ input[type="checkbox"] {
   width: auto;
   accent-color: var(--accent);
 }
+
+/* Карточка-заглушка для загрузки книг. */
+.skeleton-card {
+  background-color: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  box-shadow: var(--shadow-sm);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* Общий вид серых полос внутри скелетона. */
+.skeleton {
+  background-color: var(--line);
+  border-radius: var(--radius);
+
+  /* Простая анимация мигания. */
+  animation: skeleton-pulse 1.2s infinite;
+}
+
+/* Заглушка вместо названия книги. */
+.skeleton__title {
+  width: 70%;
+  height: 24px;
+}
+
+/* Заглушка вместо обычного текста. */
+.skeleton__text {
+  width: 100%;
+  height: 16px;
+}
+
+/* Короткая строка текста. */
+.skeleton__text--short {
+  width: 60%;
+}
+
+/* Заглушка вместо кнопки. */
+.skeleton__button {
+  width: 45%;
+  height: 36px;
+}
+
+/* Анимация для скелетона. */
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
