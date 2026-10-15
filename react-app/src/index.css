@@ -1,0 +1,54 @@
+/* Базовые настройки для всего React-приложения. */
+:root {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #1f2937;
+  background: #f4f7fb;
+
+  /* Браузер не будет искусственно изменять начертание шрифтов. */
+  font-synthesis: none;
+
+  /* Немного улучшает отображение текста. */
+  text-rendering: optimizeLegibility;
+}
+
+/* box-sizing упрощает расчёт ширины элементов:
+   padding и border входят в указанную ширину. */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Элементы формы используют тот же шрифт,
+   что и остальная страница. */
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Изображения не выходят за границы своих контейнеров. */
+img {
+  display: block;
+  max-width: 100%;
+}
