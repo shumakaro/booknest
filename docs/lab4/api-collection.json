@@ -1,0 +1,1 @@
+﻿{"name":"BookNest Open Library API","requests":[{"name":"Поиск книг","method":"GET","url":"https://openlibrary.org/search.json?q=tolkien&limit=20&page=1"},{"name":"Детали книги","method":"GET","url":"https://openlibrary.org/works/OL27448W.json"},{"name":"Данные автора","method":"GET","url":"https://openlibrary.org/authors/OL26320A.json"}]}
