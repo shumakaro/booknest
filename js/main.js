@@ -276,8 +276,14 @@ function render() {
   // 2. Сортировка.
   const sorted = sortBooks(filtered, state.sort);
 
-  // 3. Отрисовка.
-  renderBooks(listEl, sorted, state.wishlist);
+// Передаю ещё и поисковый запрос,
+// чтобы renderBooks мог подсветить совпадения.
+renderBooks(
+  listEl,
+  sorted,
+  state.wishlist,
+  state.query
+);
   renderCounter(counterEl, sorted.length);
   renderWishlistCount(wishlistCountEl, state.wishlist.size);
 

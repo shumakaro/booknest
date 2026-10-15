@@ -498,3 +498,11 @@ input[type="checkbox"] {
 .site-header__file {
   display: none;
 }
+
+/* Подсветка текста, который совпал с поисковым запросом. */
+mark {
+  background-color: var(--success);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding-inline: var(--sp-1);
+}

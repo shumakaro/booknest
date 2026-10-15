@@ -26,7 +26,8 @@ import { GENRE_LABELS } from "../lib/books.js";
 
    Ничего не возвращает, только меняет содержимое container.
    ------------------------------------------------------------------ */
-export function renderBooks(container, books, wishlist) {
+// Отрисовываю книги и дополнительно получаю поисковый запрос.
+export function renderBooks(container, books, wishlist, query = "") {
   // Если книг нет — показываем пустое состояние с подсказкой
   // и выходим из функции. Это требование задания: «корректное пустое
   // состояние с подсказкой».
@@ -93,6 +94,45 @@ export function renderBooks(container, books, wishlist) {
   // содержимое контейнера — это то, что нам нужно, потому что при
   // каждом изменении состояния мы перерисовываем список с нуля.
   container.innerHTML = html;
+
+  // Если пользователь ничего не искал,
+// подсветку делать не нужно.
+if (!query.trim()) {
+  return;
+}
+
+// Получаю все карточки, которые только что были созданы.
+const cards = container.querySelectorAll(".book-card");
+
+// Перебираю каждую карточку.
+cards.forEach((card) => {
+
+  // Получаю id книги из data-id.
+  const id = Number(card.dataset.id);
+
+  // Нахожу книгу с таким id в массиве books.
+  const book = books.find((item) => item.id === id);
+
+  // Если книга не найдена, пропускаю эту карточку.
+  if (!book) {
+    return;
+  }
+
+  // Нахожу заголовок книги.
+  const title = card.querySelector(".book-card__title");
+
+  // Нахожу все строки с дополнительной информацией.
+  const meta = card.querySelectorAll(".book-card__meta");
+
+  // Первая строка meta содержит автора.
+  const author = meta[0];
+
+  // Подсвечиваю совпадение в названии.
+  highlightText(title, book.title, query);
+
+  // Подсвечиваю совпадение в имени автора.
+  highlightText(author, "Автор: " + book.author, query);
+});
 }
 
 /* ------------------------------------------------------------------
@@ -198,4 +238,74 @@ function pluralize(n, one, few, many) {
     return few;
   }
   return many;
+}
+
+/* ------------------------------------------------------------------
+   highlightText — подсветка найденной части текста.
+
+   Здесь не используется innerHTML.
+   Все части текста создаются через textContent.
+   Поэтому пользовательский поисковый запрос
+   не может вставить HTML-код на страницу.
+   ------------------------------------------------------------------ */
+function highlightText(element, text, query) {
+
+  // Очищаю старое содержимое элемента.
+  element.textContent = "";
+
+  // Убираю пробелы у поискового запроса.
+  const search = query.trim();
+
+  // Если запрос пустой, просто возвращаю обычный текст.
+  if (!search) {
+    element.textContent = text;
+    return;
+  }
+
+  // Перевожу текст и запрос в нижний регистр,
+  // чтобы поиск не зависел от регистра.
+  const lowerText = text.toLowerCase();
+  const lowerSearch = search.toLowerCase();
+
+  // Ищу позицию совпадения.
+  const position = lowerText.indexOf(lowerSearch);
+
+  // Если совпадения нет, показываю обычный текст.
+  if (position === -1) {
+    element.textContent = text;
+    return;
+  }
+
+  // Получаю текст до совпадения.
+  const before = text.slice(0, position);
+
+  // Получаю сам найденный фрагмент.
+  const match = text.slice(
+    position,
+    position + search.length
+  );
+
+  // Получаю текст после совпадения.
+  const after = text.slice(
+    position + search.length
+  );
+
+  // Добавляю обычный текст до совпадения.
+  element.append(
+    document.createTextNode(before)
+  );
+
+  // Создаю тег mark для найденной части.
+  const mark = document.createElement("mark");
+
+  // Записываю найденный текст безопасно через textContent.
+  mark.textContent = match;
+
+  // Добавляю подсвеченный фрагмент.
+  element.append(mark);
+
+  // Добавляю оставшийся текст.
+  element.append(
+    document.createTextNode(after)
+  );
 }
