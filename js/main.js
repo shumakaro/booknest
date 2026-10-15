@@ -1,143 +1,223 @@
 /* ==========================================================================
    main.js — точка входа приложения BookNest (ЛР №4).
 
-   Здесь сходятся три вещи:
-     1. state — единственный объект состояния приложения;
-     2. обработчики событий — реагируют на ввод, клики, пагинацию;
-     3. логика поиска с debounce и отменой устаревших запросов.
+   Здесь находится основная логика интерфейса:
 
-   Что изменилось по сравнению с ЛР №3:
-     - источник данных — не локальный массив, а Open Library API;
-     - появились четыре состояния интерфейса (loading/success/empty/error);
-     - поиск идёт через debounce, чтобы не улетало 15 запросов на 15 букв;
-     - устаревшие запросы отменяются через AbortController;
-     - добавлена пагинация по 20 записей;
-     - ошибки различаются по типу: сеть (status 0), 4xx, 5xx.
+   1. единый объект state;
+   2. поиск книг через Open Library API;
+   3. debounce 350 мс;
+   4. отмена устаревших запросов через AbortController;
+   5. четыре состояния: loading, success, empty, error;
+   6. накопительная загрузка «Показать ещё»;
+   7. wishlist через localStorage;
+   8. страница профиля;
+   9. экспорт и импорт wishlist в JSON.
 
-   ВАЖНО (для защиты): ровно один объект state. Любое изменение состояния
-   приводит к вызову render-логики, которая решает, какое из четырёх
-   состояний показать.
+   ВАЖНО (для защиты):
+   fetch здесь НЕ вызывается.
+   Все сетевые запросы идут через api/books.js → api/client.js.
    ========================================================================== */
 
-// Импортируем функции запросов из слоя API.
-// Обрати внимание: fetch здесь НЕ вызывается — только наши обёртки.
-import { searchBooks, getBookById } from "../api/books.js";
+import {
+  searchBooks,
+  getBookById,
+} from "../api/books.js";
+
 import { ApiError } from "../api/client.js";
+
 import { debounce } from "./lib/debounce.js";
 
 import {
   showState,
   renderSearchResults,
-  renderPagination,
   renderWishlistCount,
   pluralize,
 } from "./ui/render.js";
 
-/* ------------------------------------------------------------------
-   Элементы страницы каталога.
-   ------------------------------------------------------------------ */
+/* ==========================================================================
+   ЭЛЕМЕНТЫ СТРАНИЦЫ КАТАЛОГА
+   ========================================================================== */
 
 const searchInput = document.querySelector("#search");
-const resultsCounterEl = document.querySelector("#counter");
-const wishlistCountEl = document.querySelector("#wishlist-count");
-const retryBtn = document.querySelector("#state-error-retry");
-const bookListEl = document.querySelector("#book-list");
-const prevBtn = document.querySelector("#pagination-prev");
-const nextBtn = document.querySelector("#pagination-next");
 
-// Элементы страницы профиля.
-const wishlistListEl = document.querySelector("#wishlist-list");
-const wishlistLoadingEl = document.querySelector("#wishlist-loading");
-const wishlistEmptyEl = document.querySelector("#wishlist-empty");
-const wishlistErrorEl = document.querySelector("#wishlist-error");
-const wishlistSuccessEl = document.querySelector("#wishlist-success");
-const wishlistErrorTextEl = document.querySelector("#wishlist-error-text");
-const wishlistRetryBtn = document.querySelector("#wishlist-error-retry");
+const resultsCounterEl =
+  document.querySelector("#counter");
 
+const wishlistCountEl =
+  document.querySelector("#wishlist-count");
 
+const retryBtn =
+  document.querySelector("#state-error-retry");
 
-// Кнопки экспорта и импорта.
-const exportBtn = document.querySelector("#export");
-const importInput = document.querySelector("#import");
+const bookListEl =
+  document.querySelector("#book-list");
 
-// Проверяем, открыта ли страница профиля.
-const isProfilePage = wishlistListEl !== null;
+// Новая кнопка вместо пагинации.
+const loadMoreBtn =
+  document.querySelector("#load-more");
+
+/* ==========================================================================
+   ЭЛЕМЕНТЫ СТРАНИЦЫ ПРОФИЛЯ
+   ========================================================================== */
+
+const wishlistListEl =
+  document.querySelector("#wishlist-list");
+
+const wishlistLoadingEl =
+  document.querySelector("#wishlist-loading");
+
+const wishlistEmptyEl =
+  document.querySelector("#wishlist-empty");
+
+const wishlistErrorEl =
+  document.querySelector("#wishlist-error");
+
+const wishlistSuccessEl =
+  document.querySelector("#wishlist-success");
+
+const wishlistErrorTextEl =
+  document.querySelector("#wishlist-error-text");
+
+const wishlistRetryBtn =
+  document.querySelector("#wishlist-error-retry");
+
+/* ==========================================================================
+   ЭКСПОРТ И ИМПОРТ
+   ========================================================================== */
+
+const exportBtn =
+  document.querySelector("#export");
+
+const importInput =
+  document.querySelector("#import");
 
 /* ------------------------------------------------------------------
-   Состояние приложения.
+   Определяем, открыта ли страница профиля.
 
-   Поля:
-     query         — что введено в поиск;
-     page          — текущая страница пагинации (1-based);
-     loading       — идёт ли запрос прямо сейчас;
-     docs          — результаты последнего успешного запроса;
-     totalPages    — всего страниц (или null, если неизвестно);
-     wishlist      — Set с OLID книг в списке желаемого.
+   Если #wishlist-list существует — значит сейчас profile.html.
    ------------------------------------------------------------------ */
+
+const isProfilePage =
+  wishlistListEl !== null;
+
+/* ==========================================================================
+   СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+
+   ВАЖНО:
+   у приложения остаётся ровно ОДИН объект state.
+   ========================================================================== */
+
 const state = {
+  // Текущий поисковый запрос.
   query: "",
+
+  // Последняя успешно загруженная страница API.
   page: 1,
+
+  // Идёт ли сейчас запрос.
   loading: false,
+
+  // Все загруженные книги.
+  // При «Показать ещё» новые книги добавляются сюда.
   docs: [],
+
+  // Общее количество страниц.
   totalPages: null,
+
+  // OLID книг из списка желаемого.
   wishlist: new Set(),
 };
 
-/* ------------------------------------------------------------------
-   Ключи localStorage.
-   ------------------------------------------------------------------ */
-const STORAGE_WISHLIST_KEY = "booknest:wishlist";
+/* ==========================================================================
+   LOCALSTORAGE
+   ========================================================================== */
+
+const STORAGE_WISHLIST_KEY =
+  "booknest:wishlist";
 
 /* ------------------------------------------------------------------
-   activeController — AbortController текущего запроса.
+   readWishlistFromStorage — читает wishlist.
 
-   Объявлен до функции runSearch, потому что используется внутри неё.
-   Хранит ссылку на контроллер последнего запроса, чтобы можно было
-   отменить его при новом вводе.
+   Если localStorage пустой или JSON испорчен,
+   просто возвращаем пустой массив.
    ------------------------------------------------------------------ */
-let activeController = null;
 
-/* ------------------------------------------------------------------
-   readWishlistFromStorage — прочитать список желаемого из localStorage.
-   Защищено try/catch, как в ЛР №3. Если данных нет или они битые —
-   возвращаем пустой массив.
-   ------------------------------------------------------------------ */
 function readWishlistFromStorage() {
   try {
-    const raw = localStorage.getItem(STORAGE_WISHLIST_KEY);
-    if (!raw) return [];
+    const raw =
+      localStorage.getItem(
+        STORAGE_WISHLIST_KEY
+      );
+
+    if (!raw) {
+      return [];
+    }
+
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    // Оставляем только строки — OLID в Open Library это строки
-    // вида "OL27448W", а не числа, как было в ЛР №3.
-    return parsed.filter((id) => typeof id === "string");
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    // OLID — строки вида OL27448W.
+    return parsed.filter(
+      (id) => typeof id === "string"
+    );
   } catch (error) {
-    console.warn("Не удалось прочитать список желаемого:", error);
+    console.warn(
+      "Не удалось прочитать wishlist:",
+      error
+    );
+
     return [];
   }
 }
 
 /* ------------------------------------------------------------------
-   saveWishlist — сохранить список желаемого в localStorage.
+   saveWishlist — сохраняет Set в localStorage.
+
+   Set напрямую в JSON сохранить нельзя,
+   поэтому сначала превращаем его в массив.
    ------------------------------------------------------------------ */
+
 function saveWishlist() {
   try {
     localStorage.setItem(
       STORAGE_WISHLIST_KEY,
-      JSON.stringify([...state.wishlist])
+      JSON.stringify(
+        [...state.wishlist]
+      )
     );
   } catch (error) {
-    console.warn("Не удалось сохранить список желаемого:", error);
+    console.warn(
+      "Не удалось сохранить wishlist:",
+      error
+    );
   }
 }
 
-// Показывает одно состояние wishlist и скрывает остальные.
-function showWishlistState(name, text = "") {
+/* ==========================================================================
+   СОСТОЯНИЯ WISHLIST НА СТРАНИЦЕ ПРОФИЛЯ
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   showWishlistState — показывает только одно состояние:
+
+   loading
+   empty
+   error
+   success
+   ------------------------------------------------------------------ */
+
+function showWishlistState(
+  name,
+  text = ""
+) {
   const states = [
     wishlistLoadingEl,
     wishlistEmptyEl,
     wishlistErrorEl,
-    wishlistSuccessEl
+    wishlistSuccessEl,
   ];
 
   states.forEach((element) => {
@@ -162,87 +242,117 @@ function showWishlistState(name, text = "") {
     target.hidden = false;
   }
 
-  if (name === "error" && wishlistErrorTextEl) {
-    wishlistErrorTextEl.textContent = text;
+  if (
+    name === "error" &&
+    wishlistErrorTextEl
+  ) {
+    wishlistErrorTextEl.textContent =
+      text;
   }
 }
 
-// Отрисовывает книги из wishlist на странице профиля.
+/* ------------------------------------------------------------------
+   renderWishlistPage — выводит книги wishlist.
+
+   Здесь используем createElement и textContent,
+   а не вставляем данные API прямо через HTML-строку.
+   ------------------------------------------------------------------ */
+
 function renderWishlistPage(books) {
-  // Если мы не на странице профиля — ничего не делаем.
   if (!wishlistListEl) {
     return;
   }
 
-  // Перед новой отрисовкой очищаем список.
-  wishlistListEl.innerHTML = "";
+  // Очищаем предыдущий список.
+  wishlistListEl.textContent = "";
 
-  // Создаём элементы для каждой книги.
   books.forEach((book) => {
-    // OLID хранится в поле key в формате "/works/OL..."
-    const olid = book.key.replace("/works/", "");
+    const olid =
+      typeof book.key === "string"
+        ? book.key.replace(
+            "/works/",
+            ""
+          )
+        : "";
 
-    // Создаём <li>.
-    const item = document.createElement("li");
-    item.className = "wishlist__item";
+    const item =
+      document.createElement("li");
 
-    // Создаём название книги.
-    const title = document.createElement("h4");
-    title.className = "wishlist__book-title";
-    title.textContent = book.title || "Без названия";
+    item.className =
+      "wishlist__item";
 
-    // Создаём кнопку удаления.
-    const button = document.createElement("button");
+    const title =
+      document.createElement("h4");
+
+    title.className =
+      "wishlist__book-title";
+
+    title.textContent =
+      book.title ||
+      "Без названия";
+
+    const button =
+      document.createElement("button");
+
     button.type = "button";
-    button.className = "btn btn--ghost js-wishlist-remove";
+
+    button.className =
+      "btn btn--ghost js-wishlist-remove";
+
     button.dataset.olid = olid;
-    button.textContent = "Удалить";
 
-    // Собираем карточку.
-    item.append(title);
-    item.append(button);
+    button.textContent =
+      "Удалить";
 
-    // Добавляем её в список.
+    item.append(
+      title,
+      button
+    );
+
     wishlistListEl.append(item);
   });
 }
 
-// Загружает данные книг из wishlist через API.
-async function loadWishlist() {
-  // Получаем массив OLID из Set.
-  const olids = [...state.wishlist];
+/* ------------------------------------------------------------------
+   loadWishlist — загружает данные книг из API по сохранённым OLID.
+   ------------------------------------------------------------------ */
 
-  // Если список пустой — показываем empty.
+async function loadWishlist() {
+  const olids =
+    [...state.wishlist];
+
   if (olids.length === 0) {
     if (wishlistListEl) {
-      wishlistListEl.innerHTML = "";
+      wishlistListEl.textContent = "";
     }
 
     showWishlistState("empty");
+
     return;
   }
 
-  // Показываем загрузку.
   showWishlistState("loading");
 
   try {
-    // Все книги загружаются параллельно.
-    const books = await Promise.all(
-      olids.map((olid) => getBookById(olid))
-    );
+    // Книги независимы друг от друга,
+    // поэтому загружаем их параллельно.
+    const books =
+      await Promise.all(
+        olids.map((olid) =>
+          getBookById(olid)
+        )
+      );
 
-    // Отрисовываем книги.
     renderWishlistPage(books);
 
-    // Показываем успешное состояние.
     showWishlistState("success");
   } catch (error) {
-    // Отменённый запрос не считаем ошибкой.
-    if (error.name === "AbortError") {
+    if (
+      error.name === "AbortError"
+    ) {
       return;
     }
 
-    // Показываем понятное сообщение.
     showWishlistState(
       "error",
       humanizeError(error)
@@ -250,295 +360,512 @@ async function loadWishlist() {
   }
 }
 
+/* ==========================================================================
+   ОБРАБОТКА ОШИБОК
+   ========================================================================== */
+
 /* ------------------------------------------------------------------
-   humanizeError — превратить объект ошибки в понятный текст для UI.
-
-   Принимает error — объект, который может быть ApiError или любой другой.
-   Возвращает строку, которую покажем пользователю.
-
-   ВАЖНО (для защиты): разные типы ошибок — разные сообщения. Это требование
-   задания. Сеть (status 0), 4xx и 5xx должны выглядеть по-разному.
+   humanizeError — превращает техническую ошибку
+   в понятный текст интерфейса.
    ------------------------------------------------------------------ */
+
 function humanizeError(error) {
-  // Сетевая ошибка — наш client.js оборачивает её в ApiError со status 0.
-  if (error instanceof ApiError && error.status === 0) {
-    return "Не удалось подключиться к серверу. Проверьте интернет-соединение.";
+  // Нет сети.
+  if (
+    error instanceof ApiError &&
+    error.status === 0
+  ) {
+    return (
+      "Не удалось подключиться к серверу. " +
+      "Проверьте интернет-соединение."
+    );
   }
 
-  // 404 — отдельный случай для страницы деталей, но в поиске тоже
-  // может встретиться.
-  if (error instanceof ApiError && error.status === 404) {
+  // Книга или ресурс не найден.
+  if (
+    error instanceof ApiError &&
+    error.status === 404
+  ) {
     return "Книга не найдена.";
   }
 
-  // Остальные 4xx — ошибки клиента.
-  if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
-    return "Запрос отклонён сервером. Попробуйте изменить условия поиска.";
+  // Другие ошибки пользователя / клиента.
+  if (
+    error instanceof ApiError &&
+    error.status >= 400 &&
+    error.status < 500
+  ) {
+    return (
+      "Запрос отклонён сервером. " +
+      "Попробуйте изменить условия поиска."
+    );
   }
 
-  // 5xx — ошибки сервера. Проблема на стороне Open Library.
-  if (error instanceof ApiError && error.status >= 500) {
-    return "Ошибка сервера. Попробуйте позже.";
+  // Ошибка Open Library.
+  if (
+    error instanceof ApiError &&
+    error.status >= 500
+  ) {
+    return (
+      "Ошибка сервера. " +
+      "Попробуйте позже."
+    );
   }
 
-  // Всё остальное — неожиданная ошибка.
-  return "Что-то пошло не так. Попробуйте ещё раз.";
+  return (
+    "Что-то пошло не так. " +
+    "Попробуйте ещё раз."
+  );
 }
 
-/* ------------------------------------------------------------------
-   runSearch — выполнить поиск по текущему state.query и state.page.
+/* ==========================================================================
+   ABORTCONTROLLER
+   ========================================================================== */
 
-   Логика:
-     1. Если запрос короче 3 символов — показываем empty и выходим.
-     2. Отменяем предыдущий запрос через AbortController.
-     3. Показываем loading.
-     4. Отправляем запрос через searchBooks.
-     5. Обрабатываем результат:
-        - успех и есть книги → success;
-        - успех и пусто → empty;
-        - ошибка → error с человеческим текстом.
-     6. В finally снимаем loading.
+// Контроллер последнего поискового запроса.
+//
+// Когда пользователь продолжает печатать,
+// предыдущий запрос можно отменить.
+let activeController = null;
+
+/* ==========================================================================
+   КНОПКА «ПОКАЗАТЬ ЕЩЁ»
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   updateLoadMoreButton — решает, надо ли показывать кнопку.
+
+   Если последняя страница уже загружена,
+   кнопка скрывается.
    ------------------------------------------------------------------ */
-async function runSearch() {
-  // Проверка минимальной длины. Это требование задания: не отправлять
-  // запрос на каждую букву, минимум 3 символа.
-  const query = state.query.trim();
-  if (query.length < 3) {
-    state.docs = [];
-    state.totalPages = null;
-    showState("empty");
-    if (resultsCounterEl) resultsCounterEl.textContent = "";
+
+function updateLoadMoreButton() {
+  if (!loadMoreBtn) {
     return;
   }
 
-  // Отменяем предыдущий незавершённый запрос, если он был.
+  const hasBooks =
+    state.docs.length > 0;
+
+  const hasNextPage =
+    state.totalPages !== null &&
+    state.page < state.totalPages;
+
+  loadMoreBtn.hidden =
+    !hasBooks ||
+    !hasNextPage;
+
+  loadMoreBtn.disabled =
+    state.loading;
+
+  if (!state.loading) {
+    loadMoreBtn.textContent =
+      "Показать ещё";
+  }
+}
+
+/* ==========================================================================
+   ПОИСК
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   runSearch — выполняет запрос к API.
+
+   page:
+     какую страницу Open Library нужно получить.
+
+   append:
+     false — новый поиск, старые книги заменяются;
+     true  — «Показать ещё», новые книги добавляются ниже.
+
+   Это главное отличие накопительной загрузки от обычной пагинации.
+   ------------------------------------------------------------------ */
+
+async function runSearch({
+  page = 1,
+  append = false,
+} = {}) {
+  const query =
+    state.query.trim();
+
+  /* ----------------------------------------------------------------
+     Минимальная длина запроса — 3 символа.
+     ---------------------------------------------------------------- */
+
+  if (query.length < 3) {
+    state.docs = [];
+    state.page = 1;
+    state.totalPages = null;
+
+    showState("empty");
+
+    if (resultsCounterEl) {
+      resultsCounterEl.textContent = "";
+    }
+
+    updateLoadMoreButton();
+
+    return;
+  }
+
+  /* ----------------------------------------------------------------
+     Отменяем предыдущий незавершённый запрос.
+     ---------------------------------------------------------------- */
+
   if (activeController) {
     activeController.abort();
   }
-  activeController = new AbortController();
 
-  // Показываем загрузку. Это ОДНО из четырёх состояний,
-  // остальные скрываются внутри showState.
+  activeController =
+    new AbortController();
+
   state.loading = true;
-  showState("loading");
+
+  /* ----------------------------------------------------------------
+     Для НОВОГО поиска показываем полноценный loading.
+
+     При «Показать ещё» уже загруженные книги не скрываем.
+     Меняем только текст кнопки.
+     ---------------------------------------------------------------- */
+
+  if (!append) {
+    showState("loading");
+  } else if (loadMoreBtn) {
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.textContent =
+      "Загрузка...";
+  }
 
   try {
-    const data = await searchBooks(query, activeController.signal, state.page);
+    /* --------------------------------------------------------------
+       Получаем одну страницу результатов.
 
-    // data.docs — массив книг, data.numFound — общее количество.
-    // Open Library возвращает это в ответе на /search.json.
-    state.docs = Array.isArray(data.docs) ? data.docs : [];
+       В api/books.js эта функция также проверяет кэш Map.
+       -------------------------------------------------------------- */
 
-    // Вычисляем количество страниц: общее число / 20 (наш limit),
-    // округляем вверх. Если numFound нет — оставляем null.
-    if (typeof data.numFound === "number" && data.numFound > 0) {
-      state.totalPages = Math.ceil(data.numFound / 20);
+    const data =
+      await searchBooks(
+        query,
+        activeController.signal,
+        page
+      );
+
+    const newDocs =
+      Array.isArray(data.docs)
+        ? data.docs
+        : [];
+
+    /* --------------------------------------------------------------
+       Если это «Показать ещё» —
+       добавляем новые книги к старым.
+
+       Если новый поиск —
+       полностью заменяем список.
+       -------------------------------------------------------------- */
+
+    if (append) {
+      state.docs = [
+        ...state.docs,
+        ...newDocs,
+      ];
+    } else {
+      state.docs = newDocs;
+    }
+
+    // Страница считается загруженной
+    // только после успешного ответа.
+    state.page = page;
+
+    /* --------------------------------------------------------------
+       Open Library возвращает numFound —
+       общее количество найденных книг.
+
+       limit = 20, поэтому вычисляем количество страниц.
+       -------------------------------------------------------------- */
+
+    if (
+      typeof data.numFound ===
+        "number" &&
+      data.numFound > 0
+    ) {
+      state.totalPages =
+        Math.ceil(
+          data.numFound / 20
+        );
     } else {
       state.totalPages = null;
     }
 
-    if (state.docs.length === 0) {
-      // Успешный запрос, но результатов нет.
+    /* --------------------------------------------------------------
+       Если первый запрос ничего не нашёл —
+       показываем empty.
+       -------------------------------------------------------------- */
+
+    if (
+      state.docs.length === 0
+    ) {
       showState("empty");
-      if (resultsCounterEl) resultsCounterEl.textContent = "";
-    } else {
-      // Успех — рендерим карточки.
-      showState("success");
-      renderSearchResults(state.docs, state.wishlist);
-      renderPagination(state.page, state.totalPages);
+
       if (resultsCounterEl) {
-        const word = pluralize(state.docs.length, "книга", "книги", "книг");
-        resultsCounterEl.textContent = `Найдено: ${state.docs.length} ${word}`;
+        resultsCounterEl.textContent =
+          "";
       }
-    }
-  } catch (error) {
-    // Отмена запроса — не ошибка. Просто выходим, ничего не показываем.
-    // Пользователь продолжает печатать, и следующий runSearch
-    // отправит новый запрос.
-    if (error.name === "AbortError") {
+
+      updateLoadMoreButton();
+
       return;
     }
 
-    // Настоящая ошибка — показываем состояние error с текстом.
-    showState("error", humanizeError(error));
+    /* --------------------------------------------------------------
+       Успешное состояние.
+
+       При «Показать ещё» render получает ВСЕ накопленные книги:
+       сначала 20, затем 40, 60 и т.д.
+       -------------------------------------------------------------- */
+
+    showState("success");
+
+    renderSearchResults(
+      state.docs,
+      state.wishlist
+    );
+
+    /* --------------------------------------------------------------
+       Счётчик показывает количество книг,
+       которые уже загружены на страницу.
+       -------------------------------------------------------------- */
+
+    if (resultsCounterEl) {
+      const word = pluralize(
+        state.docs.length,
+        "книга",
+        "книги",
+        "книг"
+      );
+
+      resultsCounterEl.textContent =
+        `Показано: ${state.docs.length} ${word}`;
+    }
+
+    updateLoadMoreButton();
+  } catch (error) {
+    /* --------------------------------------------------------------
+       AbortError возникает, когда пользователь быстро печатает
+       и старый запрос отменяется.
+
+       Его пользователю не показываем.
+       -------------------------------------------------------------- */
+
+    if (
+      error.name === "AbortError"
+    ) {
+      return;
+    }
+
+    showState(
+      "error",
+      humanizeError(error)
+    );
   } finally {
-    // ВАЖНО (для защиты): снятие индикатора загрузки ОБЯЗАТЕЛЬНО
-    // в finally. Иначе при ошибке (или отмене) приложение может
-    // зависнуть в состоянии loading навсегда.
     state.loading = false;
+
+    updateLoadMoreButton();
   }
 }
 
-/* ------------------------------------------------------------------
-   debouncedSearch — обёртка над runSearch с задержкой 350 мс.
-
-   Пока пользователь печатает, вызовы debouncedSearch перезапускают
-   таймер. Запрос уйдёт только через 350 мс после последней буквы.
-   ------------------------------------------------------------------ */
-const debouncedSearch = debounce(() => {
-  // При новом поиске сбрасываем страницу на первую.
-  state.page = 1;
-  runSearch();
-}, 350);
+/* ==========================================================================
+   DEBOUNCE
+   ========================================================================== */
 
 /* ------------------------------------------------------------------
-   Обработчик ввода в поле поиска.
+   Запрос запускается через 350 мс после последней введённой буквы.
+
+   При НОВОМ поиске:
+     page → 1;
+     docs → [];
    ------------------------------------------------------------------ */
+
+const debouncedSearch =
+  debounce(() => {
+    state.page = 1;
+    state.docs = [];
+    state.totalPages = null;
+
+    runSearch({
+      page: 1,
+      append: false,
+    });
+  }, 350);
+
+/* ==========================================================================
+   СОБЫТИЯ КАТАЛОГА
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   Ввод текста поиска.
+   ------------------------------------------------------------------ */
+
 if (searchInput) {
-  searchInput.addEventListener("input", (event) => {
-    state.query = event.target.value;
-    debouncedSearch();
-  });
+  searchInput.addEventListener(
+    "input",
+    (event) => {
+      state.query =
+        event.target.value;
+
+      debouncedSearch();
+    }
+  );
 }
 
 /* ------------------------------------------------------------------
-   Обработчик клика по кнопке «Повторить» в состоянии ошибки.
+   Кнопка «Повторить» после ошибки поиска.
+
+   Повторяем первый запрос текущего поиска.
    ------------------------------------------------------------------ */
+
 if (retryBtn) {
-  retryBtn.addEventListener("click", () => {
-    runSearch();
-  });
+  retryBtn.addEventListener(
+    "click",
+    () => {
+      state.page = 1;
+      state.docs = [];
+
+      runSearch({
+        page: 1,
+        append: false,
+      });
+    }
+  );
 }
 
 /* ------------------------------------------------------------------
-   Делегирование кликов по кнопке «Хочу прочитать».
+   Кнопка «Показать ещё».
+
+   Например:
+
+   сейчас page = 1
+   ↓
+   нажали кнопку
+   ↓
+   запрашиваем page = 2
+   ↓
+   новые 20 книг добавляются к предыдущим.
    ------------------------------------------------------------------ */
-if (bookListEl) {
-  bookListEl.addEventListener("click", (event) => {
-    const wishBtn = event.target.closest(".js-wish");
-    if (!wishBtn) return;
 
-    const olid = wishBtn.dataset.olid;
-    if (state.wishlist.has(olid)) {
-      state.wishlist.delete(olid);
-    } else {
-      state.wishlist.add(olid);
-    }
-    saveWishlist();
-    renderSearchResults(state.docs, state.wishlist);
-    if (wishlistCountEl) {
-      renderWishlistCount(wishlistCountEl, state.wishlist.size);
-    }
-  });
-}
-
-/* ------------------------------------------------------------------
-   Удаление книги из wishlist на странице профиля.
-
-   Используем делегирование событий:
-   один обработчик стоит на всём списке, а не на каждой кнопке.
-   ------------------------------------------------------------------ */
-if (wishlistListEl) {
-  wishlistListEl.addEventListener("click", (event) => {
-    // Проверяем, нажата ли кнопка удаления.
-    const removeButton = event.target.closest(".js-wishlist-remove");
-
-    if (!removeButton) {
-      return;
-    }
-
-    // Получаем OLID книги из data-атрибута кнопки.
-    const olid = removeButton.dataset.olid;
-
-    // Удаляем книгу из Set.
-    state.wishlist.delete(olid);
-
-    // Сохраняем новый wishlist в localStorage.
-    saveWishlist();
-
-    // Обновляем счётчик в шапке.
-    if (wishlistCountEl) {
-      renderWishlistCount(
-        wishlistCountEl,
-        state.wishlist.size
-      );
-    }
-
-    // Перезагружаем список на странице профиля.
-    loadWishlist();
-  });
-}
-
-/* ------------------------------------------------------------------
-   Повторная загрузка wishlist после ошибки.
-   ------------------------------------------------------------------ */
-if (wishlistRetryBtn) {
-  wishlistRetryBtn.addEventListener("click", () => {
-    loadWishlist();
-  });
-}
-
-/* ------------------------------------------------------------------
-   Экспорт списка желаемого в JSON-файл.
-   ------------------------------------------------------------------ */
-if (exportBtn) {
-  exportBtn.addEventListener("click", () => {
-    // Превращаем Set в обычный массив.
-    const wishlistArray = [...state.wishlist];
-
-    // Превращаем массив в JSON-строку.
-    const json = JSON.stringify(wishlistArray, null, 2);
-
-    // Создаём виртуальный файл в памяти браузера.
-    const blob = new Blob(
-      [json],
-      { type: "application/json" }
-    );
-
-    // Создаём временную ссылку на этот файл.
-    const url = URL.createObjectURL(blob);
-
-    // Создаём временную ссылку <a>.
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "booknest-wishlist.json";
-
-    // Запускаем скачивание.
-    link.click();
-
-    // Удаляем временную ссылку из памяти.
-    URL.revokeObjectURL(url);
-  });
-}
-
-/* ------------------------------------------------------------------
-   Импорт списка желаемого из JSON-файла.
-   ------------------------------------------------------------------ */
-if (importInput) {
-  importInput.addEventListener("change", async (event) => {
-    // Получаем выбранный файл.
-    const file = event.target.files[0];
-
-    if (!file) {
-      return;
-    }
-
-    try {
-      // Читаем файл как текст.
-      const text = await file.text();
-
-      // Превращаем JSON-текст обратно в JavaScript.
-      const data = JSON.parse(text);
-
-      // Проверяем, что внутри именно массив.
-      if (!Array.isArray(data)) {
-        throw new Error("Неверный формат файла");
+if (loadMoreBtn) {
+  loadMoreBtn.addEventListener(
+    "click",
+    () => {
+      if (state.loading) {
+        return;
       }
 
-      // Оставляем только строки,
-      // потому что wishlist хранит OLID.
-      const validIds = data.filter(
-        (id) => typeof id === "string"
-      );
+      if (
+        state.totalPages !== null &&
+        state.page >=
+          state.totalPages
+      ) {
+        return;
+      }
 
-      // Создаём новый Set.
-      state.wishlist = new Set(validIds);
+      runSearch({
+        page: state.page + 1,
+        append: true,
+      });
+    }
+  );
+}
 
-      // Сохраняем импортированный список.
+/* ------------------------------------------------------------------
+   Добавление / удаление книги из wishlist в каталоге.
+
+   Используем делегирование событий:
+   один listener находится на всём списке книг.
+   ------------------------------------------------------------------ */
+
+if (bookListEl) {
+  bookListEl.addEventListener(
+    "click",
+    (event) => {
+      const wishBtn =
+        event.target.closest(
+          ".js-wish"
+        );
+
+      if (!wishBtn) {
+        return;
+      }
+
+      const olid =
+        wishBtn.dataset.olid;
+
+      if (!olid) {
+        return;
+      }
+
+      if (
+        state.wishlist.has(olid)
+      ) {
+        state.wishlist.delete(
+          olid
+        );
+      } else {
+        state.wishlist.add(
+          olid
+        );
+      }
+
       saveWishlist();
 
-      // Обновляем счётчик.
+      // Перерисовываем все накопленные книги,
+      // чтобы изменить состояние кнопки wishlist.
+      renderSearchResults(
+        state.docs,
+        state.wishlist
+      );
+
+      if (wishlistCountEl) {
+        renderWishlistCount(
+          wishlistCountEl,
+          state.wishlist.size
+        );
+      }
+    }
+  );
+}
+
+/* ==========================================================================
+   СОБЫТИЯ ПРОФИЛЯ
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   Удаление книги из wishlist.
+   ------------------------------------------------------------------ */
+
+if (wishlistListEl) {
+  wishlistListEl.addEventListener(
+    "click",
+    (event) => {
+      const removeButton =
+        event.target.closest(
+          ".js-wishlist-remove"
+        );
+
+      if (!removeButton) {
+        return;
+      }
+
+      const olid =
+        removeButton.dataset.olid;
+
+      if (!olid) {
+        return;
+      }
+
+      state.wishlist.delete(olid);
+
+      saveWishlist();
+
       if (wishlistCountEl) {
         renderWishlistCount(
           wishlistCountEl,
@@ -546,76 +873,189 @@ if (importInput) {
         );
       }
 
-      // Если мы на странице профиля —
-      // заново загружаем книги через API.
-      if (isProfilePage) {
-        loadWishlist();
-      }
-
-      // Если мы в каталоге —
-      // обновляем состояние кнопок.
-      if (bookListEl) {
-        renderSearchResults(
-          state.docs,
-          state.wishlist
-        );
-      }
-
-    } catch (error) {
-      console.warn(
-        "Не удалось импортировать wishlist:",
-        error
-      );
-
-      alert(
-        "Не удалось прочитать файл. Проверьте формат JSON."
-      );
+      loadWishlist();
     }
-
-    // Сбрасываем input.
-    // Это позволяет выбрать тот же файл повторно.
-    event.target.value = "";
-  });
+  );
 }
 
 /* ------------------------------------------------------------------
-   Обработчики кнопок пагинации.
+   Повторная загрузка wishlist после ошибки.
    ------------------------------------------------------------------ */
-if (prevBtn) {
-  prevBtn.addEventListener("click", () => {
-    if (state.page > 1) {
-      state.page -= 1;
-      runSearch();
+
+if (wishlistRetryBtn) {
+  wishlistRetryBtn.addEventListener(
+    "click",
+    () => {
+      loadWishlist();
     }
-  });
+  );
 }
 
-if (nextBtn) {
-  nextBtn.addEventListener("click", () => {
-    if (state.totalPages === null || state.page < state.totalPages) {
-      state.page += 1;
-      runSearch();
+/* ==========================================================================
+   ЭКСПОРТ JSON
+   ========================================================================== */
+
+if (exportBtn) {
+  exportBtn.addEventListener(
+    "click",
+    () => {
+      // Set → массив.
+      const wishlistArray =
+        [...state.wishlist];
+
+      // Массив → красивый JSON.
+      const json =
+        JSON.stringify(
+          wishlistArray,
+          null,
+          2
+        );
+
+      // Создаём файл в памяти браузера.
+      const blob =
+        new Blob(
+          [json],
+          {
+            type:
+              "application/json",
+          }
+        );
+
+      const url =
+        URL.createObjectURL(blob);
+
+      const link =
+        document.createElement("a");
+
+      link.href = url;
+
+      link.download =
+        "booknest-wishlist.json";
+
+      link.click();
+
+      URL.revokeObjectURL(url);
     }
-  });
+  );
 }
 
-/* ==================================================================
-   СТАРТ ПРИЛОЖЕНИЯ.
-   ================================================================== */
+/* ==========================================================================
+   ИМПОРТ JSON
+   ========================================================================== */
 
-// 1. Восстанавливаем список желаемого из localStorage.
-state.wishlist = new Set(readWishlistFromStorage());
+if (importInput) {
+  importInput.addEventListener(
+    "change",
+    async (event) => {
+      const file =
+        event.target.files[0];
 
-// 2. Обновляем счётчик в шапке.
+      if (!file) {
+        return;
+      }
+
+      try {
+        // Читаем файл.
+        const text =
+          await file.text();
+
+        // JSON-текст → JavaScript.
+        const data =
+          JSON.parse(text);
+
+        // Ожидаем массив OLID.
+        if (!Array.isArray(data)) {
+          throw new Error(
+            "Неверный формат JSON"
+          );
+        }
+
+        // Оставляем только строки.
+        const validIds =
+          data.filter(
+            (id) =>
+              typeof id ===
+              "string"
+          );
+
+        state.wishlist =
+          new Set(validIds);
+
+        saveWishlist();
+
+        /* ----------------------------------------------------------
+           Обновляем счётчик.
+           ---------------------------------------------------------- */
+
+        if (wishlistCountEl) {
+          renderWishlistCount(
+            wishlistCountEl,
+            state.wishlist.size
+          );
+        }
+
+        /* ----------------------------------------------------------
+           Если импорт выполнен на profile.html —
+           перезагружаем список.
+           ---------------------------------------------------------- */
+
+        if (isProfilePage) {
+          loadWishlist();
+        }
+
+        /* ----------------------------------------------------------
+           Если импорт выполнен в каталоге —
+           обновляем кнопки wishlist.
+           ---------------------------------------------------------- */
+
+        if (bookListEl) {
+          renderSearchResults(
+            state.docs,
+            state.wishlist
+          );
+        }
+      } catch (error) {
+        console.warn(
+          "Не удалось импортировать wishlist:",
+          error
+        );
+
+        alert(
+          "Не удалось прочитать файл. Проверьте формат JSON."
+        );
+      }
+
+      // Позволяет снова выбрать тот же файл.
+      event.target.value = "";
+    }
+  );
+}
+
+/* ==========================================================================
+   СТАРТ ПРИЛОЖЕНИЯ
+   ========================================================================== */
+
+// 1. Восстанавливаем wishlist.
+state.wishlist =
+  new Set(
+    readWishlistFromStorage()
+  );
+
+// 2. Обновляем счётчик.
 if (wishlistCountEl) {
-  renderWishlistCount(wishlistCountEl, state.wishlist.size);
+  renderWishlistCount(
+    wishlistCountEl,
+    state.wishlist.size
+  );
 }
 
-// 3. Показываем пустое состояние — пользователь ещё ничего не искал.
+// 3. Для каталога начальное состояние — empty.
 showState("empty");
 
-// Если открыта страница профиля,
-// загружаем список желаемого.
+// 4. Подготавливаем кнопку «Показать ещё».
+updateLoadMoreButton();
+
+// 5. На profile.html загружаем wishlist.
 if (isProfilePage) {
   loadWishlist();
 }

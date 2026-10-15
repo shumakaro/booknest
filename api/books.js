@@ -1,80 +1,177 @@
 /* ==========================================================================
    api/books.js — конкретные запросы к Open Library.
 
-   Этот модуль — тонкая обёртка над api/client.js. Здесь НЕТ fetch
-   (он только в client.js), НЕТ обработки ошибок (она тоже в client.js).
-   Задача файла — знать, какие эндпоинты у Open Library и какие
-   параметры им нужны.
+   Этот модуль работает поверх api/client.js.
 
-   Всё, что делают функции здесь: собирают path и params,
-   вызывают request() и возвращают результат.
+   Здесь:
+   1. НЕТ прямого fetch — все запросы идут через request().
+   2. Хранятся конкретные адреса Open Library.
+   3. Формируются параметры поиска.
+   4. Результаты поиска кэшируются на 60 секунд.
 
    Open Library API:
      /search.json?q=...     — поиск книг
-     /works/{OLID}.json     — детали одной работы
-     /authors/{OLID}.json   — детали автора
+     /works/{OLID}.json     — детали книги
+     /authors/{OLID}.json   — данные автора
    ========================================================================== */
 
 import { request } from "./client.js";
 
 /* ------------------------------------------------------------------
-   searchBooks — поиск книг по строке запроса.
+   Кэш результатов поиска.
+
+   Map хранит данные по принципу:
+
+   ключ:
+     поисковый запрос + номер страницы
+
+   значение:
+     {
+       data: ответ API,
+       time: время сохранения
+     }
+
+   Кэш действует 60 секунд.
+   ------------------------------------------------------------------ */
+
+const searchCache = new Map();
+
+const CACHE_TIME = 60 * 1000;
+
+/* ------------------------------------------------------------------
+   makeCacheKey — создаёт ключ для Map.
+
+   Например:
+     query = "harry potter"
+     page = 2
+
+   получится:
+     "harry potter::2"
+
+   Таким образом разные страницы одного поиска
+   хранятся отдельно.
+   ------------------------------------------------------------------ */
+function makeCacheKey(query, page) {
+  return `${query.trim().toLowerCase()}::${page}`;
+}
+
+/* ------------------------------------------------------------------
+   getCachedSearch — пытается получить результат из кэша.
+
+   Если:
+     - записи нет;
+     - прошло больше 60 секунд;
+
+   возвращаем null.
+
+   Если запись ещё свежая — возвращаем сохранённые данные.
+   ------------------------------------------------------------------ */
+function getCachedSearch(key) {
+  const cached = searchCache.get(key);
+
+  if (!cached) {
+    return null;
+  }
+
+  const age = Date.now() - cached.time;
+
+  // Если прошло больше 60 секунд,
+  // удаляем устаревшую запись.
+  if (age > CACHE_TIME) {
+    searchCache.delete(key);
+    return null;
+  }
+
+  return cached.data;
+}
+
+/* ------------------------------------------------------------------
+   saveSearchToCache — сохраняет ответ API в Map.
+   ------------------------------------------------------------------ */
+function saveSearchToCache(key, data) {
+  searchCache.set(key, {
+    data,
+    time: Date.now(),
+  });
+}
+
+/* ------------------------------------------------------------------
+   searchBooks — поиск книг.
 
    Принимает:
-     query  — текст поиска (например, "harry potter");
-     signal — AbortSignal для отмены запроса.
+     query  — текст запроса;
+     signal — AbortSignal;
+     page   — номер страницы.
 
-   Возвращает объект вида { docs: [...], numFound: N }.
+   Сначала функция проверяет Map.
 
-   Параметры запроса к Open Library:
-     q      — что искать;
-     limit  — сколько результатов вернуть (по заданию 20);
-     page   — номер страницы (Open Library использует 1-based нумерацию);
-     fields — какие поля включить в ответ. Мы запрашиваем только нужные:
-              key (OLID для ссылки на детали), title, author_name,
-              first_publish_year, cover_i (id обложки), edition_count,
-              language. Без fields приходит слишком много лишнего.
+   Если свежие данные уже есть — новый сетевой запрос не выполняется.
+
+   Если данных нет или прошло больше 60 секунд —
+   выполняется запрос к Open Library и результат сохраняется в Map.
    ------------------------------------------------------------------ */
 export async function searchBooks(query, signal, page = 1) {
-  return request("/search.json", {
+  // Создаём уникальный ключ поиска.
+  const cacheKey = makeCacheKey(query, page);
+
+  // Проверяем, есть ли свежий результат.
+  const cachedData = getCachedSearch(cacheKey);
+
+  if (cachedData) {
+    return cachedData;
+  }
+
+  // Если кэша нет — обращаемся к API.
+  const data = await request("/search.json", {
     params: {
       q: query,
+
+      // По заданию на одной странице показываем 20 книг.
       limit: 20,
-      page: page,
-      // Перечисляем только поля, которые реально используем. Это уменьшает
-      // размер ответа и ускоряет загрузку.
-      fields: "key,title,author_name,first_publish_year,cover_i,edition_count,language",
+
+      // Open Library использует страницы начиная с 1.
+      page,
+
+      // Запрашиваем только те поля,
+      // которые реально используются приложением.
+      fields:
+        "key,title,author_name,first_publish_year,cover_i,edition_count,language",
     },
+
+    signal,
+  });
+
+  // Сохраняем успешный ответ в кэш.
+  saveSearchToCache(cacheKey, data);
+
+  return data;
+}
+
+/* ------------------------------------------------------------------
+   getBookById — получить подробную информацию о книге.
+
+   olid:
+     идентификатор работы Open Library,
+     например OL27448W.
+
+   При 404 client.js создаст ApiError со status = 404.
+   ------------------------------------------------------------------ */
+export async function getBookById(olid, signal) {
+  return request(`/works/${olid}.json`, {
     signal,
   });
 }
 
 /* ------------------------------------------------------------------
-   getBookById — получить детали одной книги (работа в терминах Open Library).
+   getAuthor — получить информацию об авторе.
 
-   Принимает:
-     olid   — идентификатор работы, например "OL27448W";
-     signal — AbortSignal для отмены.
+   Например:
+     OL26320A
 
-   Возвращает объект с полями title, description, covers, subjects, ...
-
-   ВАЖНО: если книга не найдена, Open Library вернёт 404. Наш client.js
-   увидит это через !response.ok и бросит ApiError со status=404.
-   Страница деталей в UI поймает эту ошибку и покажет «Книга не найдена».
-   ------------------------------------------------------------------ */
-export async function getBookById(olid, signal) {
-  return request(`/works/${olid}.json`, { signal });
-}
-
-/* ------------------------------------------------------------------
-   getAuthor — получить данные автора по его OLID.
-
-   Принимает:
-     olid   — идентификатор автора, например "OL26320A";
-     signal — AbortSignal.
-
-   Возвращает объект с полем name — имя автора.
+   Возвращает данные автора, в том числе его имя.
    ------------------------------------------------------------------ */
 export async function getAuthor(olid, signal) {
-  return request(`/authors/${olid}.json`, { signal });
+  return request(`/authors/${olid}.json`, {
+    signal,
+  });
 }

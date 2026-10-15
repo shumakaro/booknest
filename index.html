@@ -1,44 +1,37 @@
 <!DOCTYPE html>
-<!-- ^ Объявление HTML5. Первая строка файла. -->
+<!-- Объявление HTML5. -->
 
 <!-- ==========================================================================
-     ЛР №4 — интеграция с внешним REST API (Open Library).
+     ЛР №4 — интеграция с внешним REST API Open Library.
 
-     Что изменилось по сравнению с ЛР №3:
+     Что реализовано:
 
-     1. Убрана форма фильтров (жанр, сортировка, чекбокс «только доступные»).
-        В ЛР №4 данные приходят из Open Library, и фильтры по жанру/доступности
-        там не поддерживаются так, как у нас было на локальных данных.
-        Задача теперь — поиск с debounce и пагинация.
-
-     2. Добавлены четыре блока состояний интерфейса:
-          #state-loading — показывается во время запроса;
-          #state-empty   — показывается, когда ничего не найдено;
-          #state-error   — показывается при ошибке (с текстом и кнопкой «Повторить»);
-          #state-success — обёртка вокруг списка результатов.
-
-        ВАЖНО: одновременно видно ровно одно из этих состояний.
-        Управляет этим функция showState из js/ui/render.js.
-
-     3. Добавлена пагинация под списком: кнопки «Назад» / «Вперёд»
-        и счётчик страниц.
-
-     4. Список желаемого из localStorage остаётся, но теперь хранит
-        не числовые id, а строковые OLID из Open Library.
+     1. Поиск книг через Open Library API.
+     2. Debounce 350 мс.
+     3. Минимальная длина запроса — 3 символа.
+     4. Четыре состояния:
+          loading
+          success
+          empty
+          error
+     5. Кнопка «Повторить» при ошибке.
+     6. Отмена устаревших запросов через AbortController.
+     7. Накопительная загрузка через кнопку «Показать ещё».
+     8. Wishlist хранится в localStorage.
+     9. Экспорт и импорт wishlist через JSON.
      ========================================================================== -->
 
 <html lang="ru">
-<!-- ^ Корневой элемент. lang="ru" — язык страницы: русский. -->
 
 <head>
   <meta charset="UTF-8">
-  <!-- ^ Кодировка UTF-8. Универсальная, поддерживает кириллицу. -->
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- ^ Адаптивность. Требование задания — ставить на каждой странице. -->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Каталог книг — BookNest</title>
-  <!-- ^ Заголовок вкладки. Уникален для этой страницы. -->
 
   <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/base.css">
@@ -49,47 +42,128 @@
 <body>
 
   <header class="site-header">
-    <!-- ^ Шапка сайта с навигацией и счётчиком списка желаемого. -->
 
-    <h1 class="site-header__title">BookNest</h1>
-    <p class="site-header__tagline">Книжный клуб университета</p>
+    <h1 class="site-header__title">
+      BookNest
+    </h1>
+
+    <p class="site-header__tagline">
+      Книжный клуб университета
+    </p>
 
     <nav class="site-nav">
       <ul class="site-nav__list">
-        <li class="site-nav__item"><a class="site-nav__link" href="index.html" aria-current="page">Каталог</a></li>
-        <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
-        <li class="site-nav__item"><a class="site-nav__link" href="loan.html">Выдача</a></li>
-        <li class="site-nav__item"><a class="site-nav__link" href="profile.html">Профиль</a></li>
+
+        <li class="site-nav__item">
+          <a
+            class="site-nav__link"
+            href="index.html"
+            aria-current="page"
+          >
+            Каталог
+          </a>
+        </li>
+
+        <li class="site-nav__item">
+          <a
+            class="site-nav__link"
+            href="book.html"
+          >
+            Книга
+          </a>
+        </li>
+
+        <li class="site-nav__item">
+          <a
+            class="site-nav__link"
+            href="loan.html"
+          >
+            Выдача
+          </a>
+        </li>
+
+        <li class="site-nav__item">
+          <a
+            class="site-nav__link"
+            href="profile.html"
+          >
+            Профиль
+          </a>
+        </li>
+
       </ul>
     </nav>
 
+    <!-- ================================================================
+         Wishlist + экспорт / импорт.
+         ================================================================ -->
+
     <div class="site-header__actions">
-      <span class="site-header__wishlist" id="wishlist-count">Мой список: 0</span>
-      <!-- ^ Счётчик книг в списке желаемого. Обновляет main.js. -->
 
-      <button class="btn btn--ghost" type="button" id="export">Экспорт</button>
-      <!-- ^ Кнопка экспорта списка желаемого в JSON (доп. задание). -->
+      <span
+        class="site-header__wishlist"
+        id="wishlist-count"
+      >
+        Мой список: 0
+      </span>
 
-      <label class="btn btn--ghost" for="import">
+      <button
+        class="btn btn--ghost"
+        type="button"
+        id="export"
+      >
+        Экспорт
+      </button>
+
+      <label
+        class="btn btn--ghost"
+        for="import"
+      >
         Импорт
-        <input class="site-header__file" type="file" id="import" accept=".json,application/json" hidden>
+
+        <input
+          class="site-header__file"
+          type="file"
+          id="import"
+          accept=".json,application/json"
+          hidden
+        >
       </label>
+
     </div>
+
   </header>
 
   <main class="page">
 
-    <h2 class="page__title">Каталог книг</h2>
+    <h2 class="page__title">
+      Каталог книг
+    </h2>
 
-    <form class="filter" id="filters" role="search">
-      <!-- ^ Форма поиска. Оставлен только один input — текстовый запрос.
-           Фильтр по жанру и чекбокс «только доступные» убраны:
-           в Open Library нет простого способа фильтровать по ним,
-           а задание ЛР №4 этого и не требует. -->
+    <!-- ================================================================
+         ПОИСК.
+         ================================================================ -->
+
+    <form
+      class="filter"
+      id="filters"
+      role="search"
+    >
+
       <fieldset class="filter__group">
-        <legend class="filter__legend">Поиск книг</legend>
 
-        <label class="filter__label" for="search">Введите название или автора (минимум 3 символа)</label>
+        <legend class="filter__legend">
+          Поиск книг
+        </legend>
+
+        <label
+          class="filter__label"
+          for="search"
+        >
+          Введите название или автора
+          (минимум 3 символа)
+        </label>
+
         <input
           class="filter__input"
           type="search"
@@ -97,75 +171,164 @@
           placeholder="Например, Tolkien"
           autocomplete="off"
         >
-        <!-- ^ Поле поиска. id="search" — на него ссылается main.js.
-             autocomplete="off" — чтобы браузер не подставлял прошлые запросы
-             в выпадающем списке, это мешает при демонстрации. -->
+
       </fieldset>
+
     </form>
 
-    <p class="catalog__counter" id="counter"></p>
-    <!-- ^ Счётчик найденных книг. Обновляет main.js после успешного запроса. -->
+    <!-- Количество уже загруженных книг. -->
+    <p
+      class="catalog__counter"
+      id="counter"
+    ></p>
 
     <!-- ================================================================
-         ЧЕТЫРЕ СОСТОЯНИЯ ИНТЕРФЕЙСА.
+         СОСТОЯНИЕ LOADING.
 
-         Каждый блок скрыт по умолчанию (атрибут hidden). В нужный момент
-         main.js вызывает showState("loading"), showState("success") и т. д.,
-         которая скрывает все блоки и показывает только один.
+         Показывается во время первого запроса.
          ================================================================ -->
 
-    <div class="state" id="state-loading" hidden>
-      <!-- ^ Состояние loading. Показывается, пока идёт запрос к API. -->
-      <p class="state__text">Загрузка…</p>
+    <div
+      class="state"
+      id="state-loading"
+      hidden
+    >
+      <p class="state__text">
+        Загрузка…
+      </p>
     </div>
 
-    <div class="state" id="state-empty" hidden>
-      <!-- ^ Состояние empty. Показывается, когда запрос успешен,
-           но результатов нет, либо запрос короче 3 символов. -->
-      <p class="state__text">Ничего не найдено. Введите минимум 3 символа и попробуйте другой запрос.</p>
+    <!-- ================================================================
+         СОСТОЯНИЕ EMPTY.
+
+         Показывается:
+         - если введено меньше 3 символов;
+         - если API не нашёл книги.
+         ================================================================ -->
+
+    <div
+      class="state"
+      id="state-empty"
+      hidden
+    >
+      <p class="state__text">
+        Ничего не найдено.
+        Введите минимум 3 символа
+        и попробуйте другой запрос.
+      </p>
     </div>
 
-    <div class="state state--error" id="state-error" hidden>
-      <!-- ^ Состояние error. Показывается при сетевой ошибке или HTTP-ошибке.
-           Текст разный для разных случаев (см. humanizeError в main.js). -->
-      <p class="state__text" id="state-error-text"></p>
-      <button class="btn btn--ghost" type="button" id="state-error-retry">Повторить</button>
-      <!-- ^ Кнопка «Повторить» — перезапускает последний запрос.
-           Это требование задания: в состоянии ошибки пользователь
-           должен иметь возможность повторить. -->
+    <!-- ================================================================
+         СОСТОЯНИЕ ERROR.
+
+         Текст ошибки заполняется из main.js.
+
+         Ошибки различаются:
+         - нет сети;
+         - 4xx;
+         - 5xx.
+         ================================================================ -->
+
+    <div
+      class="state state--error"
+      id="state-error"
+      hidden
+    >
+
+      <p
+        class="state__text"
+        id="state-error-text"
+      ></p>
+
+      <button
+        class="btn btn--ghost"
+        type="button"
+        id="state-error-retry"
+      >
+        Повторить
+      </button>
+
     </div>
 
-    <section class="catalog" id="state-success" hidden>
-      <!-- ^ Состояние success. Показывается, когда данные успешно загружены.
-           Обёртка вокруг списка: одна команда скрывает/показывает весь
-           результат вместе с пагинацией. -->
-      <ul class="catalog__list" id="book-list">
-        <!-- ^ Контейнер для карточек. Наполняет renderSearchResults
-             из js/ui/render.js. Каждая книга превращается в <li class="book-card">. -->
-      </ul>
+    <!-- ================================================================
+         СОСТОЯНИЕ SUCCESS.
+
+         Здесь отображаются результаты поиска.
+
+         При первом запросе загружается 20 книг.
+
+         После нажатия «Показать ещё»:
+         - запрашивается следующая страница API;
+         - новые книги добавляются к уже загруженным;
+         - старые книги не исчезают.
+         ================================================================ -->
+
+    <section
+      class="catalog"
+      id="state-success"
+      hidden
+    >
+
+      <!-- Список книг заполняется через renderSearchResults(). -->
+      <ul
+        class="catalog__list"
+        id="book-list"
+      ></ul>
+
+      <!-- ==============================================================
+           НАКОПИТЕЛЬНАЯ ЗАГРУЗКА.
+
+           Эта кнопка заменяет старую пагинацию
+           «Назад / Вперёд».
+
+           main.js сам:
+           - показывает кнопку;
+           - блокирует её во время запроса;
+           - скрывает на последней странице.
+           ============================================================== -->
 
       <div class="pagination">
-        <!-- ^ Пагинация по 20 записей. Кнопки блокируются на границах. -->
-        <button class="btn btn--ghost" type="button" id="pagination-prev">← Назад</button>
-        <span class="pagination__info" id="pagination-info"></span>
-        <button class="btn btn--ghost" type="button" id="pagination-next">Вперёд →</button>
+
+        <button
+          class="btn btn--ghost"
+          type="button"
+          id="load-more"
+          hidden
+        >
+          Показать ещё
+        </button>
+
       </div>
+
     </section>
 
   </main>
 
   <footer class="site-footer">
-    <p class="site-footer__copy">© 2026 BookNest — книжный клуб университета</p>
+
+    <p class="site-footer__copy">
+      © 2026 BookNest — книжный клуб университета
+    </p>
+
     <address class="site-footer__contacts">
-      <a class="site-footer__link" href="mailto:booknest@university.ru">booknest@university.ru</a>
+
+      <a
+        class="site-footer__link"
+        href="mailto:booknest@university.ru"
+      >
+        booknest@university.ru
+      </a>
+
     </address>
+
   </footer>
 
-  <script type="module" src="js/main.js"></script>
-  <!-- ^ Подключение главного модуля. type="module" обязателен для ESM.
-       Скрипт в конце body — чтобы DOM был построен к моменту
-       его выполнения. Если бы поставили в head, document.querySelector
-       вернул бы null. -->
+  <!-- Главный JS-модуль приложения. -->
+  <script
+    type="module"
+    src="js/main.js"
+  ></script>
 
 </body>
+
 </html>
