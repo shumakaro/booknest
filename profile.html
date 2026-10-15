@@ -41,14 +41,6 @@
     <p class="site-header__tagline">Книжный клуб университета</p>
 
     <nav class="site-nav">
-          <div class="site-header__actions">
-      <span class="site-header__wishlist" id="wishlist-count">Мой список: 0</span>
-      <button class="btn btn--ghost" type="button" id="export">Экспорт</button>
-      <label class="btn btn--ghost" for="import">
-        Импорт
-        <input class="site-header__file" type="file" id="import" accept=".json,application/json" hidden>
-      </label>
-    </div>
       <ul class="site-nav__list">
         <li class="site-nav__item"><a class="site-nav__link" href="index.html">Каталог</a></li>
         <li class="site-nav__item"><a class="site-nav__link" href="book.html">Книга</a></li>
@@ -57,6 +49,27 @@
         <!-- ^ aria-current="page" — эта страница текущая. -->
       </ul>
     </nav>
+
+    <div class="site-header__actions">
+  <span class="site-header__wishlist" id="wishlist-count">Мой список: 0</span>
+
+  <button class="btn btn--ghost" type="button" id="export">
+    Экспорт
+  </button>
+
+  <label class="btn btn--ghost" for="import">
+    Импорт
+
+    <input
+      class="site-header__file"
+      type="file"
+      id="import"
+      accept=".json,application/json"
+      hidden
+    >
+  </label>
+</div>
+
   </header>
 
   <main class="page">
@@ -145,17 +158,40 @@
       </table>
     </section>
 
-        <aside class="wishlist" aria-labelledby="wishlist-heading" id="wishlist-page">
-      <!-- ^ ЛР №3: список желаемого теперь динамический.
-           Раньше здесь были две статичные книги из ЛР №1, теперь
-           пустой контейнер, который наполнит JavaScript из модуля
-           ui/render.js — функцией renderWishlistPage. -->
-      <h3 class="wishlist__title" id="wishlist-heading">Мой список</h3>
-      <ul class="wishlist__list" id="wishlist-list">
-        <!-- ^ Пустой список. Сюда main.js вставит карточки тех книг,
-             которые пользователь отметил кнопкой «Хочу прочитать». -->
-      </ul>
-    </aside>
+    <aside class="wishlist" aria-labelledby="wishlist-heading" id="wishlist-page">
+
+  <h3 class="wishlist__title" id="wishlist-heading">
+    Мой список
+  </h3>
+
+  <div class="state" id="wishlist-loading" hidden>
+    <p class="state__text">Загрузка списка…</p>
+  </div>
+
+  <div class="state" id="wishlist-empty" hidden>
+    <p class="state__text">
+      В вашем списке пока нет книг.
+    </p>
+  </div>
+
+  <div class="state state--error" id="wishlist-error" hidden>
+    <p class="state__text" id="wishlist-error-text"></p>
+
+    <button
+      class="btn btn--ghost"
+      type="button"
+      id="wishlist-error-retry"
+    >
+      Повторить
+    </button>
+  </div>
+
+  <div id="wishlist-success" hidden">
+    <ul class="wishlist__list" id="wishlist-list">
+    </ul>
+  </div>
+
+</aside>
   </main>
 
   <footer class="site-footer">
@@ -165,11 +201,7 @@
     </address>
   </footer>
 
-   <script type="module" src="js/main.js"></script>
-  <!-- ^ Подключение модуля. На странице профиля main.js отрисует
-       список желаемого, потому что найдёт #wishlist-list.
-       Обработчики каталога не активируются — в profile.html нет
-       элементов #book-list, #filters и прочих. -->
+  <script type="module" src="js/main.js"></script>
+  
 </body>
-
 </html>

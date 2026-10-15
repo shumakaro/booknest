@@ -21,7 +21,7 @@
 
 // Импортируем функции запросов из слоя API.
 // Обрати внимание: fetch здесь НЕ вызывается — только наши обёртки.
-import { searchBooks } from "../api/books.js";
+import { searchBooks, getBookById } from "../api/books.js";
 import { ApiError } from "../api/client.js";
 import { debounce } from "./lib/debounce.js";
 
@@ -34,15 +34,34 @@ import {
 } from "./ui/render.js";
 
 /* ------------------------------------------------------------------
-   Элементы страницы.
+   Элементы страницы каталога.
    ------------------------------------------------------------------ */
-const searchInput      = document.querySelector("#search");
+
+const searchInput = document.querySelector("#search");
 const resultsCounterEl = document.querySelector("#counter");
-const wishlistCountEl  = document.querySelector("#wishlist-count");
-const retryBtn         = document.querySelector("#state-error-retry");
-const bookListEl       = document.querySelector("#book-list");
-const prevBtn          = document.querySelector("#pagination-prev");
-const nextBtn          = document.querySelector("#pagination-next");
+const wishlistCountEl = document.querySelector("#wishlist-count");
+const retryBtn = document.querySelector("#state-error-retry");
+const bookListEl = document.querySelector("#book-list");
+const prevBtn = document.querySelector("#pagination-prev");
+const nextBtn = document.querySelector("#pagination-next");
+
+// Элементы страницы профиля.
+const wishlistListEl = document.querySelector("#wishlist-list");
+const wishlistLoadingEl = document.querySelector("#wishlist-loading");
+const wishlistEmptyEl = document.querySelector("#wishlist-empty");
+const wishlistErrorEl = document.querySelector("#wishlist-error");
+const wishlistSuccessEl = document.querySelector("#wishlist-success");
+const wishlistErrorTextEl = document.querySelector("#wishlist-error-text");
+const wishlistRetryBtn = document.querySelector("#wishlist-error-retry");
+
+
+
+// Кнопки экспорта и импорта.
+const exportBtn = document.querySelector("#export");
+const importInput = document.querySelector("#import");
+
+// Проверяем, открыта ли страница профиля.
+const isProfilePage = wishlistListEl !== null;
 
 /* ------------------------------------------------------------------
    Состояние приложения.
@@ -109,6 +128,125 @@ function saveWishlist() {
     );
   } catch (error) {
     console.warn("Не удалось сохранить список желаемого:", error);
+  }
+}
+
+// Показывает одно состояние wishlist и скрывает остальные.
+function showWishlistState(name, text = "") {
+  const states = [
+    wishlistLoadingEl,
+    wishlistEmptyEl,
+    wishlistErrorEl,
+    wishlistSuccessEl
+  ];
+
+  states.forEach((element) => {
+    if (element) {
+      element.hidden = true;
+    }
+  });
+
+  let target = null;
+
+  if (name === "loading") {
+    target = wishlistLoadingEl;
+  } else if (name === "empty") {
+    target = wishlistEmptyEl;
+  } else if (name === "error") {
+    target = wishlistErrorEl;
+  } else if (name === "success") {
+    target = wishlistSuccessEl;
+  }
+
+  if (target) {
+    target.hidden = false;
+  }
+
+  if (name === "error" && wishlistErrorTextEl) {
+    wishlistErrorTextEl.textContent = text;
+  }
+}
+
+// Отрисовывает книги из wishlist на странице профиля.
+function renderWishlistPage(books) {
+  // Если мы не на странице профиля — ничего не делаем.
+  if (!wishlistListEl) {
+    return;
+  }
+
+  // Перед новой отрисовкой очищаем список.
+  wishlistListEl.innerHTML = "";
+
+  // Создаём элементы для каждой книги.
+  books.forEach((book) => {
+    // OLID хранится в поле key в формате "/works/OL..."
+    const olid = book.key.replace("/works/", "");
+
+    // Создаём <li>.
+    const item = document.createElement("li");
+    item.className = "wishlist__item";
+
+    // Создаём название книги.
+    const title = document.createElement("h4");
+    title.className = "wishlist__book-title";
+    title.textContent = book.title || "Без названия";
+
+    // Создаём кнопку удаления.
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn--ghost js-wishlist-remove";
+    button.dataset.olid = olid;
+    button.textContent = "Удалить";
+
+    // Собираем карточку.
+    item.append(title);
+    item.append(button);
+
+    // Добавляем её в список.
+    wishlistListEl.append(item);
+  });
+}
+
+// Загружает данные книг из wishlist через API.
+async function loadWishlist() {
+  // Получаем массив OLID из Set.
+  const olids = [...state.wishlist];
+
+  // Если список пустой — показываем empty.
+  if (olids.length === 0) {
+    if (wishlistListEl) {
+      wishlistListEl.innerHTML = "";
+    }
+
+    showWishlistState("empty");
+    return;
+  }
+
+  // Показываем загрузку.
+  showWishlistState("loading");
+
+  try {
+    // Все книги загружаются параллельно.
+    const books = await Promise.all(
+      olids.map((olid) => getBookById(olid))
+    );
+
+    // Отрисовываем книги.
+    renderWishlistPage(books);
+
+    // Показываем успешное состояние.
+    showWishlistState("success");
+  } catch (error) {
+    // Отменённый запрос не считаем ошибкой.
+    if (error.name === "AbortError") {
+      return;
+    }
+
+    // Показываем понятное сообщение.
+    showWishlistState(
+      "error",
+      humanizeError(error)
+    );
   }
 }
 
@@ -285,6 +423,162 @@ if (bookListEl) {
 }
 
 /* ------------------------------------------------------------------
+   Удаление книги из wishlist на странице профиля.
+
+   Используем делегирование событий:
+   один обработчик стоит на всём списке, а не на каждой кнопке.
+   ------------------------------------------------------------------ */
+if (wishlistListEl) {
+  wishlistListEl.addEventListener("click", (event) => {
+    // Проверяем, нажата ли кнопка удаления.
+    const removeButton = event.target.closest(".js-wishlist-remove");
+
+    if (!removeButton) {
+      return;
+    }
+
+    // Получаем OLID книги из data-атрибута кнопки.
+    const olid = removeButton.dataset.olid;
+
+    // Удаляем книгу из Set.
+    state.wishlist.delete(olid);
+
+    // Сохраняем новый wishlist в localStorage.
+    saveWishlist();
+
+    // Обновляем счётчик в шапке.
+    if (wishlistCountEl) {
+      renderWishlistCount(
+        wishlistCountEl,
+        state.wishlist.size
+      );
+    }
+
+    // Перезагружаем список на странице профиля.
+    loadWishlist();
+  });
+}
+
+/* ------------------------------------------------------------------
+   Повторная загрузка wishlist после ошибки.
+   ------------------------------------------------------------------ */
+if (wishlistRetryBtn) {
+  wishlistRetryBtn.addEventListener("click", () => {
+    loadWishlist();
+  });
+}
+
+/* ------------------------------------------------------------------
+   Экспорт списка желаемого в JSON-файл.
+   ------------------------------------------------------------------ */
+if (exportBtn) {
+  exportBtn.addEventListener("click", () => {
+    // Превращаем Set в обычный массив.
+    const wishlistArray = [...state.wishlist];
+
+    // Превращаем массив в JSON-строку.
+    const json = JSON.stringify(wishlistArray, null, 2);
+
+    // Создаём виртуальный файл в памяти браузера.
+    const blob = new Blob(
+      [json],
+      { type: "application/json" }
+    );
+
+    // Создаём временную ссылку на этот файл.
+    const url = URL.createObjectURL(blob);
+
+    // Создаём временную ссылку <a>.
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "booknest-wishlist.json";
+
+    // Запускаем скачивание.
+    link.click();
+
+    // Удаляем временную ссылку из памяти.
+    URL.revokeObjectURL(url);
+  });
+}
+
+/* ------------------------------------------------------------------
+   Импорт списка желаемого из JSON-файла.
+   ------------------------------------------------------------------ */
+if (importInput) {
+  importInput.addEventListener("change", async (event) => {
+    // Получаем выбранный файл.
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      // Читаем файл как текст.
+      const text = await file.text();
+
+      // Превращаем JSON-текст обратно в JavaScript.
+      const data = JSON.parse(text);
+
+      // Проверяем, что внутри именно массив.
+      if (!Array.isArray(data)) {
+        throw new Error("Неверный формат файла");
+      }
+
+      // Оставляем только строки,
+      // потому что wishlist хранит OLID.
+      const validIds = data.filter(
+        (id) => typeof id === "string"
+      );
+
+      // Создаём новый Set.
+      state.wishlist = new Set(validIds);
+
+      // Сохраняем импортированный список.
+      saveWishlist();
+
+      // Обновляем счётчик.
+      if (wishlistCountEl) {
+        renderWishlistCount(
+          wishlistCountEl,
+          state.wishlist.size
+        );
+      }
+
+      // Если мы на странице профиля —
+      // заново загружаем книги через API.
+      if (isProfilePage) {
+        loadWishlist();
+      }
+
+      // Если мы в каталоге —
+      // обновляем состояние кнопок.
+      if (bookListEl) {
+        renderSearchResults(
+          state.docs,
+          state.wishlist
+        );
+      }
+
+    } catch (error) {
+      console.warn(
+        "Не удалось импортировать wishlist:",
+        error
+      );
+
+      alert(
+        "Не удалось прочитать файл. Проверьте формат JSON."
+      );
+    }
+
+    // Сбрасываем input.
+    // Это позволяет выбрать тот же файл повторно.
+    event.target.value = "";
+  });
+}
+
+/* ------------------------------------------------------------------
    Обработчики кнопок пагинации.
    ------------------------------------------------------------------ */
 if (prevBtn) {
@@ -319,3 +613,9 @@ if (wishlistCountEl) {
 
 // 3. Показываем пустое состояние — пользователь ещё ничего не искал.
 showState("empty");
+
+// Если открыта страница профиля,
+// загружаем список желаемого.
+if (isProfilePage) {
+  loadWishlist();
+}
