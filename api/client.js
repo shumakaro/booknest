@@ -18,6 +18,16 @@
 // Вынесен в константу, чтобы в одном месте менять при необходимости.
 const BASE_URL = "https://openlibrary.org";
 
+// Задержка перед повторным запросом при ошибке сервера.
+const RETRY_DELAY = 500;
+
+// Простая функция ожидания.
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 /* ------------------------------------------------------------------
    ApiError — свой класс ошибки для всех проблем с сетью и API.
 
@@ -77,37 +87,46 @@ export async function request(path, options = {}) {
     url.search = new URLSearchParams(params).toString();
   }
 
-  let response;
+let response;
+
+// Максимум две попытки:
+// первая обычная + один автоматический повтор.
+for (let attempt = 0; attempt < 2; attempt += 1) {
   try {
     response = await fetch(url, {
-      // Accept: application/json — говорим серверу, что ждём JSON.
       headers: {
         "Accept": "application/json",
-        ...(rest.headers || {}),   // если передали свои headers — они дополнят
+        ...(rest.headers || {}),
       },
-      signal,                       // AbortSignal для отмены запроса
-      ...rest,                      // остальные опции fetch
+      signal,
+      ...rest,
     });
   } catch (cause) {
-    // Сюда попадаем, если fetch не смог выполнить запрос вообще:
-    // нет сети, отказал DNS, браузер заблокировал по CORS.
-    // Это НЕ HTTP-ошибка — запрос даже не дошёл до сервера.
+    if (cause.name === "AbortError") {
+      throw cause;
+    }
 
-    // Отмена через AbortController — это не ошибка приложения.
-    // Пробрасываем как есть, чтобы вызывающий код её не показывал.
-    if (cause.name === "AbortError") throw cause;
-
-    // Настоящая сетевая ошибка. Оборачиваем в ApiError со status=0,
-    // чтобы UI отличал её от HTTP-ошибок.
-    throw new ApiError(0, "Нет соединения с сервером", cause);
+    throw new ApiError(
+      0,
+      "Нет соединения с сервером",
+      cause
+    );
   }
 
-  // КЛЮЧЕВОЙ МОМЕНТ (для защиты): fetch НЕ выбрасывает исключение
-  // при кодах 404, 500 и других неуспешных. Он считает запрос
-  // выполненным, если сервер ответил. Проверять успешность надо
-  // вручную через response.ok. Если этого не сделать — 404
-  // будет выглядеть как данные, и на экране появится мусор.
-  if (!response.ok) {
+  if (
+    response.status >= 500 &&
+    response.status < 600 &&
+    attempt === 0
+  ) {
+    await wait(RETRY_DELAY);
+    continue;
+  }
+
+  break;
+}
+
+// Дальше обычная проверка HTTP-ошибки.
+if (!response.ok) {
     // Пытаемся прочитать тело ответа (там может быть описание ошибки).
     // Если тело не JSON — вернём null, ничего страшного.
     const body = await response.json().catch(() => null);
