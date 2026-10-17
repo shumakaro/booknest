@@ -1,54 +1,112 @@
 import {
+  lazy,
+  Suspense,
+} from "react";
+
+import {
   Navigate,
   Route,
   Routes,
 } from "react-router-dom";
 
-import { AppLayout } from "../../shared/layout/AppLayout";
+import { Spinner } from "../../components/Spinner";
 import { BookDetailsPage } from "../../pages/books/BookDetailsPage";
-import { BookFormPage } from "../../pages/books/BookFormPage";
 import { BooksPage } from "../../pages/books/BooksPage";
 import { LoginPage } from "../../pages/login/LoginPage";
 import { NotFoundPage } from "../../pages/not-found/NotFoundPage";
 import { WishlistPage } from "../../pages/wishlist/WishlistPage";
+import { AppLayout } from "../../shared/layout/AppLayout";
+
 import { RequireAuth } from "./RequireAuth";
+
+const BookFormPage = lazy(
+  async () => {
+    const module =
+      await import(
+        "../../pages/books/BookFormPage"
+      );
+
+    return {
+      default:
+        module.BookFormPage,
+    };
+  },
+);
+
+function LazyBookFormPage() {
+  return (
+    <Suspense
+      fallback={
+        <Spinner label="Загружаем форму..." />
+      }
+    >
+      <BookFormPage />
+    </Suspense>
+  );
+}
 
 export function AppRouter() {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
+      <Route
+        element={<AppLayout />}
+      >
         <Route
           index
-          element={<Navigate to="/books" replace />}
+          element={
+            <Navigate
+              to="/books"
+              replace
+            />
+          }
         />
 
-        <Route path="books" element={<BooksPage />} />
-
         <Route
-          path="books/:bookId"
-          element={<BookDetailsPage />}
+          path="books"
+          element={<BooksPage />}
         />
 
         <Route
           path="books/new"
-          element={<BookFormPage />}
+          element={
+            <LazyBookFormPage />
+          }
+        />
+
+        <Route
+          path="books/:bookId"
+          element={
+            <BookDetailsPage />
+          }
         />
 
         <Route
           path="books/:bookId/edit"
-          element={<BookFormPage />}
+          element={
+            <LazyBookFormPage />
+          }
         />
 
-        <Route path="login" element={<LoginPage />} />
-
-        <Route element={<RequireAuth />}>
+        <Route
+          element={<RequireAuth />}
+        >
           <Route
             path="wishlist"
-            element={<WishlistPage />}
+            element={
+              <WishlistPage />
+            }
           />
         </Route>
 
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="*"
+          element={<NotFoundPage />}
+        />
       </Route>
     </Routes>
   );

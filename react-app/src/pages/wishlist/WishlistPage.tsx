@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { syncWishlist } from "../../api/wishlist";
 import { WishlistSection } from "../../components/WishlistSection";
 import {
   loadWishlist,
@@ -18,20 +19,36 @@ export function WishlistPage() {
       loadWishlist(),
     );
 
-  function handleWishlistToggle(
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState("");
+
+  async function handleWishlistToggle(
     book: Book,
   ) {
-    setBooks((current) => {
-      const next =
-        current.filter(
-          (item) =>
-            item.id !== book.id,
-        );
+    const previousBooks = books;
 
-      saveWishlist(next);
+    const nextBooks =
+      books.filter(
+        (item) =>
+          item.id !== book.id,
+      );
 
-      return next;
-    });
+    setBooks(nextBooks);
+    saveWishlist(nextBooks);
+    setErrorMessage("");
+
+    try {
+      await syncWishlist(book);
+    } catch {
+      setBooks(previousBooks);
+      saveWishlist(previousBooks);
+
+      setErrorMessage(
+        "Ошибка синхронизации. Изменение отменено.",
+      );
+    }
   }
 
   function handleDetails(
@@ -46,7 +63,15 @@ export function WishlistPage() {
 
   return (
     <section>
-      <h2>Список желаемого</h2>
+      <h2>
+        Список желаемого
+      </h2>
+
+      {errorMessage && (
+        <p role="alert">
+          {errorMessage}
+        </p>
+      )}
 
       <WishlistSection
         books={books}

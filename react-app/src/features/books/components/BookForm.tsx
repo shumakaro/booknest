@@ -8,14 +8,16 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
-  bookSchema,
-  type BookFormValues,
-} from "../bookSchema";
-
-import {
   BookFormApiError,
   saveBook,
 } from "../../../api/bookForm";
+
+import { useUnsavedChanges } from "../../../shared/hooks/useUnsavedChanges";
+
+import {
+  bookSchema,
+  type BookFormValues,
+} from "../bookSchema";
 
 interface BookFormProps {
   mode: "create" | "edit";
@@ -56,13 +58,17 @@ export function BookForm({
       isDirty,
     },
   } = useForm<BookFormValues>({
-    resolver: zodResolver(
-      bookSchema,
-    ),
+    resolver:
+      zodResolver(bookSchema),
+
     defaultValues:
       defaultValues ??
       CREATE_DEFAULTS,
   });
+
+  useUnsavedChanges(
+    isDirty && !isSubmitting,
+  );
 
   const onSubmit: SubmitHandler<
     BookFormValues
@@ -227,9 +233,7 @@ export function BookForm({
 
         <input
           id="publisher"
-          {...register(
-            "publisher",
-          )}
+          {...register("publisher")}
           aria-invalid={
             Boolean(
               errors.publisher,
@@ -299,7 +303,8 @@ export function BookForm({
           {...register(
             "publicationYear",
             {
-              valueAsNumber: true,
+              valueAsNumber:
+                true,
             },
           )}
           aria-invalid={
@@ -339,7 +344,8 @@ export function BookForm({
           {...register(
             "editionYear",
             {
-              valueAsNumber: true,
+              valueAsNumber:
+                true,
             },
           )}
           aria-invalid={
@@ -378,7 +384,8 @@ export function BookForm({
           {...register(
             "pages",
             {
-              valueAsNumber: true,
+              valueAsNumber:
+                true,
             },
           )}
           aria-invalid={
