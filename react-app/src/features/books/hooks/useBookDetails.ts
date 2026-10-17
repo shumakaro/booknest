@@ -5,10 +5,10 @@ import {
   useState,
 } from "react";
 
-import { getBookDetails } from "../../../api/books";
+import { getBookDetailsById } from "../../../api/books";
+import { ApiError } from "../../../api/client";
 
 import type {
-  Book,
   BookDetails,
   RequestStatus,
 } from "../../../types";
@@ -17,57 +17,53 @@ interface UseBookDetailsResult {
   details: BookDetails | null;
   status: RequestStatus;
   errorMessage: string;
-  openDetails: (book: Book) => void;
-  closeDetails: () => void;
+  notFound: boolean;
   retry: () => void;
 }
 
-// Отдельный hook отвечает только за окно
-// с подробной информацией о книге.
-export function useBookDetails(): UseBookDetailsResult {
+export function useBookDetails(
+  bookId: string | undefined,
+): UseBookDetailsResult {
   const [details, setDetails] =
     useState<BookDetails | null>(null);
 
   const [status, setStatus] =
-    useState<RequestStatus>("idle");
+    useState<RequestStatus>("loading");
 
   const [errorMessage, setErrorMessage] =
     useState("");
 
-  // Запоминаем выбранную книгу,
-  // чтобы кнопка Retry могла повторить запрос.
-  const selectedBookRef =
-    useRef<Book | null>(null);
+  const [notFound, setNotFound] =
+    useState(false);
 
-  // Храним контроллер для отмены незавершённого запроса.
   const controllerRef =
     useRef<AbortController | null>(null);
 
-  const openDetails = useCallback(
-    async (book: Book) => {
+  const loadDetails = useCallback(
+    async (id: string) => {
       controllerRef.current?.abort();
 
       const controller =
         new AbortController();
 
-      controllerRef.current = controller;
-      selectedBookRef.current = book;
+      controllerRef.current =
+        controller;
 
       setDetails(null);
       setErrorMessage("");
+      setNotFound(false);
       setStatus("loading");
 
       try {
         const result =
-          await getBookDetails(
-            book,
+          await getBookDetailsById(
+            id,
             controller.signal,
           );
 
         setDetails(result);
         setStatus("success");
       } catch (error) {
-        // Отмена запроса не является ошибкой для пользователя.
         if (
           error instanceof DOMException &&
           error.name === "AbortError"
@@ -75,46 +71,58 @@ export function useBookDetails(): UseBookDetailsResult {
           return;
         }
 
-        setStatus("error");
+        setDetails(null);
 
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Не удалось получить информацию о книге.",
-        );
+        if (
+          error instanceof ApiError &&
+          error.status === 404
+        ) {
+          setNotFound(true);
+          setErrorMessage(
+            "Книга с таким идентификатором не найдена.",
+          );
+        } else {
+          setNotFound(false);
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "Не удалось загрузить информацию о книге.",
+          );
+        }
+
+        setStatus("error");
       }
     },
     [],
   );
 
-  const closeDetails = useCallback(() => {
-    controllerRef.current?.abort();
+  const retry = useCallback(() => {
+    if (bookId) {
+      void loadDetails(bookId);
+    }
+  }, [bookId, loadDetails]);
 
-    setDetails(null);
-    setStatus("idle");
-    setErrorMessage("");
-  }, []);
+  useEffect(() => {
+    if (!bookId) {
+      return;
+    }
 
-const retry = useCallback(() => {
-  if (selectedBookRef.current) {
-    void openDetails(
-      selectedBookRef.current,
-    );
-  }
-}, [openDetails]);
+    const timerId =
+      globalThis.setTimeout(() => {
+        void loadDetails(bookId);
+      }, 0);
 
-useEffect(() => {
-  return () => {
-    controllerRef.current?.abort();
+    return () => {
+      globalThis.clearTimeout(timerId);
+      controllerRef.current?.abort();
+    };
+  }, [bookId, loadDetails]);
+
+  return {
+    details,
+    status,
+    errorMessage,
+    notFound,
+    retry,
   };
-}, []);
-
-return {
-  details,
-  status,
-  errorMessage,
-  openDetails,
-  closeDetails,
-  retry,
-};
 }

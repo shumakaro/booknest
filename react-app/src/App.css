@@ -573,3 +573,19 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+.main-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+}
+
+.nav-link--active {
+  font-weight: 700;
+  text-decoration: underline;
+}

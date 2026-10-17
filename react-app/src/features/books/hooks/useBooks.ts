@@ -22,24 +22,38 @@ interface UseBooksResult {
   errorMessage: string;
   loadingMore: boolean;
   hasMore: boolean;
+  page: number;
   search: (query: string) => void;
   loadMore: () => void;
   retry: () => void;
 }
 
-export function useBooks(query: string): UseBooksResult {
-  const [books, setBooks] = useState<Book[]>([]);
+export function useBooks(
+  query: string,
+): UseBooksResult {
+  const [books, setBooks] =
+    useState<Book[]>([]);
+
   const [status, setStatus] =
     useState<RequestStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const lastQueryRef = useRef("");
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const [page, setPage] =
+    useState(1);
+
+  const [total, setTotal] =
+    useState(0);
+
+  const [loadingMore, setLoadingMore] =
+    useState(false);
+
+  const lastQueryRef =
+    useRef("");
+
   const controllerRef =
     useRef<AbortController | null>(null);
-
 
   const executeSearch = useCallback(
     async (
@@ -47,9 +61,13 @@ export function useBooks(query: string): UseBooksResult {
       nextPage: number,
       append: boolean,
     ) => {
-      const normalizedQuery = searchQuery.trim();
+      const normalizedQuery =
+        searchQuery.trim();
 
-      if (normalizedQuery.length < MIN_QUERY_LENGTH) {
+      if (
+        normalizedQuery.length <
+        MIN_QUERY_LENGTH
+      ) {
         controllerRef.current?.abort();
 
         setBooks([]);
@@ -63,9 +81,14 @@ export function useBooks(query: string): UseBooksResult {
 
       controllerRef.current?.abort();
 
-      const controller = new AbortController();
-      controllerRef.current = controller;
-      lastQueryRef.current = normalizedQuery;
+      const controller =
+        new AbortController();
+
+      controllerRef.current =
+        controller;
+
+      lastQueryRef.current =
+        normalizedQuery;
 
       if (append) {
         setLoadingMore(true);
@@ -75,15 +98,19 @@ export function useBooks(query: string): UseBooksResult {
       }
 
       try {
-        const result = await searchBooks(
-          normalizedQuery,
-          nextPage,
-          controller.signal,
-        );
+        const result =
+          await searchBooks(
+            normalizedQuery,
+            nextPage,
+            controller.signal,
+          );
 
         setBooks((current) =>
           append
-            ? [...current, ...result.docs]
+            ? [
+                ...current,
+                ...result.docs,
+              ]
             : result.docs,
         );
 
@@ -91,7 +118,8 @@ export function useBooks(query: string): UseBooksResult {
         setPage(nextPage);
 
         setStatus(
-          result.docs.length === 0 && !append
+          result.docs.length === 0 &&
+            !append
             ? "empty"
             : "success",
         );
@@ -119,32 +147,37 @@ export function useBooks(query: string): UseBooksResult {
 
   const search = useCallback(
     (searchQuery: string) => {
-      void executeSearch(searchQuery, 1, false);
+      void executeSearch(
+        searchQuery,
+        1,
+        false,
+      );
     },
     [executeSearch],
   );
 
-  const loadMore = useCallback(() => {
-    if (
-      loadingMore ||
-      !lastQueryRef.current ||
-      books.length >= total
-    ) {
-      return;
-    }
+  const loadMore =
+    useCallback(() => {
+      if (
+        loadingMore ||
+        !lastQueryRef.current ||
+        books.length >= total
+      ) {
+        return;
+      }
 
-    void executeSearch(
-      lastQueryRef.current,
-      page + 1,
-      true,
-    );
-  }, [
-    books.length,
-    executeSearch,
-    loadingMore,
-    page,
-    total,
-  ]);
+      void executeSearch(
+        lastQueryRef.current,
+        page + 1,
+        true,
+      );
+    }, [
+      books.length,
+      executeSearch,
+      loadingMore,
+      page,
+      total,
+    ]);
 
   const retry = useCallback(() => {
     if (!lastQueryRef.current) {
@@ -158,24 +191,26 @@ export function useBooks(query: string): UseBooksResult {
     );
   }, [executeSearch]);
 
-useDebounce(
-  query,
-  search,
-  DEBOUNCE_DELAY,
-);
+  useDebounce(
+    query,
+    search,
+    DEBOUNCE_DELAY,
+  );
 
-useEffect(() => {
-  return () => {
-    controllerRef.current?.abort();
-  };
-}, []);
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort();
+    };
+  }, []);
 
   return {
     books,
     status,
     errorMessage,
     loadingMore,
-    hasMore: books.length < total,
+    hasMore:
+      books.length < total,
+    page,
     search,
     loadMore,
     retry,

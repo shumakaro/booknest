@@ -117,3 +117,106 @@ export async function getBookDetails(
     ),
   };
 }
+
+
+interface OpenLibraryAuthorReference {
+  author?: {
+    key?: string;
+  };
+}
+
+interface OpenLibraryAuthorResponse {
+  key?: string;
+  name?: string;
+}
+
+interface OpenLibraryWorkDetailsResponse {
+  key?: string;
+  title?: string;
+
+  description?:
+    | string
+    | {
+        value?: string;
+      };
+
+  authors?: OpenLibraryAuthorReference[];
+}
+
+export async function getBookDetailsById(
+  bookId: string,
+  signal?: AbortSignal,
+): Promise<BookDetails> {
+  const normalizedId =
+    bookId.startsWith("/")
+      ? bookId
+      : `/${bookId}`;
+
+  const data =
+    await request<OpenLibraryWorkDetailsResponse>(
+      `${normalizedId}.json`,
+      undefined,
+      signal,
+    );
+
+  let description =
+    "Описание отсутствует.";
+
+  if (
+    typeof data.description === "string"
+  ) {
+    description = data.description;
+  } else if (
+    data.description?.value
+  ) {
+    description =
+      data.description.value;
+  }
+
+  const authorKeys =
+    (data.authors ?? [])
+      .map(
+        (item) =>
+          item.author?.key,
+      )
+      .filter(
+        (key): key is string =>
+          Boolean(key),
+      );
+
+  const authors =
+    await Promise.all(
+      authorKeys.map(
+        async (authorKey) => {
+          const author =
+            await request<OpenLibraryAuthorResponse>(
+              `${authorKey}.json`,
+              undefined,
+              signal,
+            );
+
+          return {
+            id:
+              author.key ??
+              authorKey,
+            name:
+              author.name ??
+              "Автор не указан",
+          };
+        },
+      ),
+    );
+
+  return {
+    id:
+      data.key ??
+      normalizedId,
+
+    title:
+      data.title ??
+      "Без названия",
+
+    description,
+    authors,
+  };
+}
