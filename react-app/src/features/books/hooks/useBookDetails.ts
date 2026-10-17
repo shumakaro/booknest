@@ -1,16 +1,17 @@
 import {
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from "react";
 
-import { getBookDetails } from "../api/books";
+import { getBookDetails } from "../../../api/books";
 
 import type {
   Book,
   BookDetails,
   RequestStatus,
-} from "../types";
+} from "../../../types";
 
 interface UseBookDetailsResult {
   details: BookDetails | null;
@@ -94,20 +95,26 @@ export function useBookDetails(): UseBookDetailsResult {
     setErrorMessage("");
   }, []);
 
-  const retry = useCallback(() => {
-    if (selectedBookRef.current) {
-      void openDetails(
-        selectedBookRef.current,
-      );
-    }
-  }, [openDetails]);
+const retry = useCallback(() => {
+  if (selectedBookRef.current) {
+    void openDetails(
+      selectedBookRef.current,
+    );
+  }
+}, [openDetails]);
 
-  return {
-    details,
-    status,
-    errorMessage,
-    openDetails,
-    closeDetails,
-    retry,
+useEffect(() => {
+  return () => {
+    controllerRef.current?.abort();
   };
+}, []);
+
+return {
+  details,
+  status,
+  errorMessage,
+  openDetails,
+  closeDetails,
+  retry,
+};
 }
