@@ -5,4 +5,4 @@ if [ "$#" -gt 0 ]; then
     exec "$@"
 fi
 python -m tools.apply_pending
-exec uvicorn app.main:app --host 0.0.0.0 --port "${API_PORT:-8000}"
+exec uvicorn app.main:app --host 0.0.0.0 --port "${API_PORT:-8000}" --proxy-headers --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-127.0.0.1}"

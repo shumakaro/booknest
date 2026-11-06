@@ -4,7 +4,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import Settings
-from app.core.http import configure_http
+from app.core.http import ERROR_RESPONSES, configure_http
 from app.routers.loans import router as loans_router
 from app.routers.auth import router as auth_router
 from app.routers.wishlist import router as wishlist_router
@@ -16,7 +16,10 @@ def create_app() -> FastAPI:
     # Отдельное приложение удобно создавать для каждого теста.
     settings = Settings()
     application = FastAPI(
-        title=settings.title, version=settings.version, description="Учебный REST API книжного клуба BookNest"
+        responses=ERROR_RESPONSES,
+        title=settings.title,
+        version=settings.version,
+        description="Учебный REST API книжного клуба BookNest",
     )
     # Данные хранятся в PostgreSQL; схема создаётся только миграциями.
     configure_http(application, settings.write_limit)

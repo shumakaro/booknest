@@ -3,6 +3,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from app.core.pagination import Pagination
+from app.schemas import ErrorRead
 from app.repositories.memory import MemoryStore, get_store
 from app.schemas import (
     AuthorCreate,
@@ -25,6 +26,11 @@ ERRORS = {
     422: {"description": "Ошибка проверки данных"},
     429: {"description": "Слишком много запросов"},
 }
+
+
+# Уточнения маршрута сохраняют общую схему тела ошибки.
+for description in ERRORS.values():
+    description["model"] = ErrorRead
 
 
 @router.get("/books", response_model=Page[BookRead], status_code=200, tags=["books"], responses=ERRORS)
