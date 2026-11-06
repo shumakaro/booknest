@@ -56,3 +56,12 @@ npm --prefix react-app run test:e2e
 [PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Markdown и DOCX различаются только форматом; визуальная проверка DOCX требует рендерера и пока не подтверждена. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
 
 Публичный адрес пока отсутствует: VPS и домен не предоставлены. Итоговый BookNest нельзя объявлять развёрнутым до фактической проверки HTTPS.
+
+## Запуск в Docker
+На машине с Docker Engine и Compose следует заполнить .env (для существующего .env только добавить POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, WEB_BIND и WEB_PORT). Сгенерированный пароль рекомендуется делать URL-safe, например hex. Существующую локальную DATABASE_URL заменять не нужно: Compose отдельно формирует внутренний адрес db.
+
+Запуск: `docker compose up -d --build --wait`. Действуют db, api, одноразовый seed и web; интерфейс доступен на WEB_BIND:WEB_PORT. Пароли демонстрационных ролей находятся внутри тома API в .tools/demo-accounts.json и не включаются в образ/Git. Проверки: `docker compose ps`, `docker compose logs api`, `docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB>`.
+
+Обычный `docker compose down` сохраняет именованные тома. `down -v` и `docker system prune` для существующих данных не применять. Профиль тестов: `docker compose --profile test up --build --abort-on-container-exit --exit-code-from test test`. Для разработки явно подключается `-f docker-compose.yml -f docker-compose.dev.yml`. Диагностика: [docs/docker-debug.md](docs/docker-debug.md).
+
+В этой Windows-среде Docker Engine/WSL отсутствуют; локально подтверждена только проверка config автономным Compose. Runtime-проверки выполняются в CI, их фактический статус отмечается в PROGRESS.md.

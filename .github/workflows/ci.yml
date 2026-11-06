@@ -1,0 +1,98 @@
+name: BookNest checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: booknest
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d booknest"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres@127.0.0.1:5432/booknest
+      TEST_DATABASE_URL: postgresql+psycopg://postgres@127.0.0.1:5432/booknest_test
+      CORS_ORIGINS: '["http://localhost:5173"]'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: react-app/package-lock.json
+      - name: Prepare isolated test configuration
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, secrets
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('SECRET_KEY=' + secrets.token_hex(32) + '\n')
+          PY
+          pip install -r requirements-lock.txt
+          python - <<'PY'
+          import psycopg
+          with psycopg.connect('postgresql://postgres@127.0.0.1:5432/postgres', autocommit=True) as db:
+              db.execute('CREATE DATABASE booknest_test')
+          PY
+      - run: python -m ruff check app tests migrations examples
+      - run: python -m pytest -q --cov=app --cov-report=term-missing
+      - run: npm --prefix react-app ci
+      - run: npm --prefix react-app run lint
+      - run: npm --prefix react-app run test
+      - run: npm --prefix react-app run build
+  containers:
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Generate disposable container configuration
+        run: |
+          python - <<'PY'
+          import pathlib, secrets
+          pathlib.Path('.env').write_text('POSTGRES_DB=booknest\nPOSTGRES_USER=booknest\nPOSTGRES_PASSWORD='+secrets.token_hex(24)+'\nSECRET_KEY='+secrets.token_hex(32)+'\nWEB_BIND=127.0.0.1\nWEB_PORT=8080\nCORS_ORIGINS=["http://127.0.0.1:8080"]\nCOOKIE_SECURE=false\nPLAYWRIGHT_BASE_URL=http://127.0.0.1:8080\n')
+          PY
+      - run: docker compose config --quiet
+      - run: docker compose up -d --build --wait
+      - name: Smoke and persistence without deleting volumes
+        run: |
+          python tools/check_container_http.py
+          docker compose down
+          docker compose up -d --wait
+          python tools/check_container_http.py
+          docker compose ps
+          docker image ls booknest-api:local
+          docker image ls booknest-web:local
+          python tools/check_image_sizes.py
+      - name: Browser scenario inside clean container environment
+        run: |
+          mkdir -p .tools
+          docker compose exec -T api cat .tools/demo-accounts.json > .tools/demo-accounts.json
+          npm --prefix react-app ci
+          cd react-app
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - name: Test profile with independent database
+        run: docker compose --profile test up --build --abort-on-container-exit --exit-code-from test test
+      - name: Diagnostics
+        if: failure()
+        run: docker compose ps && docker compose logs --no-color --tail=150 db api seed web
+      - name: Stop only this disposable runner project
+        if: always()
+        run: docker compose --profile test down

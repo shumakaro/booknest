@@ -16,7 +16,7 @@ def main() -> None:
         db.flush()
         books = []
         for number in range(1,31):
-            book=Book(title=f'Книга {number:02}',author_id=authors[(number-1)%5].id,year=1990+number,total_copies=3,description=f'Учебная запись {number}',genres=[genres[(number-1)%5]])
+            book=Book(title=f'Книга {number:02}',author_id=authors[(number-1)%5].id,year=1990+number,edition_year=1990+number,total_copies=3,description=f'Учебная запись {number}',genres=[genres[(number-1)%5]])
             books.append(book)
         db.add_all(books)
         db.flush()
