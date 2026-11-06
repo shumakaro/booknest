@@ -1,0 +1,111 @@
+x-logs: &logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+x-api-env: &api-env
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?set POSTGRES_USER}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:?set POSTGRES_DB}
+  SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+  CORS_ORIGINS: ${CORS_ORIGINS:-[]}
+  COOKIE_SECURE: ${COOKIE_SECURE:-false}
+  ACCESS_TTL_MIN: ${ACCESS_TTL_MIN:-15}
+  REFRESH_TTL_DAYS: ${REFRESH_TTL_DAYS:-7}
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    logging: *logs
+  api:
+    image: booknest-api:local
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+      target: runtime
+    environment: *api-env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - demo-accounts:/app/.tools
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+    logging: *logs
+  seed:
+    image: booknest-api:local
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+      target: runtime
+    environment: *api-env
+    command: [sh, -c, 'python -m tools.seed && python -m tools.create_demo_users']
+    volumes:
+      - demo-accounts:/app/.tools
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: "no"
+    logging: *logs
+  web:
+    image: booknest-web:local
+    build:
+      context: ./react-app
+    ports:
+      - '${WEB_BIND:-127.0.0.1}:${WEB_PORT:-8080}:80'
+    depends_on:
+      api:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1/health]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+    logging: *logs
+  test-db:
+    image: postgres:17-alpine
+    profiles: [test]
+    environment:
+      POSTGRES_DB: booknest_test
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d booknest_test']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    logging: *logs
+  test:
+    profiles: [test]
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+      target: test
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@test-db:5432/unused_work_database
+      TEST_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@test-db:5432/booknest_test
+      SECRET_KEY: ${SECRET_KEY}
+      CORS_ORIGINS: '["http://localhost:5173"]'
+    depends_on:
+      test-db:
+        condition: service_healthy
+    logging: *logs
+volumes:
+  pgdata:
+  demo-accounts:
