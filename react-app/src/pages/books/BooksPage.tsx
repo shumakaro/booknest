@@ -1,304 +1,106 @@
-import {
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { searchBooks } from "../../api/books";
+import { toUserMessage } from "../../api/client";
+import { getWishlist, setWishlistSaved } from "../../api/wishlist";
+import { useAuth } from "../../app/useAuth";
+import { BookList } from "../../components/BookList";
+import { ErrorBox } from "../../components/ErrorBox";
+import { Spinner } from "../../components/Spinner";
+import { useDebounce } from "../../shared/hooks/useDebounce";
+import type { Book, RequestStatus } from "../../types";
 
-import {
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
-
-import { CatalogSection } from "../../components/CatalogSection";
-import { usePaginatedBooks } from "../../features/books/hooks/usePaginatedBooks";
-import { getVisibleBooks } from "../../lib/catalog";
-import {
-  loadWishlist,
-  saveWishlist,
-} from "../../lib/storage";
-
-import type {
-  Book,
-  SortOption,
-} from "../../types";
-
-const DEFAULT_SORT: SortOption =
-  "relevance";
-
-const SORT_OPTIONS: SortOption[] = [
-  "relevance",
-  "title-asc",
-  "title-desc",
-  "year-asc",
-  "year-desc",
-];
-
-function getSortOption(
-  value: string | null,
-): SortOption {
-  if (
-    value &&
-    SORT_OPTIONS.includes(
-      value as SortOption,
-    )
-  ) {
-    return value as SortOption;
-  }
-
-  return DEFAULT_SORT;
-}
-
-function getPage(
-  value: string | null,
-): number {
-  const page =
-    Number.parseInt(
-      value ?? "1",
-      10,
-    );
-
-  return Number.isNaN(page) ||
-    page < 1
-    ? 1
-    : page;
-}
-
+// Фильтры остаются в URL; сервер выполняет выборку и пагинацию.
 export function BooksPage() {
-  const navigate =
-    useNavigate();
+  const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const query = params.get("q") ?? "";
+  const [debounced, setDebounced] = useState(query);
+  useDebounce(query, setDebounced, 350);
+  const sort = params.get("sort") ?? "title";
+  const genre = params.get("genre") ?? "";
+  const available = params.get("available") === "1";
+  const page = Math.max(1, Number(params.get("page")) || 1);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [total, setTotal] = useState(0);
+  const [status, setStatus] = useState<RequestStatus>("loading");
+  const [error, setError] = useState("");
+  const [revision, setRevision] = useState(0);
+  const [wishlist, setWishlist] = useState<Book[]>([]);
+  const [wishError, setWishError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const wishlistIds = useMemo(() => new Set(wishlist.map(book => book.id)), [wishlist]);
 
-  const [
-    searchParams,
-    setSearchParams,
-  ] = useSearchParams();
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      setStatus("loading"); setError("");
+      try {
+        const result = await searchBooks(debounced, page, controller.signal, { sort, genre, availableOnly: available });
+        if (!controller.signal.aborted) { setBooks(result.docs); setTotal(result.total); setStatus(result.docs.length ? "success" : "empty"); }
+      } catch (reason) { if (!controller.signal.aborted) { setError(toUserMessage(reason)); setStatus("error"); } }
+    }
+    void load();
+    return () => controller.abort();
+  }, [debounced, page, sort, genre, available, revision]);
 
-  const query =
-    searchParams.get("q") ?? "";
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      try { const items = user ? await getWishlist() : []; if (active) setWishlist(items); }
+      catch (reason) { if (active) setWishError(toUserMessage(reason)); }
+    }
+    void load(); return () => { active = false; };
+  }, [user]);
 
-  const sort =
-    getSortOption(
-      searchParams.get("sort"),
-    );
-
-  const onlyWithCover =
-    searchParams.get("cover") ===
-    "1";
-
-  const page =
-    getPage(
-      searchParams.get("page"),
-    );
-
-  const [wishlist, setWishlist] =
-    useState<Book[]>(() =>
-      loadWishlist(),
-    );
-
-  const {
-    books,
-    status,
-    errorMessage,
-    loadingMore,
-    hasMore,
-    search,
-    retry,
-  } = usePaginatedBooks(
-    query,
-    page,
-  );
-
-  const wishlistIds =
-    useMemo(
-      () =>
-        new Set(
-          wishlist.map(
-            (book) =>
-              book.id,
-          ),
-        ),
-      [wishlist],
-    );
-
-  const visibleBooks =
-    useMemo(
-      () =>
-        getVisibleBooks(
-          books,
-          sort,
-          onlyWithCover,
-        ),
-      [
-        books,
-        sort,
-        onlyWithCover,
-      ],
-    );
-
-  function updateParams(
-    updates: Record<
-      string,
-      string | null
-    >,
-  ) {
-    const next =
-      new URLSearchParams(
-        searchParams,
-      );
-
-    Object.entries(
-      updates,
-    ).forEach(
-      ([key, value]) => {
-        if (
-          value === null ||
-          value === ""
-        ) {
-          next.delete(key);
-        } else {
-          next.set(
-            key,
-            value,
-          );
-        }
-      },
-    );
-
-    setSearchParams(next);
+  function change(key: string, value: string) {
+    const next = new URLSearchParams(params);
+    if (value) next.set(key, value); else next.delete(key);
+    if (key !== "page") next.set("page", "1");
+    setParams(next);
   }
 
-  function handleQueryChange(
-    value: string,
-  ) {
-    updateParams({
-      q: value,
-      page: "1",
-    });
+  async function toggleWishlist(book: Book) {
+    if (!user) { navigate("/login", { state: { from: location } }); return; }
+    if (saving) return;
+    const previous = wishlist;
+    const saved = !wishlistIds.has(book.id);
+    setWishlist(saved ? [...wishlist, book] : wishlist.filter(item => item.id !== book.id));
+    setSaving(true); setWishError("");
+    try { await setWishlistSaved(book.id, saved); }
+    catch (reason) { setWishlist(previous); setWishError(toUserMessage(reason) + " Изменение отменено."); }
+    finally { setSaving(false); }
   }
 
-  function handleSortChange(
-    value: SortOption,
-  ) {
-    updateParams({
-      sort:
-        value ===
-        DEFAULT_SORT
-          ? null
-          : value,
-      page: "1",
-    });
-  }
-
-  function handleCoverChange(
-    value: boolean,
-  ) {
-    updateParams({
-      cover:
-        value
-          ? "1"
-          : null,
-      page: "1",
-    });
-  }
-
-  function handleWishlistToggle(
-    book: Book,
-  ) {
-    setWishlist(
-      (current) => {
-        const exists =
-          current.some(
-            (item) =>
-              item.id ===
-              book.id,
-          );
-
-        const next =
-          exists
-            ? current.filter(
-                (item) =>
-                  item.id !==
-                  book.id,
-              )
-            : [
-                ...current,
-                book,
-              ];
-
-        saveWishlist(next);
-
-        return next;
-      },
-    );
-  }
-
-  function handleDetails(
-    book: Book,
-  ) {
-    navigate(
-      `/books/${encodeURIComponent(
-        book.id,
-      )}`,
-    );
-  }
-
-  function handleLoadMore() {
-    updateParams({
-      page: String(
-        page + 1,
-      ),
-    });
-  }
-
-  return (
-    <section>
-      <h2>
-        Каталог книг
-      </h2>
-
-      <CatalogSection
-        query={query}
-        sort={sort}
-        onlyWithCover={
-          onlyWithCover
-        }
-        books={
-          visibleBooks
-        }
-        wishlistIds={
-          wishlistIds
-        }
-        status={status}
-        errorMessage={
-          errorMessage
-        }
-        loadingMore={
-          loadingMore
-        }
-        hasMore={
-          hasMore
-        }
-        onQueryChange={
-          handleQueryChange
-        }
-        onSearch={
-          search
-        }
-        onSortChange={
-          handleSortChange
-        }
-        onCoverChange={
-          handleCoverChange
-        }
-        onWishlistToggle={
-          handleWishlistToggle
-        }
-        onDetails={
-          handleDetails
-        }
-        onLoadMore={
-          handleLoadMore
-        }
-        onRetry={retry}
-      />
-    </section>
-  );
+  return <section><h2>Каталог книг</h2>
+    <form onSubmit={event => { event.preventDefault(); setRevision(value => value + 1); }}>
+      <label htmlFor="catalog-query">Поиск по названию</label>
+      <input id="catalog-query" value={query} onChange={event => change("q", event.target.value)} />
+      <button>Найти</button>
+      <label htmlFor="catalog-sort">Сортировка</label>
+      <select id="catalog-sort" value={sort} onChange={event => change("sort", event.target.value)}>
+        <option value="title">Название А–Я</option><option value="-title">Название Я–А</option>
+        <option value="year">Сначала старые</option><option value="-year">Сначала новые</option>
+      </select>
+      <label htmlFor="catalog-genre">Жанр</label>
+      <select id="catalog-genre" value={genre} onChange={event => change("genre", event.target.value)}>
+        <option value="">Все жанры</option><option value="scifi">Фантастика</option><option value="history">История</option>
+        <option value="poetry">Поэзия</option><option value="cs">Информатика</option><option value="fiction">Проза</option>
+      </select>
+      <label><input type="checkbox" checked={available} onChange={event => change("available", event.target.checked ? "1" : "")} /> Только доступные</label>
+    </form>
+    {wishError && <p role="alert">{wishError}</p>}
+    {status === "loading" && <Spinner label="Загружаем каталог..." />}
+    {status === "error" && <ErrorBox message={error} onRetry={() => setRevision(value => value + 1)} />}
+    {(status === "success" || status === "empty") && <><p>Найдено: {total}</p>
+      <BookList books={books} wishlistIds={wishlistIds} onWishlistToggle={book => { void toggleWishlist(book); }}
+        onDetails={book => navigate(`/books/${encodeURIComponent(book.id)}`)} />
+      <nav aria-label="Страницы каталога">
+        <button disabled={page <= 1} onClick={() => change("page", String(page - 1))}>Предыдущая</button>
+        <span>Страница {page}</span>
+        <button disabled={page * 20 >= total} onClick={() => change("page", String(page + 1))}>Следующая</button>
+      </nav></>}
+  </section>;
 }

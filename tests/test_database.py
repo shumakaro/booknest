@@ -17,7 +17,7 @@ def db_book(db_client, db_author):
 def test_database_crud(db_client, db_book):
     path = f"/api/v1/books/{db_book['id']}"
     assert db_client.get(path).json()["title"] == "Книга БД"
-    assert db_client.patch(path, json={"year": 2021}).json()["year"] == 2021
+    assert db_client.patch(path, json={"year": 2021, "edition_year": 2021}).json()["year"] == 2021
     assert db_client.delete(path).status_code == 204
     assert db_client.get(path).status_code == 404
     assert db_client.get("/api/v1/books").json()["total"] == 0

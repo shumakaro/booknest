@@ -79,32 +79,16 @@ export function BookFormPage() {
     mode === "edit" &&
     details
   ) {
+    const record = details.record;
     defaultValues = {
-      title:
-        details.title,
-
-      author:
-        details.authors[0]
-          ?.name ??
-        "Автор не указан",
-
-      isbn:
-        "1234567890",
-
-      publisher:
-        "Open Library",
-
-      language:
-        "Английский",
-
-      publicationYear:
-        2000,
-
-      editionYear:
-        2000,
-
-      pages:
-        200,
+      title: details.title,
+      author: details.authors[0]?.name ?? "",
+      isbn: record?.isbn ?? "",
+      publisher: record?.publisher ?? "",
+      language: record?.language ?? "",
+      publicationYear: record?.year ?? 2020,
+      editionYear: record?.edition_year ?? record?.year ?? 2020,
+      pages: record?.pages ?? 1,
     };
   }
 

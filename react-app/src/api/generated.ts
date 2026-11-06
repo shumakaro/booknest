@@ -15,6 +15,15 @@ export interface AuthorUpdate {
   birth_year?: number | null;
 }
 
+export interface Body_token_api_v1_auth_token_post {
+  grant_type?: string | null;
+  username: string;
+  password: string;
+  scope?: string;
+  client_id?: string | null;
+  client_secret?: string | null;
+}
+
 export interface BookCreate {
   title: string;
   author_id: number;
@@ -23,6 +32,10 @@ export interface BookCreate {
   genre?: "scifi" | "history" | "poetry" | "cs" | "fiction";
   total_copies?: number;
   description?: string;
+  publisher?: string;
+  language?: string;
+  edition_year?: number | null;
+  pages?: number;
 }
 
 export interface BookRead {
@@ -33,6 +46,10 @@ export interface BookRead {
   genre?: "scifi" | "history" | "poetry" | "cs" | "fiction";
   total_copies?: number;
   description?: string;
+  publisher?: string;
+  language?: string;
+  edition_year?: number | null;
+  pages?: number;
   id: number;
   available: number;
   author: string;
@@ -46,10 +63,44 @@ export interface BookUpdate {
   genre?: "scifi" | "history" | "poetry" | "cs" | "fiction" | null;
   total_copies?: number | null;
   description?: string | null;
+  publisher?: string | null;
+  language?: string | null;
+  edition_year?: number | null;
+  pages?: number | null;
+}
+
+export interface ConfirmationRequest {
+  token: string;
+}
+
+export interface HTTPValidationError {
+  detail?: (ValidationError)[];
 }
 
 export interface HealthRead {
   status: string;
+}
+
+export interface LoanCreate {
+  user_id?: number | null;
+  due_date: string;
+}
+
+export interface LoanRead {
+  id: number;
+  book_id: number;
+  user_id: number;
+  issued_at: string;
+  due_date: string;
+  returned_at: string | null;
+}
+
+export interface LoanReturn {
+  state: string;
+}
+
+export interface MessageRead {
+  message: string;
 }
 
 export interface Page_AuthorRead_ {
@@ -64,4 +115,36 @@ export interface Page_BookRead_ {
   total: number;
   page: number;
   size: number;
+}
+
+export interface Page_LoanRead_ {
+  items: (LoanRead)[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+}
+
+export interface TokenRead {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+export interface UserRead {
+  id: number;
+  email: string;
+  role: "member" | "librarian";
+  is_active: boolean;
+  email_verified: boolean;
+}
+
+export interface ValidationError {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
 }

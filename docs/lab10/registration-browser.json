@@ -1,0 +1,7 @@
+{
+  "registration": 201,
+  "login": true,
+  "member_controls_hidden": true,
+  "librarian_route_denied": true,
+  "logout": true
+}

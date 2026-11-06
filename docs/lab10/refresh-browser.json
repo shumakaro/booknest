@@ -1,0 +1,19 @@
+{
+  "access_ttl_seconds": 30,
+  "waited_seconds": 31,
+  "responses": [
+    [
+      "/api/v1/wishlist/1",
+      401
+    ],
+    [
+      "/api/v1/auth/refresh",
+      200
+    ],
+    [
+      "/api/v1/wishlist/1",
+      204
+    ]
+  ],
+  "passed": true
+}

@@ -12,6 +12,7 @@ import {
 import { Spinner } from "../../components/Spinner";
 import { BookDetailsPage } from "../../pages/books/BookDetailsPage";
 import { BooksPage } from "../../pages/books/BooksPage";
+import { LoansPage } from "../../pages/loans/LoansPage";
 import { LoginPage } from "../../pages/login/LoginPage";
 import { NotFoundPage } from "../../pages/not-found/NotFoundPage";
 import { WishlistPage } from "../../pages/wishlist/WishlistPage";
@@ -92,6 +93,7 @@ export function AppRouter() {
         <Route
           element={<RequireAuth />}
         >
+          <Route path="loans" element={<LoansPage />} />
           <Route
             path="wishlist"
             element={

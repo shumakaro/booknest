@@ -50,6 +50,8 @@ class Book(Base):
     __table_args__ = (
         CheckConstraint("year BETWEEN 1450 AND 2100", name="books_year_ck"),
         CheckConstraint("total_copies >= 0", name="books_copies_ck"),
+        CheckConstraint("edition_year BETWEEN year AND 2100", name="books_edition_ck"),
+        CheckConstraint("pages BETWEEN 1 AND 10000", name="books_pages_ck"),
         CheckConstraint("length(trim(title)) > 0", name="books_title_ck"),
         CheckConstraint("isbn IS NULL OR isbn ~ '^[0-9]{13}$'", name="books_isbn_ck"),
         Index("books_author_year_idx", "author_id", "year", "id"),
@@ -65,6 +67,9 @@ class Book(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     # Вторая миграция добавляет язык и мягкое удаление, не теряя старые книги.
     language: Mapped[str] = mapped_column(String(30), server_default="ru")
+    publisher: Mapped[str] = mapped_column(String(100), server_default="Не указано")
+    edition_year: Mapped[int]
+    pages: Mapped[int] = mapped_column(server_default="1")
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     author: Mapped[Author] = relationship(back_populates="books")
     genres: Mapped[list["Genre"]] = relationship(secondary=book_genres, back_populates="books")
@@ -149,3 +154,11 @@ class AuditEvent(Base):
     method: Mapped[str] = mapped_column(String(10))
     path: Mapped[str] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class WishlistEntry(Base):
+    """Желаемое принадлежит пользователю; пару нельзя добавить дважды."""
+
+    __tablename__ = "wishlist_entries"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id", ondelete="CASCADE"), primary_key=True)

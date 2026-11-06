@@ -2,7 +2,7 @@
 
 from datetime import date
 from typing import Annotated, Generic, Literal, TypeVar
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 T = TypeVar("T")
 Genre = Literal["scifi", "history", "poetry", "cs", "fiction"]
@@ -58,6 +58,18 @@ class BookCreate(BaseModel):
     genre: Genre = "fiction"
     total_copies: int = Field(default=1, ge=0, le=10000)
     description: str = Field(default="", max_length=10000)
+    publisher: str = Field(default="Не указано", min_length=2, max_length=100)
+    language: str = Field(default="ru", min_length=2, max_length=30)
+    edition_year: int | None = Field(default=None, ge=1450, le=2100)
+    pages: int = Field(default=1, ge=1, le=10000)
+
+    @model_validator(mode="after")
+    def edition_after_publication(self) -> "BookCreate":
+        if self.edition_year is None:
+            self.edition_year = self.year
+        if self.edition_year < self.year:
+            raise ValueError("Год издания не может быть раньше первой публикации")
+        return self
 
     @field_validator("title")
     @classmethod
@@ -88,8 +100,23 @@ class BookUpdate(BaseModel):
     genre: Genre | None = None
     total_copies: int | None = Field(default=None, ge=0, le=10000)
     description: str | None = Field(default=None, max_length=10000)
+    publisher: str | None = Field(default=None, min_length=2, max_length=100)
+    language: str | None = Field(default=None, min_length=2, max_length=30)
+    edition_year: int | None = Field(default=None, ge=1450, le=2100)
+    pages: int | None = Field(default=None, ge=1, le=10000)
 
-    @field_validator("title", "author_id", "year", "genre", "total_copies", "description")
+    @field_validator(
+        "title",
+        "author_id",
+        "year",
+        "genre",
+        "total_copies",
+        "description",
+        "publisher",
+        "language",
+        "edition_year",
+        "pages",
+    )
     @classmethod
     def reject_null(cls, value: object) -> object:
         # Отсутствующее поле разрешено, явный null для обязательного поля — нет.

@@ -10,3 +10,5 @@ htmlcov/
 *.db
 artifacts/
 .tools/
+react-app/test-results/
+react-app/playwright-report/

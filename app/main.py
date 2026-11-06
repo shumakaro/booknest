@@ -7,6 +7,7 @@ from app.config import Settings
 from app.core.http import configure_http
 from app.routers.loans import router as loans_router
 from app.routers.auth import router as auth_router
+from app.routers.wishlist import router as wishlist_router
 from app.routers.catalog_db import router
 from app.schemas import HealthRead
 
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
     application.include_router(router, prefix="/api/v1")
     application.include_router(loans_router, prefix="/api/v1")
     application.include_router(auth_router, prefix="/api/v1")
+    application.include_router(wishlist_router, prefix="/api/v1")
     application.include_router(auth_router, include_in_schema=False)
 
     @application.get("/health", response_model=HealthRead, status_code=200, tags=["service"])
