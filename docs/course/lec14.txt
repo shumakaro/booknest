@@ -1,0 +1,287 @@
+Лекция 14 · Неделя 14
+Docker, Docker Compose, Nginx и развёртывание на сервере2 ч
+  Learning objectives
+    
+Объяснить, какую задачу решает контейнеризация и чем контейнер отличается от виртуальной машины.
+    
+Написать multi-stage Dockerfile для Python-сервиса и для сборки клиента.
+    
+Собрать четырёхсервисное приложение в Docker Compose с томами, сетями и healthcheck.
+    
+Настроить Nginx как раздатчик статики SPA и reverse proxy для API.
+    
+Развернуть приложение на VPS с HTTPS и описать процедуру повторного развёртывания.
+  
+  Основные понятия
+Linux, SSH, права доступа, пакетный менеджер, journalctl, образ, контейнер, слой, кэш сборки, Dockerfile, инструкции FROM/COPY/RUN/CMD/EXPOSE, multi-stage build, .dockerignore, том, bind mount, сеть Docker, DNS сервисов по имени, порты, depends_on, healthcheck, переменные окружения в compose, reverse proxy, try_files, upstream, TLS-сертификат, Let's Encrypt, certbot, firewall, CI/CD, pipeline, GitHub Actions, workflow, артефакт
+  План лекции
+    
+0–12 мин. «У меня работает» как инженерная проблема: разные версии Python, отсутствующая БД, другой часовой пояс. Контейнер как ответ. Контейнер против виртуальной машины: что переиспользуется, откуда скорость.
+    
+12–25 мин. Linux-минимум для разработчика: подключение по SSH, ключи, права, установка пакетов, чтение журналов, базовые правила firewall.
+    
+25–48 мин. Образ и Dockerfile: слои и кэш (почему COPY requirements.txt идёт до COPY .), .dockerignore, multi-stage для FastAPI, отдельный multi-stage для Vite со сборкой статики.
+    
+48–70 мин. Docker Compose: четыре сервиса (postgres, api, web-builder/nginx), тома для данных БД, именованная сеть и обращение по имени сервиса, depends_on с condition: service_healthy, передача переменных окружения, docker compose logs/exec/ps.
+    
+70–88 мин. Nginx: раздача собранной статики, try_files $uri /index.html — почему без этого при обновлении страницы SPA получается 404, проксирование /api на сервис api, заголовки, ограничение размера тела запроса, gzip.
+    
+88–102 мин. Развёртывание на VPS: подготовка сервера, доменное имя, запуск compose, получение сертификата Let's Encrypt, повторное развёртывание, резервное копирование БД, что делать при падении.
+    
+102–110 мин. CI/CD обзорно: один workflow GitHub Actions — линтер и тесты на каждый Pull Request; упоминание автоматического развёртывания как следующего шага за пределами курса.
+  
+  Теоретический материал
+    
+Неделя 14 замыкает тему воспроизводимости, начатую миграциями и переменными окружения. Формулировка требования проста и проверяема: проект должен запускаться на чистой машине двумя командами — cp .env.example .env и docker compose up -d. Если требуется что-то ещё, конфигурация неполна. Такая постановка избавляет от долгих объяснений «зачем Docker»: студент к этому моменту уже трижды столкнулся с тем, что проект не запускается у соседа.
+    
+Три технических акцента. Первый — порядок инструкций в Dockerfile определяет скорость сборки: зависимости копируются и устанавливаются до копирования исходного кода, иначе каждая правка одной строки заново скачивает все пакеты. Второй — multi-stage: в финальный образ попадает результат сборки, а не инструменты сборки; учебный образ клиента уменьшается с ~1,2 ГБ до ~50 МБ, и эту разницу полезно показать командой docker images. Третий — try_files: клиентская маршрутизация недели 8 работает только тогда, когда сервер на любой неизвестный путь отдаёт index.html. Это самая частая причина сообщения «после деплоя всё сломалось», и связь между лекциями 8 и 14 следует проговорить явно.
+  
+  Практические примеры
+    
+Сборка образа api дважды: полная (90 с) и после правки одной строки кода при правильном порядке слоёв (4 с).
+    
+docker images: сравнение размера образа клиента при однослойной и multi-stage сборке.
+    
+Отключить try_files, обновить страницу /books/42 — 404; включить — работает.
+  
+  Code examples
+    Dockerfile для FastAPI: порядок слоёв и непривилегированный пользователь
+# backend/Dockerfile
+FROM python:3.12-slim AS base
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+WORKDIR /app
+
+# 1. СНАЧАЛА зависимости — этот слой кэшируется и не пересобирается при правке кода
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 2. ПОТОМ исходный код — меняется часто, но слой дешёвый
+COPY app ./app
+COPY migrations ./migrations
+COPY alembic.ini .
+
+# не запускаем от root
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+      
+# frontend/Dockerfile — multi-stage: инструменты сборки в финальный образ не попадают
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci                       # ci, а не install: строго по package-lock.json
+COPY . .
+ARG VITE_API_BASE_URL=/api/v1
+RUN npm run build                # результат — статика в /app/dist
+
+FROM nginx:1.27-alpine AS runtime
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+# образ ~50 МБ вместо ~1,2 ГБ со всем node_modules
+    docker-compose.yml: всё приложение одной командой
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data      # том: данные переживают пересоздание контейнера
+    healthcheck:                              # api не должен стартовать раньше готовности БД
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    environment:
+      # "db" — имя сервиса, Docker разрешает его во внутренний IP. Не localhost!
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      CORS_ORIGINS: '["https://${DOMAIN}"]'
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api/v1
+    depends_on: [api]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/certs:/etc/letsencrypt:ro
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+# Запуск на чистой машине:
+#   cp .env.example .env && nano .env
+#   docker compose up -d --build
+#   docker compose logs -f api
+    nginx.conf: статика SPA + проксирование API
+server {
+    listen 80;
+    server_name booknest.example.kz;
+    client_max_body_size 5m;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    root /usr/share/nginx/html;
+
+    # API проксируем на сервис api по внутренней сети Docker
+    location /api/ {
+        proxy_pass http://api:8000;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # хешированные ассеты можно кэшировать надолго
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # КЛЮЧЕВАЯ СТРОКА для SPA: неизвестный путь → index.html,
+    # иначе обновление страницы /books/42 даёт 404
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+    Развёртывание на VPS и CI-workflow
+# --- на сервере (Ubuntu 24.04 LTS) ---
+ssh deploy@203.0.113.10
+sudo apt update && sudo apt install -y docker.io docker-compose-v2 git
+sudo ufw allow OpenSSH && sudo ufw allow 80,443/tcp && sudo ufw enable
+
+git clone https://github.com/student/booknest.git && cd booknest
+cp .env.example .env && nano .env          # DOMAIN, SECRET_KEY, пароль БД
+docker compose up -d --build
+docker compose ps && docker compose logs -f api
+
+# HTTPS
+sudo certbot certonly --standalone -d booknest.example.kz
+docker compose restart web
+
+# повторное развёртывание после изменений
+git pull && docker compose up -d --build && docker compose exec api alembic upgrade head
+
+# резервная копия БД
+docker compose exec -T db pg_dump -U booknest booknest | gzip > backup-$(date +%F).sql.gz
+      
+# .github/workflows/ci.yml — проверка каждого Pull Request
+name: CI
+on: [push, pull_request]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env: { POSTGRES_PASSWORD: test, POSTGRES_DB: booknest_test, POSTGRES_USER: test }
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-retries 10
+        ports: ["5432:5432"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r backend/requirements.txt
+      - run: ruff check backend
+      - run: pytest -q
+        env:
+          DATABASE_URL: postgresql+psycopg://test:test@localhost:5432/booknest_test
+          SECRET_KEY: ci-only-secret
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: "npm", cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci --prefix frontend
+      - run: npm run lint --prefix frontend
+      - run: npx vitest run --prefix frontend
+      - run: npm run build --prefix frontend
+  
+  Демонстрация на занятии
+«От нуля до публичного адреса». Преподаватель работает на подготовленном чистом VPS с проброшенным экраном терминала. Последовательность: клонирование репозитория → cp .env.example .env → docker compose up -d --build (с комментированием происходящего в логе: скачивание образов, сборка, применение миграций, healthcheck БД) → открытие публичного адреса в браузере → регистрация пользователя → создание записи. Затем демонстрация диагностики: остановить контейнер БД и показать, что видит пользователь и что пишет docker compose logs api; вернуть, показать восстановление. Финал: docker compose down без флага -v, повторный up — данные на месте благодаря тому, что они в томе; и предупреждение о том, что делает down -v.
+  Типичные ошибки студентов
+    
+localhost в строке подключения к БД внутри контейнера вместо имени сервиса db.
+    
+COPY . . перед установкой зависимостей — каждая правка кода пересобирает всё.
+    
+Отсутствие .dockerignore: node_modules, .git и .env попадают в образ.
+    
+Секреты, вписанные прямо в Dockerfile или compose вместо переменных окружения.
+    
+Данные БД без тома — при пересоздании контейнера всё теряется.
+    
+Отсутствие try_files — SPA возвращает 404 при обновлении любой внутренней страницы.
+    
+depends_on без healthcheck: api стартует раньше БД и падает.
+    
+Порт 8000 API открыт в интернет напрямую, минуя reverse proxy.
+    
+Развёртывание без HTTPS с последующей передачей пароля в открытом виде.
+    
+Миграции не применяются автоматически — «на сервере таблиц нет».
+    
+Запуск контейнеров от root без необходимости.
+  
+  Контрольные вопросы
+    
+Чем контейнер отличается от виртуальной машины?
+    
+Почему COPY requirements.txt должен идти до COPY .?
+    
+Что даёт multi-stage сборка и на сколько уменьшает образ клиента?
+    
+Как сервис api находит базу данных внутри compose-сети?
+    
+Зачем нужен том и что произойдёт при docker compose down -v?
+    
+Для чего нужен healthcheck и почему depends_on без него недостаточен?
+    
+Объясните строку try_files $uri $uri/ /index.html.
+    
+Что делает reverse proxy и почему API не публикуют напрямую?
+    
+Как передать секреты в контейнер, не помещая их в образ?
+    
+Как выполняется повторное развёртывание после изменений в коде и в схеме БД?
+    
+Что должно происходить в CI при каждом Pull Request?
+  
+  Домашнее задание
+Полная контейнеризация собственного проекта (лабораторная 11) и подготовка к развёртыванию: Dockerfile для backend и frontend (оба multi-stage или с обоснованием), .dockerignore, docker-compose.yml с четырьмя сервисами, томом, healthcheck и автоматическим применением миграций, .env.example, раздел «Развёртывание» в README.md. Проверка: удалить локальные образы и тома (docker compose down -v, docker system prune), выполнить docker compose up -d --build и убедиться, что приложение поднимается «с нуля». Приложить вывод docker compose ps и docker images. Настроить workflow CI с линтером и тестами; в PR должна быть зелёная отметка проверки.
+  Материалы
+    
+docs.docker.com — Get started, Building best practices, Multi-stage builds, Compose file reference, Volumes, Networking.
+    
+nginx.org/ru/docs — Beginner's Guide, директивы try_files, proxy_pass.
+    
+docs.github.com — GitHub Actions: Understanding workflows, Service containers.
+    
+Let's Encrypt / certbot — инструкции для nginx; Ubuntu Server Guide — SSH, ufw.
+    
+12factor.net — Build, release, run.

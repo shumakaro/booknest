@@ -1,0 +1,1828 @@
+# Полный чек-лист недель 9–15
+
+Источник: web-technologies-syllabus.html. Исходные формулировки сохранены в docs/course.
+[ ] означает, что пункт ещё не подтверждён результатом. Демонстрации преподавателя не выдаются за собственные проверки.
+
+## Фактическое состояние на 6 ноября 2026
+
+- [x] Найдена исходная ветка завершённой ЛР №6: lab-6b/router-forms, a481506.
+- [x] Создана зависимая ветка lab-7/fastapi.
+- [x] Повторная установка всех зависимостей requirements.txt из PyPI успешно завершена в .venv.
+- [x] pip check: No broken requirements found.
+- [x] Проверен импорт FastAPI, Uvicorn, Pydantic, SQLAlchemy, Alembic, psycopg, pytest и JWT; хеширование и проверка bcrypt выполнены успешно.
+- [x] Подготовлен первый вариант CRUD API книг и авторов ЛР №7, схемы, пагинация, ошибки, логирование и ограничитель запросов.
+- [x] API-тесты выполнены дважды: 16 passed (1,78 с и 2,07 с). Есть предупреждение совместимости Starlette с новым AnyIO; тесты проходят.
+- [x] Ruff: All checks passed.
+- [x] Подготовлены docs/api-design.md, экспорт docs/lab7/openapi.json и Markdown-черновик отчёта docs/lab7/report.md.
+- [ ] Проверка Swagger UI в браузере и запуск отдельного процесса Uvicorn.
+- [ ] Генерация TypeScript-типов из OpenAPI и использование в React.
+- [ ] DOCX и визуальная проверка отчёта ЛР №7.
+- [ ] Коммиты лабораторной, push и PR: ещё не выполнялись, ссылок нет.
+- [ ] Лабораторные №8–12: реализация ещё не начата.
+
+Ниже сохранён полный исходный перечень материала. Его пункты пока не сверены по отдельности; выполненные действия перечислены выше. Ограничение загрузки PyPI снято успешной повторной попыткой. Наличие установленных драйверов не означает наличие работающего сервера PostgreSQL, Docker или VPS.
+## lec9
+
+- [ ] Лекция 9 · Неделя 9
+- [ ] Python для веба и REST API на FastAPI2 ч
+- [ ] Learning objectives
+- [ ] Развернуть проект FastAPI и объяснить роль ASGI-сервера Uvicorn.
+- [ ] Спроектировать ресурсный API: перечень эндпоинтов, методы, коды ответов.
+- [ ] Описать входные и выходные данные схемами Pydantic v2 и разделить Create/Update/Read.
+- [ ] Возвращать корректные коды состояний и осмысленные сообщения об ошибках.
+- [ ] Пользоваться автогенерируемой документацией OpenAPI как средством проверки собственного API.
+- [ ] Основные понятия
+- [ ] WSGI и ASGI, Uvicorn, маршрут, декоратор пути, path-параметр, query-параметр, тело запроса, схема, Pydantic v2, BaseModel, валидатор, Field, model_config, response_model, status_code, HTTPException, APIRouter, префикс и теги, Depends, внедрение зависимостей, middleware, OpenAPI, Swagger UI, ReDoc, ресурсная модель, пагинация, фильтрация, идемпотентность, виртуальное окружение
+- [ ] План лекции
+- [ ] 0–10 мин. Что такое backend и что он обязан делать: хранить данные, применять правила предметной области, проверять права. Почему нельзя доверять клиенту — третье повторение тезиса недели 1.
+- [ ] 10–25 мин. Подготовка окружения: venv, pip install fastapi uvicorn, структура пакета, запуск с автоперезагрузкой, первый эндпоинт за 6 строк. Что делает async def и когда он не нужен.
+- [ ] 25–45 мин. Проектирование REST: ресурсы существительными во множественном числе, методы вместо глаголов в URL (POST /books, а не /createBook), вложенные ресурсы, коды 200/201/204/400/401/403/404/409/422. Разбор плохого и хорошего API на одной задаче.
+- [ ] 45–70 мин. Pydantic v2: схема как контракт, типы и ограничения через Field, разделение BookCreate / BookUpdate / BookRead и зачем оно нужно; собственный валидатор; автоматический ответ 422 и его формат.
+- [ ] 70–85 мин. Организация кода: APIRouter, разделение по ресурсам, зависимости Depends как способ переиспользования (параметры пагинации, доступ к хранилищу), lifespan.
+- [ ] 85–100 мин. Ошибки: HTTPException, единый обработчик, что можно и что нельзя писать в сообщении об ошибке. Логирование запроса через middleware.
+- [ ] 100–110 мин. OpenAPI: Swagger UI как рабочий инструмент, проверка API без клиента, экспорт схемы, генерация типов для фронтенда — обзорно. Задание на лабораторную 7.
+- [ ] Теоретический материал
+- [ ] FastAPI выбран в качестве backend-фреймворка курса по методическим причинам: он делает контракт API видимым. Аннотации типов Python одновременно являются валидацией, документацией и подсказками редактора, поэтому студент физически не может «забыть» описать входные данные — иначе эндпоинт не примет их. Автогенерируемый Swagger UI превращает проверку API в самостоятельное действие, не требующее готового фронтенда: студент видит своё API так, как его увидит потребитель.
+- [ ] Ключевая содержательная тема лекции — проектирование ресурсной модели. Студенты приходят с привычкой мыслить «функциями» (/getBooks, /deleteBookById), а REST требует мыслить существительными и состояниями. Практическое правило: сначала выпишите список сущностей, затем для каждой — пять базовых операций, затем отдельно нестандартные действия (выдать книгу, вернуть книгу) как переходы состояния подчинённого ресурса (POST /books/42/loans). Второй акцент — разделение схем: при создании книги id не передаётся, при чтении — обязателен, при частичном обновлении все поля необязательны, а пароль присутствует во входной схеме и категорически отсутствует в выходной. Эта дисциплина предотвращает наиболее опасный класс дефектов — утечку данных через ответ API.
+- [ ] Практические примеры
+- [ ] Совместное проектирование API BookNest на доске: 6 ресурсов, 22 эндпоинта, коды ответов для каждого.
+- [ ] Демонстрация 422: отправить строку в поле year и разобрать структуру ответа detail.
+- [ ] Сравнение ответа с response_model=UserRead и без него — во втором случае в JSON виден хеш пароля.
+- [ ] Code examples
+- [ ] Схемы Pydantic: три роли одной сущности
+- [ ] # app/schemas/book.py
+- [ ] from datetime import date
+- [ ] from typing import Annotated, Literal, Optional
+- [ ] from pydantic import BaseModel, Field, field_validator, ConfigDict
+- [ ] Genre = Literal["scifi", "history", "poetry", "cs"]
+- [ ] class BookBase(BaseModel):
+- [ ] title:  Annotated[str, Field(min_length=1, max_length=200)]
+- [ ] genre:  Genre
+- [ ] year:   Annotated[int, Field(ge=1450, le=2100)]
+- [ ] isbn:   Annotated[str | None, Field(pattern=r"^\d{13}$")] = None
+- [ ] @field_validator("title")
+- [ ] @classmethod
+- [ ] def strip_title(cls, v: str) -> str:
+- [ ] v = v.strip()
+- [ ] if not v:
+- [ ] raise ValueError("Название не может состоять из пробелов")
+- [ ] return v
+- [ ] class BookCreate(BookBase):            # вход: id не передаётся — его выдаёт сервер
+- [ ] author_id: int
+- [ ] total_copies: Annotated[int, Field(ge=1, le=100)] = 1
+- [ ] class BookUpdate(BaseModel):           # PATCH: все поля необязательны
+- [ ] title: Optional[str] = None
+- [ ] genre: Optional[Genre] = None
+- [ ] year:  Optional[int] = None
+- [ ] total_copies: Optional[int] = None
+- [ ] class AuthorRead(BaseModel):
+- [ ] model_config = ConfigDict(from_attributes=True)   # позволит собирать из ORM-объекта
+- [ ] id: int
+- [ ] name: str
+- [ ] class BookRead(BookBase):              # выход: только то, что можно показывать
+- [ ] model_config = ConfigDict(from_attributes=True)
+- [ ] id: int
+- [ ] author: AuthorRead
+- [ ] available_copies: int
+- [ ] created_at: date
+- [ ] class Page[T](BaseModel):              # единый конверт для всех списков API
+- [ ] items: list[T]
+- [ ] total: int
+- [ ] page: int
+- [ ] size: int
+- [ ] Роутер: коды ответов, зависимости, обработка конфликтов
+- [ ] # app/routers/books.py
+- [ ] from fastapi import APIRouter, Depends, HTTPException, Query, status
+- [ ] router = APIRouter(prefix="/books", tags=["books"])
+- [ ] # зависимость: переиспользуемые параметры пагинации для всех списков
+- [ ] class Pagination:
+- [ ] def __init__(self,
+- [ ] page: int = Query(1, ge=1),
+- [ ] size: int = Query(20, ge=1, le=100)):
+- [ ] self.page, self.size = page, size
+- [ ] self.offset = (page - 1) * size
+- [ ] @router.get("", response_model=Page[BookRead], summary="Список книг с фильтрами")
+- [ ] def list_books(
+- [ ] pg: Pagination = Depends(),
+- [ ] q: str | None = Query(None, min_length=2, description="Поиск по названию"),
+- [ ] genre: Genre | None = None,
+- [ ] available_only: bool = False,
+- [ ] repo: BookRepository = Depends(get_book_repo),
+- [ ] ):
+- [ ] items, total = repo.list(q=q, genre=genre, available_only=available_only,
+- [ ] offset=pg.offset, limit=pg.size)
+- [ ] return Page(items=items, total=total, page=pg.page, size=pg.size)
+- [ ] @router.get("/{book_id}", response_model=BookRead,
+- [ ] responses={404: {"description": "Книга не найдена"}})
+- [ ] def get_book(book_id: int, repo: BookRepository = Depends(get_book_repo)):
+- [ ] book = repo.get(book_id)
+- [ ] if book is None:
+- [ ] raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+- [ ] return book
+- [ ] @router.post("", response_model=BookRead, status_code=status.HTTP_201_CREATED)
+- [ ] def create_book(payload: BookCreate, repo: BookRepository = Depends(get_book_repo)):
+- [ ] if payload.isbn and repo.get_by_isbn(payload.isbn):
+- [ ] # 409 — запрос корректен, но противоречит текущему состоянию данных
+- [ ] raise HTTPException(status.HTTP_409_CONFLICT, detail="Книга с таким ISBN уже есть")
+- [ ] return repo.create(payload)
+- [ ] @router.patch("/{book_id}", response_model=BookRead)
+- [ ] def update_book(book_id: int, payload: BookUpdate,
+- [ ] repo: BookRepository = Depends(get_book_repo)):
+- [ ] # exclude_unset: обновляем только переданные поля, а не все
+- [ ] updated = repo.update(book_id, payload.model_dump(exclude_unset=True))
+- [ ] if updated is None:
+- [ ] raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+- [ ] return updated
+- [ ] @router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+- [ ] def delete_book(book_id: int, repo: BookRepository = Depends(get_book_repo)):
+- [ ] if not repo.delete(book_id):
+- [ ] raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+- [ ] # 204 — тело ответа отсутствует, return не нужен
+- [ ] Точка входа приложения и логирующее middleware
+- [ ] # app/main.py
+- [ ] import time, logging
+- [ ] from fastapi import FastAPI, Request
+- [ ] from app.routers import books, authors, loans
+- [ ] app = FastAPI(
+- [ ] title="BookNest API",
+- [ ] version="1.0.0",
+- [ ] description="Учебный API книжного клуба. Курс «Современные веб-технологии».",
+- [ ] )
+- [ ] log = logging.getLogger("booknest")
+- [ ] @app.middleware("http")
+- [ ] async def log_requests(request: Request, call_next):
+- [ ] started = time.perf_counter()
+- [ ] response = await call_next(request)
+- [ ] ms = (time.perf_counter() - started) * 1000
+- [ ] log.info("%s %s → %s (%.1f ms)", request.method, request.url.path,
+- [ ] response.status_code, ms)
+- [ ] response.headers["X-Process-Time-ms"] = f"{ms:.1f}"
+- [ ] return response
+- [ ] app.include_router(books.router,   prefix="/api/v1")
+- [ ] app.include_router(authors.router, prefix="/api/v1")
+- [ ] app.include_router(loans.router,   prefix="/api/v1")
+- [ ] @app.get("/health", tags=["service"])
+- [ ] def health():
+- [ ] return {"status": "ok"}
+- [ ] # uvicorn app.main:app --reload  →  http://127.0.0.1:8000/docs
+- [ ] Демонстрация на занятии
+- [ ] «API за 20 минут в Swagger UI». Создать проект с нуля, написать эндпоинт списка книг и открыть /docs. Далее, не покидая Swagger UI: выполнить POST с корректным телом (201 и объект в ответе), затем с year: "давно" (422 с точным указанием поля), затем повторить создание с тем же ISBN (409), затем GET несуществующего id (404), затем DELETE (204 без тела). Показать, что документация обновилась автоматически после добавления поля в схему. Финал: удалить response_model у эндпоинта пользователя и показать в ответе password_hash — наглядная демонстрация, зачем нужны отдельные схемы чтения.
+- [ ] Типичные ошибки студентов
+- [ ] Глаголы в URL: /getAllBooks, /book/delete/5.
+- [ ] Код 200 на все случаи, включая ошибки; ошибка передаётся в теле как {"success": false}.
+- [ ] Одна схема на все операции: клиент может передать id или created_at при создании.
+- [ ] Отсутствие response_model → в ответе оказываются служебные и чувствительные поля.
+- [ ] Возврат 200 вместо 201 при создании и тела при 204.
+- [ ] Вся логика в одном main.py на 400 строк без роутеров.
+- [ ] Валидация «руками» через if вместо ограничений Pydantic.
+- [ ] Текст исключения Python отдаётся клиенту целиком — раскрытие внутренней структуры приложения.
+- [ ] Блокирующие операции внутри async def (например, time.sleep) — сервер перестаёт отвечать.
+- [ ] Контрольные вопросы
+- [ ] Чем ASGI отличается от WSGI и зачем нужен Uvicorn?
+- [ ] Как должен выглядеть URL и метод для операций «получить все книги», «создать книгу», «выдать книгу №42»?
+- [ ] Когда возвращается 201, 204, 400, 404, 409, 422?
+- [ ] Зачем разделять схемы Create, Update и Read? Приведите поле, которое есть только в одной из них.
+- [ ] Что делает response_model и какую уязвимость предотвращает?
+- [ ] Как Pydantic сообщает клиенту об ошибке валидации и как выглядит структура ответа?
+- [ ] Для чего нужен механизм Depends? Приведите два применения.
+- [ ] Чем PATCH отличается от PUT и что делает exclude_unset=True?
+- [ ] Что даёт OpenAPI-схема и как проверить API без клиентского приложения?
+- [ ] Почему нельзя выполнять блокирующий код внутри async def?
+- [ ] Домашнее задание
+- [ ] Составить и сдать проектную спецификацию API собственного итогового проекта в файле docs/api-design.md: перечень ресурсов; таблица эндпоинтов (метод, путь, назначение, коды ответов, требуемая роль); примеры тел запроса и ответа для трёх ключевых операций; описание формата ошибки; правила пагинации и фильтрации. Дополнительно реализовать в FastAPI два эндпоинта из этой спецификации на хранилище в памяти и приложить скриншот Swagger UI. Документ становится основой лабораторных 7–9 и оценивается как часть промежуточного контроля.
+- [ ] Материалы
+- [ ] fastapi.tiangolo.com — Tutorial: User Guide, разделы Path Parameters, Query Parameters, Request Body, Response Model, Handling Errors, Bigger Applications.
+- [ ] docs.pydantic.dev — Models, Fields, Validators (v2).
+- [ ] MDN — HTTP response status codes (повторение недели 1 в применении к своему API).
+- [ ] docs.python.org — venv, typing, asyncio (обзорно).
+
+## lec10
+
+- [ ] Лекция 10 · Неделя 10
+- [ ] PostgreSQL и проектирование реляционной базы данных2 ч
+- [ ] Learning objectives
+- [ ] Спроектировать схему предметной области в третьей нормальной форме и обосновать её.
+- [ ] Реализовать связи 1:1, 1:N и M:N средствами внешних ключей и таблицы-связки.
+- [ ] Написать запросы с соединениями, группировкой и агрегатами.
+- [ ] Определить необходимость индекса и подтвердить эффект планом запроса.
+- [ ] Объяснить роль транзакции и свойства ACID на примере операции выдачи книги.
+- [ ] Основные понятия
+- [ ] отношение, кортеж, атрибут, домен, первичный ключ, естественный и суррогатный ключ, внешний ключ, ссылочная целостность, ON DELETE, ограничения NOT NULL/UNIQUE/CHECK, нормализация (1NF, 2NF, 3NF), аномалии, связи 1:1 / 1:N / M:N, таблица-связка, JOIN (INNER, LEFT), GROUP BY, агрегатные функции, подзапрос, транзакция, ACID, уровень изоляции (обзорно), индекс, B-tree, EXPLAIN ANALYZE, seq scan и index scan, типы PostgreSQL (serial/identity, text, numeric, timestamptz, boolean, jsonb — обзорно)
+- [ ] План лекции
+- [ ] 0–10 мин. Почему не файлы и не «список в памяти»: параллельный доступ, целостность, отказоустойчивость, запросы. Место БД в архитектуре недели 1.
+- [ ] 10–30 мин. Реляционная модель и типы данных PostgreSQL. Первичный ключ: суррогатный против естественного. Ограничения как способ переложить проверку правил на СУБД.
+- [ ] 30–55 мин. Проектирование от предметной области: сущности → атрибуты → связи → ключи. Разбор аномалий на заведомо плохой таблице «Выдачи» с дублированием данных читателя и книги; поэтапная нормализация до 3NF.
+- [ ] 55–70 мин. Три типа связей на схеме BookNest: 1:N (автор → книги), M:N (книги ↔ жанры через таблицу-связку), 1:1 (пользователь → профиль). Поведение ON DELETE CASCADE / RESTRICT / SET NULL и как выбрать.
+- [ ] 70–90 мин. SQL для приложения: SELECT с фильтрами и сортировкой, INNER и LEFT JOIN, GROUP BY с агрегатами, LIMIT/OFFSET для пагинации, COUNT(*) OVER() для общего числа. Разбор запросов, которые понадобятся в лабораторной 8.
+- [ ] 90–102 мин. Транзакции: операция выдачи книги как две согласованные записи; демонстрация BEGIN … ROLLBACK; ACID своими словами.
+- [ ] 102–110 мин. Индексы: зачем, чем платим, где создавать. Демонстрация EXPLAIN ANALYZE на таблице в 500 000 строк до и после создания индекса. Задание на лабораторную 8 (часть 1).
+- [ ] Теоретический материал
+- [ ] Нормализация подаётся не как формальная процедура, а как средство устранения наблюдаемых аномалий. Методический приём: показать одну «широкую» таблицу выдач, где имя читателя и название книги повторяются в каждой строке, и задать три вопроса — «как переименовать книгу», «как добавить читателя без выдачи», «что произойдёт при удалении единственной выдачи читателя». Аномалии обновления, вставки и удаления студенты обнаруживают сами, после чего 3NF воспринимается как решение конкретной проблемы, а не как требование учебника.
+- [ ] Второй тезис — ограничения целостности принадлежат базе данных. Проверка «количество экземпляров не отрицательно» может стоять в React, в Pydantic и в SQL, но только последняя работает всегда — независимо от того, какой клиент и какой скрипт обращается к данным. Отсюда правило курса: инварианты предметной области выражаются через NOT NULL, UNIQUE, CHECK и FOREIGN KEY, а прикладная валидация лишь даёт пользователю понятное сообщение раньше. Третий тезис — индекс это компромисс: ускоряет чтение, замедляет запись и занимает место. Курс требует не «расставить индексы», а обосновать каждый индекс конкретным запросом и подтвердить эффект через EXPLAIN ANALYZE.
+- [ ] Практические примеры
+- [ ] Пошаговая нормализация «широкой» таблицы выдач до пяти таблиц с проверкой исчезновения аномалий.
+- [ ] Запрос «топ-5 авторов по числу выдач за семестр» — с JOIN, GROUP BY, HAVING и сортировкой.
+- [ ] Замер: поиск по title без индекса и с индексом на таблице 500 тыс. строк; сравнение планов и времени.
+- [ ] Code examples
+- [ ] DDL-схема BookNest: три типа связей и ограничения целостности
+- [ ] CREATE TABLE authors (
+- [ ] id         integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+- [ ] name       text NOT NULL,
+- [ ] birth_year integer CHECK (birth_year BETWEEN 1000 AND 2100),
+- [ ] CONSTRAINT authors_name_uniq UNIQUE (name)
+- [ ] );
+- [ ] CREATE TABLE books (
+- [ ] id            integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+- [ ] title         text    NOT NULL,
+- [ ] year          integer NOT NULL CHECK (year BETWEEN 1450 AND 2100),
+- [ ] isbn          char(13) UNIQUE,
+- [ ] total_copies  integer NOT NULL DEFAULT 1 CHECK (total_copies >= 0),
+- [ ] -- связь 1:N — у книги один автор, у автора много книг.
+- [ ] -- RESTRICT: не позволяем удалить автора, пока есть его книги.
+- [ ] author_id     integer NOT NULL REFERENCES authors(id) ON DELETE RESTRICT,
+- [ ] created_at    timestamptz NOT NULL DEFAULT now()
+- [ ] );
+- [ ] CREATE TABLE genres (
+- [ ] id   integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+- [ ] code text NOT NULL UNIQUE,
+- [ ] name text NOT NULL
+- [ ] );
+- [ ] -- связь M:N — книга во многих жанрах, жанр у многих книг.
+- [ ] -- Составной первичный ключ исключает дубликаты пары.
+- [ ] CREATE TABLE book_genres (
+- [ ] book_id  integer NOT NULL REFERENCES books(id)  ON DELETE CASCADE,
+- [ ] genre_id integer NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+- [ ] PRIMARY KEY (book_id, genre_id)
+- [ ] );
+- [ ] CREATE TABLE users (
+- [ ] id            integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+- [ ] email         text NOT NULL UNIQUE,
+- [ ] password_hash text NOT NULL,
+- [ ] role          text NOT NULL DEFAULT 'member'
+- [ ] CHECK (role IN ('member', 'librarian', 'admin')),
+- [ ] is_active     boolean NOT NULL DEFAULT true,
+- [ ] created_at    timestamptz NOT NULL DEFAULT now()
+- [ ] );
+- [ ] -- связь 1:1 — профиль расширяет пользователя (UNIQUE на внешнем ключе)
+- [ ] CREATE TABLE profiles (
+- [ ] user_id    integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+- [ ] full_name  text NOT NULL,
+- [ ] faculty    text,
+- [ ] avatar_url text
+- [ ] );
+- [ ] CREATE TABLE loans (
+- [ ] id         integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+- [ ] book_id    integer NOT NULL REFERENCES books(id) ON DELETE RESTRICT,
+- [ ] user_id    integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+- [ ] issued_at  date NOT NULL DEFAULT current_date,
+- [ ] due_date   date NOT NULL,
+- [ ] returned_at date,
+- [ ] CONSTRAINT loans_dates_ck   CHECK (due_date > issued_at),
+- [ ] CONSTRAINT loans_return_ck  CHECK (returned_at IS NULL OR returned_at >= issued_at)
+- [ ] );
+- [ ] -- бизнес-правило средствами БД: одна невозвращённая выдача на пару книга+читатель
+- [ ] CREATE UNIQUE INDEX loans_active_uniq
+- [ ] ON loans (book_id, user_id)
+- [ ] WHERE returned_at IS NULL;
+- [ ] Запросы уровня приложения
+- [ ] -- 1. Каталог: книга, автор, жанры одной строкой + признак доступности
+- [ ] SELECT b.id, b.title, b.year,
+- [ ] a.name AS author,
+- [ ] string_agg(g.name, ', ' ORDER BY g.name) AS genres,
+- [ ] b.total_copies - count(l.id) FILTER (WHERE l.returned_at IS NULL) AS available
+- [ ] FROM books b
+- [ ] JOIN authors a       ON a.id = b.author_id
+- [ ] LEFT JOIN book_genres bg ON bg.book_id = b.id
+- [ ] LEFT JOIN genres g       ON g.id = bg.genre_id
+- [ ] LEFT JOIN loans l        ON l.book_id = b.id
+- [ ] WHERE (b.title ILIKE '%' || $1 || '%' OR $1 IS NULL)
+- [ ] GROUP BY b.id, a.name
+- [ ] ORDER BY b.title
+- [ ] LIMIT 20 OFFSET 0;
+- [ ] -- 2. Просроченные выдачи с числом дней просрочки
+- [ ] SELECT u.email, b.title, l.due_date, current_date - l.due_date AS days_overdue
+- [ ] FROM loans l
+- [ ] JOIN users u ON u.id = l.user_id
+- [ ] JOIN books b ON b.id = l.book_id
+- [ ] WHERE l.returned_at IS NULL AND l.due_date < current_date
+- [ ] ORDER BY days_overdue DESC;
+- [ ] -- 3. Топ-5 авторов по числу выдач (только те, у кого больше 3)
+- [ ] SELECT a.name, count(*) AS loans_count
+- [ ] FROM loans l
+- [ ] JOIN books   b ON b.id = l.book_id
+- [ ] JOIN authors a ON a.id = b.author_id
+- [ ] GROUP BY a.name
+- [ ] HAVING count(*) > 3
+- [ ] ORDER BY loans_count DESC
+- [ ] LIMIT 5;
+- [ ] Транзакция и подтверждение эффекта индекса
+- [ ] -- Выдача книги: либо оба действия, либо ни одного
+- [ ] BEGIN;
+- [ ] INSERT INTO loans (book_id, user_id, due_date)
+- [ ] VALUES (42, 7, current_date + 14);
+- [ ] UPDATE books SET total_copies = total_copies - 1
+- [ ] WHERE id = 42 AND total_copies > 0;
+- [ ] -- если UPDATE не затронул строк, приложение вызывает ROLLBACK
+- [ ] COMMIT;
+- [ ] -- Индекс обосновывается конкретным запросом и проверяется планом
+- [ ] EXPLAIN ANALYZE
+- [ ] SELECT * FROM loans WHERE user_id = 7 AND returned_at IS NULL;
+- [ ] -- ДО:     Seq Scan on loans  (rows=500000)  actual time=142.331 ms
+- [ ] CREATE INDEX loans_user_active_idx ON loans (user_id) WHERE returned_at IS NULL;
+- [ ] -- ПОСЛЕ:  Index Scan using loans_user_active_idx  actual time=0.094 ms
+- [ ] Демонстрация на занятии
+- [ ] «Плохая таблица и три аномалии». Создать в psql одну таблицу с полями reader_name, reader_email, book_title, author_name, issued_at, заполнить 8 строками и предложить студентам выполнить три операции: исправить опечатку в названии книги (обновление в N строках — аномалия обновления), зарегистрировать читателя без выдачи (некуда — аномалия вставки), удалить единственную выдачу читателя (исчезает и читатель — аномалия удаления). Затем на глазах группы разделить таблицу и повторить те же три операции на нормализованной схеме. Вторая часть: сгенерировать 500 000 строк через generate_series, замерить запрос, создать индекс, замерить снова, показать смену Seq Scan на Index Scan.
+- [ ] Типичные ошибки студентов
+- [ ] Хранение списка значений в одном поле через запятую вместо связи M:N.
+- [ ] Отсутствие внешних ключей: «связь» существует только в коде приложения.
+- [ ] Тип varchar(255) для всего; float для денег вместо numeric; timestamp без часового пояса.
+- [ ] Отсутствие NOT NULL там, где значение обязательно; поля с тремя возможными смыслами NULL.
+- [ ] Хранение вычислимых величин (число доступных экземпляров) без механизма поддержания согласованности.
+- [ ] ON DELETE CASCADE везде — потеря данных при удалении справочной записи.
+- [ ] Индексы «на всякий случай» на каждом столбце без единого запроса-обоснования.
+- [ ] Пароли в открытом виде в таблице пользователей (устраняется на неделе 12).
+- [ ] Пагинация без ORDER BY — при повторном запросе порядок строк меняется.
+- [ ] Контрольные вопросы
+- [ ] Приведите пример аномалии обновления и покажите, как нормализация её устраняет.
+- [ ] Как реализуется связь M:N и почему нельзя обойтись одним внешним ключом?
+- [ ] Чем отличаются ON DELETE CASCADE, RESTRICT и SET NULL? Приведите уместный сценарий для каждого.
+- [ ] Чем INNER JOIN отличается от LEFT JOIN? Приведите запрос, где разница критична.
+- [ ] Что означают свойства ACID? Проиллюстрируйте атомарность на операции выдачи книги.
+- [ ] Зачем нужен индекс и какова цена его создания?
+- [ ] Как убедиться, что индекс действительно используется?
+- [ ] Почему numeric предпочтительнее float для денежных величин?
+- [ ] Что даст ограничение CHECK (due_date > issued_at), если такая же проверка уже есть в Pydantic?
+- [ ] Как корректно реализовать пагинацию и почему обязателен ORDER BY?
+- [ ] Домашнее задание
+- [ ] Спроектировать схему базы данных собственного итогового проекта: ER-диаграмма (dbdiagram.io или аналог), DDL-скрипт с не менее 6 таблицами, всеми тремя типами связей и не менее 8 ограничениями целостности, скрипт наполнения тестовыми данными (не менее 30 строк в основной таблице), 10 SQL-запросов с описанием прикладного смысла каждого, 2 индекса с обоснованием и приложенными планами запроса до и после. Сдать в каталоге db/ с файлом db/README.md. Схема защищается устно на практике недели 11 и является допуском к лабораторной 8.
+- [ ] Материалы
+- [ ] postgresql.org/docs — Tutorial (гл. 2–3), Data Types, Constraints, Indexes, Using EXPLAIN.
+- [ ] PostgreSQL Tutorial (постгрес-туториалы) — соединения, группировка, оконные функции — как справочник по синтаксису.
+- [ ] use-the-index-luke.com — вводные главы об индексах и планах запроса.
+- [ ] Инструменты: psql, DBeaver или pgAdmin, dbdiagram.io для ER-диаграмм.
+
+## lec11
+
+- [ ] Лекция 11 · Неделя 11
+- [ ] SQLAlchemy 2.0, миграции Alembic и слоистая архитектура backend2 ч
+- [ ] Learning objectives
+- [ ] Описать таблицы БД декларативными моделями SQLAlchemy и настроить связи между ними.
+- [ ] Выполнять запросы в стиле select() и управлять жизненным циклом сессии.
+- [ ] Диагностировать и устранять проблему N+1 запросов средствами жадной загрузки.
+- [ ] Версионировать схему БД миграциями Alembic, включая откат.
+- [ ] Разделять код backend на слои маршрутов, сервисов и репозиториев и объяснять пользу такого разделения.
+- [ ] Основные понятия
+- [ ] ORM, объектно-реляционное отображение, DeclarativeBase, Mapped/mapped_column, relationship, back_populates, engine, сессия, единица работы, identity map, select(), where, join, options, ленивая и жадная загрузка, selectinload/joinedload, N+1, транзакция и commit/rollback, refresh, миграция, ревизия, autogenerate, upgrade/downgrade, слой репозитория, слой сервиса, DTO, инверсия зависимостей
+- [ ] План лекции
+- [ ] 0–12 мин. Зачем ORM: сравнение кода с psycopg вручную и через SQLAlchemy. Что ORM даёт (типы, связи, безопасность от инъекций) и чего стоит (скрытые запросы, кривая обучения).
+- [ ] 12–35 мин. Декларативные модели: Mapped-аннотации, соответствие типов, relationship в обе стороны, back_populates, M:N через secondary. Перенос схемы недели 10 в код.
+- [ ] 35–50 мин. Сессия: engine, фабрика сессий, зависимость FastAPI get_db, границы транзакции, commit и rollback, почему нельзя создавать сессию на уровне модуля.
+- [ ] 50–70 мин. Запросы: select().where().order_by().limit(), соединения, агрегаты, scalars(). Включение echo=True и сравнение сгенерированного SQL с собственным запросом из лабораторной 8.
+- [ ] 70–85 мин. Проблема N+1: воспроизвести (список 20 книг → 21 запрос), обнаружить по логу, устранить через selectinload. Почему это самая дорогая ошибка backend-новичка.
+- [ ] 85–100 мин. Alembic: инициализация, autogenerate, чтение и правка ревизии, upgrade head, downgrade -1, миграция с данными, конфликты ревизий в командной работе. Правило: изменение модели без миграции — не изменение.
+- [ ] 100–110 мин. Слоистая архитектура: router (HTTP) → service (правила предметной области) → repository (доступ к данным). Где живёт правило «нельзя выдать выданную книгу». Задание на лабораторную 8 (часть 2).
+- [ ] Теоретический материал
+- [ ] ORM подаётся строго после недели SQL и именно как надстройка, а не замена. Главное умение, которое требует курс, — видеть SQL за объектным кодом. Отсюда обязательное упражнение: включить echo=True, выполнить запрос через ORM и сравнить лог с рукописным SQL той же задачи. Студент, который не может ответить «сколько запросов уйдёт в базу при отрисовке этой страницы», ORM ещё не освоил.
+- [ ] Второй сюжет — миграции как часть кода. Схема БД должна воспроизводиться из репозитория одной командой на любой машине: это то же требование воспроизводимости, которое на неделе 14 приведёт к Docker. Правило курса: изменение модели, не сопровождённое ревизией Alembic, считается несделанным и не проходит code review. Третий сюжет — слои. Разделение вводится не «ради красоты», а через задачу: правило «нельзя выдать книгу, если нет свободных экземпляров» нельзя разместить в маршруте (иначе оно не действует при импорте данных) и нельзя в репозитории (тот не знает о правилах). Ему место в сервисе. После этого объяснения студенты начинают строить слои осознанно.
+- [ ] Практические примеры
+- [ ] Один и тот же каталог: рукописный SQL из недели 10 и вариант на SQLAlchemy — сравнение логов.
+- [ ] N+1 в живом виде: 21 строка в логе на 20 книг, затем 2 строки после selectinload.
+- [ ] Полный цикл миграции: добавить поле books.language, сгенерировать ревизию, применить, откатить, применить снова.
+- [ ] Code examples
+- [ ] Модели: 1:N, M:N и 1:1 в SQLAlchemy 2.0
+- [ ] # app/models.py
+- [ ] from datetime import date, datetime
+- [ ] from typing import Optional
+- [ ] from sqlalchemy import ForeignKey, String, Table, Column, CheckConstraint, func
+- [ ] from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+- [ ] class Base(DeclarativeBase):
+- [ ] pass
+- [ ] book_genres = Table(                       # таблица-связка для M:N
+- [ ] "book_genres", Base.metadata,
+- [ ] Column("book_id",  ForeignKey("books.id",  ondelete="CASCADE"), primary_key=True),
+- [ ] Column("genre_id", ForeignKey("genres.id", ondelete="CASCADE"), primary_key=True),
+- [ ] )
+- [ ] class Author(Base):
+- [ ] __tablename__ = "authors"
+- [ ] id:   Mapped[int] = mapped_column(primary_key=True)
+- [ ] name: Mapped[str] = mapped_column(String(120), unique=True)
+- [ ] books: Mapped[list["Book"]] = relationship(back_populates="author")
+- [ ] class Book(Base):
+- [ ] __tablename__ = "books"
+- [ ] __table_args__ = (CheckConstraint("year BETWEEN 1450 AND 2100", name="books_year_ck"),)
+- [ ] id:           Mapped[int] = mapped_column(primary_key=True)
+- [ ] title:        Mapped[str] = mapped_column(String(200), index=True)
+- [ ] year:         Mapped[int]
+- [ ] isbn:         Mapped[Optional[str]] = mapped_column(String(13), unique=True)
+- [ ] total_copies: Mapped[int] = mapped_column(default=1)
+- [ ] author_id:    Mapped[int] = mapped_column(ForeignKey("authors.id", ondelete="RESTRICT"))
+- [ ] created_at:   Mapped[datetime] = mapped_column(server_default=func.now())
+- [ ] author: Mapped["Author"]       = relationship(back_populates="books")
+- [ ] genres: Mapped[list["Genre"]]  = relationship(secondary=book_genres, back_populates="books")
+- [ ] loans:  Mapped[list["Loan"]]   = relationship(back_populates="book")
+- [ ] class Loan(Base):
+- [ ] __tablename__ = "loans"
+- [ ] id:          Mapped[int]  = mapped_column(primary_key=True)
+- [ ] book_id:     Mapped[int]  = mapped_column(ForeignKey("books.id"))
+- [ ] user_id:     Mapped[int]  = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+- [ ] issued_at:   Mapped[date] = mapped_column(server_default=func.current_date())
+- [ ] due_date:    Mapped[date]
+- [ ] returned_at: Mapped[Optional[date]]
+- [ ] book: Mapped["Book"] = relationship(back_populates="loans")
+- [ ] user: Mapped["User"] = relationship(back_populates="loans")
+- [ ] Сессия как зависимость, репозиторий и устранение N+1
+- [ ] # app/db.py
+- [ ] from sqlalchemy import create_engine
+- [ ] from sqlalchemy.orm import sessionmaker, Session
+- [ ] from app.config import settings
+- [ ] engine = create_engine(settings.database_url, echo=settings.sql_echo, pool_pre_ping=True)
+- [ ] SessionLocal = sessionmaker(engine, autoflush=False, expire_on_commit=False)
+- [ ] def get_db():                       # зависимость FastAPI: сессия на один запрос
+- [ ] db = SessionLocal()
+- [ ] try:
+- [ ] yield db
+- [ ] finally:
+- [ ] db.close()
+- [ ] # app/repositories/books.py
+- [ ] from sqlalchemy import select, func
+- [ ] from sqlalchemy.orm import Session, selectinload
+- [ ] class BookRepository:
+- [ ] def __init__(self, db: Session):
+- [ ] self.db = db
+- [ ] def list(self, *, q=None, genre=None, offset=0, limit=20) -> tuple[list[Book], int]:
+- [ ] stmt = (
+- [ ] select(Book)
+- [ ] # БЕЗ этой строки: 1 запрос на книги + 20 на авторов + 20 на жанры = N+1
+- [ ] .options(selectinload(Book.author), selectinload(Book.genres))
+- [ ] )
+- [ ] if q:
+- [ ] stmt = stmt.where(Book.title.ilike(f"%{q}%"))
+- [ ] if genre:
+- [ ] stmt = stmt.join(Book.genres).where(Genre.code == genre)
+- [ ] total = self.db.scalar(select(func.count()).select_from(stmt.subquery()))
+- [ ] items = self.db.scalars(
+- [ ] stmt.order_by(Book.title).offset(offset).limit(limit)
+- [ ] ).all()
+- [ ] return list(items), total
+- [ ] def get(self, book_id: int) -> Book | None:
+- [ ] return self.db.get(Book, book_id)          # get() использует identity map
+- [ ] def active_loans_count(self, book_id: int) -> int:
+- [ ] return self.db.scalar(
+- [ ] select(func.count()).select_from(Loan)
+- [ ] .where(Loan.book_id == book_id, Loan.returned_at.is_(None))
+- [ ] )
+- [ ] Сервисный слой: место правил предметной области
+- [ ] # app/services/loans.py
+- [ ] class BookUnavailableError(Exception): ...
+- [ ] class AlreadyBorrowedError(Exception): ...
+- [ ] class LoanService:
+- [ ] def __init__(self, books: BookRepository, loans: LoanRepository, db: Session):
+- [ ] self.books, self.loans, self.db = books, loans, db
+- [ ] def issue(self, *, book_id: int, user_id: int, days: int = 14) -> Loan:
+- [ ] book = self.books.get(book_id)
+- [ ] if book is None:
+- [ ] raise NotFoundError("Книга не найдена")
+- [ ] # ПРАВИЛО ПРЕДМЕТНОЙ ОБЛАСТИ живёт здесь, а не в маршруте и не в SQL
+- [ ] if self.books.active_loans_count(book_id) >= book.total_copies:
+- [ ] raise BookUnavailableError("Свободных экземпляров нет")
+- [ ] if self.loans.has_active(book_id=book_id, user_id=user_id):
+- [ ] raise AlreadyBorrowedError("Эта книга уже у вас на руках")
+- [ ] loan = self.loans.create(book_id=book_id, user_id=user_id,
+- [ ] due_date=date.today() + timedelta(days=days))
+- [ ] self.db.commit()            # граница транзакции — на уровне сервиса
+- [ ] self.db.refresh(loan)
+- [ ] return loan
+- [ ] # app/routers/loans.py — маршрут только переводит исключения в коды HTTP
+- [ ] @router.post("/books/{book_id}/loans", response_model=LoanRead, status_code=201)
+- [ ] def issue_loan(book_id: int, user: User = Depends(get_current_user),
+- [ ] service: LoanService = Depends(get_loan_service)):
+- [ ] try:
+- [ ] return service.issue(book_id=book_id, user_id=user.id)
+- [ ] except NotFoundError as e:
+- [ ] raise HTTPException(404, str(e))
+- [ ] except (BookUnavailableError, AlreadyBorrowedError) as e:
+- [ ] raise HTTPException(409, str(e))
+- [ ] Alembic: рабочий цикл миграции
+- [ ] # однократная настройка
+- [ ] alembic init -t async migrations        # или без -t для синхронного варианта
+- [ ] # в migrations/env.py: target_metadata = Base.metadata
+- [ ] # рабочий цикл при каждом изменении моделей
+- [ ] alembic revision --autogenerate -m "add language column to books"
+- [ ] # ОБЯЗАТЕЛЬНО открыть сгенерированный файл и проверить: autogenerate
+- [ ] # не видит переименований и не всегда правильно определяет типы
+- [ ] alembic upgrade head
+- [ ] alembic downgrade -1                    # проверка обратимости — требование курса
+- [ ] alembic upgrade head
+- [ ] alembic current && alembic history --verbose
+- [ ] Демонстрация на занятии
+- [ ] «Считаем запросы». Включить echo=True, открыть эндпоинт списка книг и посчитать строки SELECT в логе: 21 запрос на 20 книг. Задать вопрос «что произойдёт на 1000 книгах» и получить оценку. Добавить selectinload — в логе 3 запроса. Затем показать joinedload и разницу в форме SQL. Вторая часть — полный цикл миграции: добавить поле в модель, сгенерировать ревизию, открыть файл ревизии и найти в нём ошибку (autogenerate не увидел значение по умолчанию для существующих строк), исправить вручную, применить, откатить, применить снова, показать таблицу alembic_version в psql.
+- [ ] Типичные ошибки студентов
+- [ ] N+1 запросов из-за ленивой загрузки связей в цикле сериализации.
+- [ ] Одна сессия на всё приложение либо сессия, создаваемая внутри каждой функции репозитория.
+- [ ] Отсутствие commit («данные не сохраняются») или commit в цикле по каждой записи.
+- [ ] Использование Base.metadata.create_all() в продуктивном коде вместо миграций.
+- [ ] Правка уже применённой на другой машине ревизии вместо создания новой.
+- [ ] Слепое доверие autogenerate: неучтённые переименования, потеря данных при смене типа.
+- [ ] Возврат ORM-объектов напрямую в ответе API без схемы Pydantic — утечка полей и ошибки сериализации.
+- [ ] Правила предметной области в маршруте: маршрут на 60 строк, сервисного слоя нет.
+- [ ] Строковая интерполяция в SQL при переходе на text() — возвращение уязвимости к инъекциям.
+- [ ] Контрольные вопросы
+- [ ] Что даёт ORM по сравнению с рукописным SQL и что при этом теряется?
+- [ ] Зачем нужен back_populates и что произойдёт без него?
+- [ ] Что такое сессия SQLAlchemy и почему она должна создаваться на один запрос?
+- [ ] Опишите проблему N+1 и два способа её устранения.
+- [ ] Чем selectinload отличается от joinedload?
+- [ ] Почему create_all() недопустим вместо миграций?
+- [ ] Что делает alembic revision --autogenerate и чего он не умеет?
+- [ ] Как проверить обратимость миграции и зачем это нужно?
+- [ ] В каком слое размещается правило «нельзя выдать книгу без свободных экземпляров» и почему не в двух других?
+- [ ] Где в вашем коде находится граница транзакции?
+- [ ] Домашнее задание
+- [ ] (1) Перенести схему БД собственного проекта из DDL-скрипта недели 10 в модели SQLAlchemy, добиться идентичности схем (сравнить \d в psql до и после применения миграции). (2) Реализовать репозиторий одной сущности с методами list (фильтр + пагинация + сортировка), get, create, update, delete. (3) Сознательно воспроизвести N+1 в своём коде, приложить лог запросов, устранить и приложить лог после устранения — оба лога в описании PR. (4) Создать две миграции, вторую откатить и применить повторно; приложить вывод alembic history.
+- [ ] Материалы
+- [ ] docs.sqlalchemy.org — ORM Quick Start, Declarative Mapping, Relationship Patterns, Relationship Loading Techniques, Session Basics.
+- [ ] alembic.sqlalchemy.org — Tutorial, Auto Generating Migrations, Operation Reference.
+- [ ] fastapi.tiangolo.com — SQL (Relational) Databases, Dependencies with yield.
+- [ ] Architecture Patterns with Python (Percival, Gregory) — главы о репозитории и сервисном слое, обзорно.
+
+## lec12
+
+- [ ] Лекция 12 · Неделя 12
+- [ ] Аутентификация, авторизация и безопасность веб-приложений2 ч
+- [ ] Learning objectives
+- [ ] Различать идентификацию, аутентификацию и авторизацию и приводить примеры каждой.
+- [ ] Реализовать регистрацию и вход с корректным хешированием паролей.
+- [ ] Объяснить устройство JWT, его проверку и границы применимости.
+- [ ] Защитить эндпоинты по признаку принадлежности ресурса и по роли пользователя.
+- [ ] Выявить в собственном коде уязвимости из OWASP Top 10 и устранить их.
+- [ ] Основные понятия
+- [ ] идентификация, аутентификация, авторизация, фактор аутентификации, хеш, соль, bcrypt/argon2, атака по словарю, сессия и cookie, токен, JWT (header.payload.signature), подпись HS256, exp/sub/iat, access и refresh токены, Authorization: Bearer, OAuth2 password flow, RBAC, принцип наименьших привилегий, CORS и preflight, XSS (хранимый и отражённый), SQL-инъекция, CSRF, IDOR, перечисление пользователей, rate limiting, HTTPS, секреты и .env, OWASP Top 10
+- [ ] План лекции
+- [ ] 0–12 мин. Три разных вопроса: «кто вы?», «докажите» и «что вам разрешено». Почему студенты путают второе и третье и к каким дефектам это ведёт.
+- [ ] 12–30 мин. Пароли: почему нельзя хранить в открытом виде и почему нельзя MD5/SHA-256 без соли; демонстрация подбора хеша по радужной таблице; bcrypt, соль, стоимость хеширования; политика минимальных требований к паролю.
+- [ ] 30–45 мин. Два подхода к состоянию входа: серверная сессия + cookie против токена. Сравнение по масштабируемости, отзыву доступа, уязвимостям. Почему курс выбирает JWT (и в чём его цена).
+- [ ] 45–65 мин. JWT изнутри: разбор реального токена на jwt.io, три части, что подпись гарантирует и чего не гарантирует. Ключевой момент: payload не зашифрован — в токен нельзя помещать секреты. Срок жизни, refresh-токен, отзыв.
+- [ ] 65–80 мин. Реализация в FastAPI: OAuth2PasswordBearer, эндпоинты /register и /token, зависимость get_current_user, зависимость require_role. Хранение токена на клиенте: localStorage против cookie — сравнение рисков.
+- [ ] 80–92 мин. Авторизация на объектах: IDOR — почему GET /loans/17 не должен отдавать чужую выдачу. Проверка владения ресурсом.
+- [ ] 92–105 мин. Уязвимости и защита: XSS (и почему React защищает по умолчанию, а dangerouslySetInnerHTML — нет), SQL-инъекция (и почему параметризованные запросы решают её), CSRF, CORS и его правильная настройка, перечисление пользователей через сообщения об ошибке, отсутствие ограничения частоты запросов.
+- [ ] 105–110 мин. Секреты: .env, .gitignore, что делать, если ключ уже попал в репозиторий. Задание на лабораторную 9.
+- [ ] Теоретический материал
+- [ ] Лекция строится на одном сквозном различении: аутентификация отвечает «кто», авторизация — «что можно». Массовая ошибка студенческих проектов — реализовать вход и считать приложение защищённым. При этом любой вошедший пользователь может запросить GET /api/loans/17 и получить чужие данные, потому что проверяется лишь наличие токена, а не право на конкретный объект. Курс требует, чтобы каждый эндпоинт отвечал на два вопроса: «есть ли действительный токен» и «имеет ли этот пользователь право на этот ресурс».
+- [ ] Второй тезис — подпись не равна шифрованию. JWT защищён от изменения, но полностью читаем: разбор токена на jwt.io обычно производит на студентов сильное впечатление и надёжно предотвращает попытки положить в payload номер телефона или внутренние идентификаторы. Из читаемости и невозможности мгновенного отзыва следуют практические правила: короткий срок жизни access-токена, отдельный refresh-токен, минимум данных в payload. Третий тезис — защита многослойна: React экранирует вывод, но dangerouslySetInnerHTML отменяет защиту; ORM параметризует запросы, но text() со форматированием строк возвращает инъекцию; HTTPS защищает канал, но не приложение. Каждый механизм следует называть вместе с условиями, при которых он перестаёт работать.
+- [ ] Практические примеры
+- [ ] Разбор своего же токена на jwt.io: изменить role на admin в payload и получить 401 — подпись не совпала.
+- [ ] IDOR на учебном эндпоинте: войти за пользователя A и запросить ресурс пользователя B. Закрыть проверкой владения.
+- [ ] Настройка CORS: показать ошибку в консоли браузера, затем добавить корректный allow_origins; показать, почему allow_origins=["*"] вместе с allow_credentials=True не работает.
+- [ ] Code examples
+- [ ] Пароли и токены: слой безопасности
+- [ ] # app/core/security.py
+- [ ] from datetime import datetime, timedelta, timezone
+- [ ] from jose import jwt, JWTError
+- [ ] from passlib.context import CryptContext
+- [ ] from app.config import settings
+- [ ] pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
+- [ ] def hash_password(raw: str) -> str:
+- [ ] return pwd.hash(raw)                       # соль генерируется автоматически
+- [ ] def verify_password(raw: str, hashed: str) -> bool:
+- [ ] return pwd.verify(raw, hashed)
+- [ ] def create_access_token(sub: str, role: str) -> str:
+- [ ] payload = {
+- [ ] "sub": sub,                            # subject: id пользователя
+- [ ] "role": role,
+- [ ] "type": "access",
+- [ ] "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.access_ttl_min),
+- [ ] "iat": datetime.now(timezone.utc),
+- [ ] }
+- [ ] # ВНИМАНИЕ: payload только подписан, но НЕ зашифрован — его прочитает любой
+- [ ] return jwt.encode(payload, settings.secret_key, algorithm="HS256")
+- [ ] def decode_token(token: str) -> dict:
+- [ ] try:
+- [ ] return jwt.decode(token, settings.secret_key, algorithms=["HS256"])
+- [ ] except JWTError as e:
+- [ ] raise CredentialsError("Недействительный или истёкший токен") from e
+- [ ] Зависимости: кто вошёл, что ему разрешено, кому принадлежит ресурс
+- [ ] # app/core/deps.py
+- [ ] from fastapi import Depends, HTTPException, status
+- [ ] from fastapi.security import OAuth2PasswordBearer
+- [ ] oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+- [ ] # 1. АУТЕНТИФИКАЦИЯ: кто это?
+- [ ] def get_current_user(token: str = Depends(oauth2_scheme),
+- [ ] db: Session = Depends(get_db)) -> User:
+- [ ] unauthorized = HTTPException(
+- [ ] status.HTTP_401_UNAUTHORIZED, "Не удалось подтвердить учётные данные",
+- [ ] headers={"WWW-Authenticate": "Bearer"},
+- [ ] )
+- [ ] try:
+- [ ] payload = decode_token(token)
+- [ ] except CredentialsError:
+- [ ] raise unauthorized
+- [ ] user = db.get(User, int(payload["sub"]))
+- [ ] if user is None or not user.is_active:
+- [ ] raise unauthorized
+- [ ] return user
+- [ ] # 2. АВТОРИЗАЦИЯ ПО РОЛИ: что вам разрешено?
+- [ ] def require_role(*roles: str):
+- [ ] def dependency(user: User = Depends(get_current_user)) -> User:
+- [ ] if user.role not in roles:
+- [ ] raise HTTPException(status.HTTP_403_FORBIDDEN, "Недостаточно прав")
+- [ ] return user
+- [ ] return dependency
+- [ ] # 3. АВТОРИЗАЦИЯ НА ОБЪЕКТЕ: защита от IDOR
+- [ ] def get_own_loan(loan_id: int, user: User = Depends(get_current_user),
+- [ ] db: Session = Depends(get_db)) -> Loan:
+- [ ] loan = db.get(Loan, loan_id)
+- [ ] if loan is None:
+- [ ] raise HTTPException(404, "Выдача не найдена")
+- [ ] if loan.user_id != user.id and user.role not in ("librarian", "admin"):
+- [ ] # 404, а не 403: иначе подтверждаем существование чужого ресурса
+- [ ] raise HTTPException(404, "Выдача не найдена")
+- [ ] return loan
+- [ ] # app/routers/auth.py
+- [ ] @router.post("/register", response_model=UserRead, status_code=201)
+- [ ] def register(payload: UserCreate, db: Session = Depends(get_db)):
+- [ ] if db.scalar(select(User).where(User.email == payload.email)):
+- [ ] # осознанный компромисс: сообщаем о занятости e-mail, но НЕ на /token
+- [ ] raise HTTPException(409, "Пользователь с таким e-mail уже зарегистрирован")
+- [ ] user = User(email=payload.email, password_hash=hash_password(payload.password),
+- [ ] role="member")
+- [ ] db.add(user); db.commit(); db.refresh(user)
+- [ ] return user                                # UserRead не содержит password_hash
+- [ ] @router.post("/token", response_model=TokenPair)
+- [ ] def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+- [ ] user = db.scalar(select(User).where(User.email == form.username))
+- [ ] if not user or not verify_password(form.password, user.password_hash):
+- [ ] # ОДИН текст для обоих случаев — иначе перечисление пользователей
+- [ ] raise HTTPException(401, "Неверный e-mail или пароль")
+- [ ] return TokenPair(
+- [ ] access_token=create_access_token(str(user.id), user.role),
+- [ ] refresh_token=create_refresh_token(str(user.id)),
+- [ ] token_type="bearer",
+- [ ] )
+- [ ] # защита маршрута ролью — одна строка
+- [ ] @router.delete("/books/{book_id}", status_code=204,
+- [ ] dependencies=[Depends(require_role("librarian", "admin"))])
+- [ ] def delete_book(book_id: int, service: BookService = Depends(get_book_service)):
+- [ ] service.delete(book_id)
+- [ ] CORS, секреты и перехватчик токена на клиенте
+- [ ] # app/main.py — CORS настраивается на СЕРВЕРЕ, никогда на клиенте
+- [ ] app.add_middleware(
+- [ ] CORSMiddleware,
+- [ ] allow_origins=settings.cors_origins,   # ["http://localhost:5173", "https://booknest.kz"]
+- [ ] allow_credentials=True,                # при этом "*" в origins недопустим
+- [ ] allow_methods=["*"],
+- [ ] allow_headers=["Authorization", "Content-Type"],
+- [ ] )
+- [ ] # app/config.py — секреты только из окружения, .env в .gitignore
+- [ ] class Settings(BaseSettings):
+- [ ] model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+- [ ] database_url: str
+- [ ] secret_key: str                        # нет значения по умолчанию — приложение
+- [ ] access_ttl_min: int = 15               # не запустится без явно заданного ключа
+- [ ] refresh_ttl_days: int = 7
+- [ ] cors_origins: list[str] = []
+- [ ] settings = Settings()
+- [ ] // src/api/client.ts — токен добавляется в одном месте
+- [ ] export async function request(path: string, options: RequestInit = {}) {
+- [ ] const token = tokenStore.get();
+- [ ] const response = await fetch(`${BASE_URL}${path}`, {
+- [ ] ...options,
+- [ ] headers: {
+- [ ] "Content-Type": "application/json",
+- [ ] ...(token ? { Authorization: `Bearer ${token}` } : {}),
+- [ ] ...options.headers,
+- [ ] },
+- [ ] });
+- [ ] if (response.status === 401) {
+- [ ] const refreshed = await tokenStore.tryRefresh();   // одна попытка обновления
+- [ ] if (refreshed) return request(path, options);
+- [ ] tokenStore.clear();
+- [ ] window.location.assign("/login");
+- [ ] throw new ApiError(401, "Сессия истекла, войдите снова");
+- [ ] }
+- [ ] ...
+- [ ] }
+- [ ] Демонстрация на занятии
+- [ ] «Атака и защита за 20 минут». Подготовить заведомо уязвимое учебное приложение и выполнить четыре действия. (1) XSS: отправить в поле отзыва <img src=x onerror="fetch('/steal?c='+localStorage.token)"> и показать в логе перехваченный токен; закрыть, убрав dangerouslySetInnerHTML. (2) SQL-инъекция: ввести в поиск ' OR 1=1 -- на эндпоинте с форматированием строки; закрыть параметризацией. (3) Изменение токена: вставить в jwt.io свой токен, изменить role, подставить в запрос — 401. (4) IDOR: запросить чужую выдачу по id — успех; добавить проверку владения — 404. Каждый шаг сопровождается вопросом «где в вашем проекте то же самое?».
+- [ ] Типичные ошибки студентов
+- [ ] Пароли в открытом виде или хеш без соли (MD5, SHA-256 «руками»).
+- [ ] Проверка только наличия токена без проверки прав на конкретный объект (IDOR).
+- [ ] Секретный ключ и .env в репозитории; ключ по умолчанию вида "secret".
+- [ ] Чувствительные данные в payload токена (e-mail, телефон, внутренние идентификаторы).
+- [ ] Токен без срока действия либо срок в несколько месяцев.
+- [ ] Различающиеся сообщения «неверный пароль» и «пользователь не найден» — перечисление учётных записей.
+- [ ] allow_origins=["*"] вместе с allow_credentials=True; попытка «исправить» CORS на клиенте.
+- [ ] Защита только на клиенте: маршрут скрыт в React, но эндпоинт открыт для любого запроса.
+- [ ] Возврат User с полем password_hash из-за отсутствия response_model.
+- [ ] Хранение токена так, что при XSS он немедленно утекает, без осознания этого риска.
+- [ ] Контрольные вопросы
+- [ ] Чем аутентификация отличается от авторизации? Приведите по эндпоинту, где нужна каждая.
+- [ ] Зачем нужна соль при хешировании пароля и почему SHA-256 недостаточно?
+- [ ] Из каких трёх частей состоит JWT и что гарантирует подпись?
+- [ ] Можно ли поместить в payload номер телефона? Обоснуйте.
+- [ ] Зачем нужен refresh-токен, если есть access-токен?
+- [ ] Что такое IDOR? Приведите пример из своего проекта и способ защиты.
+- [ ] Почему на неудачный вход следует возвращать одинаковое сообщение в обоих случаях?
+- [ ] Кто и почему блокирует запрос при ошибке CORS и где она устраняется?
+- [ ] Как React защищает от XSS и в каком случае эта защита отключается?
+- [ ] Почему параметризованные запросы устраняют SQL-инъекцию?
+- [ ] Что делать, если секретный ключ уже попал в публичный репозиторий?
+- [ ] Достаточно ли HTTPS, чтобы считать приложение защищённым?
+- [ ] Домашнее задание
+- [ ] Security review своего проекта. Заполнить чек-лист из 15 пунктов (хеширование паролей; отсутствие секретов в репозитории; срок жизни токена; отсутствие чувствительных данных в payload; response_model на всех эндпоинтах; проверка владения ресурсом; проверка роли на изменяющих операциях; отсутствие dangerouslySetInnerHTML; параметризация всех запросов; ограниченный список origins в CORS; единое сообщение при ошибке входа; валидация на сервере, а не только на клиенте; отсутствие внутренних сообщений об ошибках в ответах; HTTPS в конфигурации развёртывания; ограничение частоты запросов на /token). По каждому пункту — статус, ссылка на строку кода и, при наличии дефекта, коммит с исправлением. Формат — docs/security-review.md. Дополнительно: найти и описать одну уязвимость в проекте однокурсника (по согласованию) в виде корректного отчёта.
+- [ ] Материалы
+- [ ] fastapi.tiangolo.com — Security (полный раздел), OAuth2 with Password and JWT, CORS.
+- [ ] OWASP Top 10 (актуальная редакция) — обзорно; OWASP Cheat Sheet Series — Password Storage, JWT for Java (принципы применимы вне языка).
+- [ ] MDN — Website security, Content Security Policy (обзорно), CORS.
+- [ ] jwt.io — инструмент разбора токена (только для учебных токенов, не для реальных).
+
+## lec13
+
+- [ ] Лекция 13 · Неделя 13
+- [ ] Интеграция Full-Stack, обработка ошибок и тестирование2 ч
+- [ ] Learning objectives
+- [ ] Настроить взаимодействие клиента и сервера в режиме разработки и объяснить роль dev-proxy.
+- [ ] Вынести всю конфигурацию в переменные окружения по принципам 12-factor.
+- [ ] Спроектировать единый формат ошибки API и корректно отобразить её в интерфейсе.
+- [ ] Написать интеграционные тесты API на тестовой базе и unit-тесты компонентов.
+- [ ] Определить, что именно следует тестировать в учебном проекте при ограниченном времени.
+- [ ] Основные понятия
+- [ ] интеграция, dev-proxy, порты и origin, переменные окружения, 12-factor app, .env и .env.example, единый формат ошибки, problem detail, обработчик исключений, корреляционный идентификатор запроса, логирование и уровни логов, пирамида тестирования, unit / integration / e2e, фикстура, изоляция теста, тестовая БД, TestClient/httpx.AsyncClient, подмена зависимости, Vitest, React Testing Library, запрос по роли, покрытие, регрессия
+- [ ] План лекции
+- [ ] 0–15 мин. Два процесса на одной машине: Vite на 5173, Uvicorn на 8000. Три способа их соединить (CORS, dev-proxy, единый origin через Nginx) и почему в разработке выбирается proxy, а в продуктивной среде — Nginx.
+- [ ] 15–30 мин. Конфигурация: что обязано быть переменной окружения (адрес БД, секрет, список origins, базовый URL API), правило «в репозитории лежит .env.example, а не .env», особенности VITE_-префикса и почему клиентские переменные не являются секретами.
+- [ ] 30–50 мин. Ошибки: проектирование единого формата ответа об ошибке; централизованный обработчик исключений FastAPI; трансляция исключений предметной области в коды HTTP; что можно и что нельзя сообщать клиенту; логирование с идентификатором запроса и как по нему найти проблему.
+- [ ] 50–62 мин. Отображение ошибок в интерфейсе: карта «код → сообщение для пользователя», компонент ErrorBoundary, повторная попытка, различение восстановимых и невосстановимых ошибок.
+- [ ] 62–80 мин. Зачем тесты: демонстрация регрессии — правка в сервисе ломает выдачу книги, тест ловит это за 2 секунды. Пирамида тестирования и что она означает для учебного проекта.
+- [ ] 80–98 мин. Тестирование API: фикстуры pytest, отдельная тестовая БД, подмена зависимости get_db, откат транзакции после каждого теста, тесты на 201/404/422/401/403, тест бизнес-правила.
+- [ ] 98–108 мин. Тестирование клиента: Vitest + React Testing Library, поиск элементов по роли и метке, имитация ввода пользователя, подмена сетевого слоя. Что тестировать в первую очередь: утилиты, валидацию, критичный компонент.
+- [ ] 108–110 мин. Задание на лабораторную 10.
+- [ ] Теоретический материал
+- [ ] Неделя интеграции — момент, когда студент впервые видит систему целиком, и главная её тема — воспроизводимость. Приложение не должно содержать ни одного значения, зависящего от машины разработчика: адреса, порты, пароли и ключи приходят из окружения. Практический критерий: проект запускается на чужом компьютере после копирования .env.example в .env и заполнения значений, без правки исходного кода. Это же требование через неделю сделает Docker естественным продолжением, а не новой темой.
+- [ ] Второй сюжет — ошибка как часть контракта API. Если каждый эндпоинт сообщает об ошибке по-своему, клиент вынужден разбирать каждый случай отдельно. Единый формат (code, message, details, request_id) позволяет написать обработку ошибок один раз в клиенте API. Отдельно проговаривается граница: пользователю показывается понятное сообщение, в лог пишется техническая подробность, а внутренние трассировки клиенту не отдаются никогда. Третий сюжет — тесты как экономия времени, а не бюрократия. Требования курса умеренны и потому выполнимы: 8–12 тестов на проект, покрывающих критический путь (аутентификация, главное бизнес-правило, коды ошибок). Цель — не покрытие в процентах, а способность студента изменить код и в течение минуты убедиться, что он ничего не сломал.
+- [ ] Практические примеры
+- [ ] Демонстрация ошибки CORS при запуске «в лоб», затем настройка dev-proxy — ошибка исчезает без правки backend.
+- [ ] Обрыв соединения с БД: показать, что видит пользователь (понятное сообщение) и что попадает в лог (трассировка и request_id).
+- [ ] Внесение регрессии в сервис выдачи книги — «красный» тест на экране через 2 секунды.
+- [ ] Code examples
+- [ ] Конфигурация и dev-proxy: ни одного адреса в коде
+- [ ] # .env.example — лежит в репозитории, .env — никогда
+- [ ] DATABASE_URL=postgresql+psycopg://booknest:changeme@localhost:5432/booknest
+- [ ] SECRET_KEY=replace-with-openssl-rand-hex-32
+- [ ] ACCESS_TTL_MIN=15
+- [ ] CORS_ORIGINS=["http://localhost:5173"]
+- [ ] LOG_LEVEL=INFO
+- [ ] // vite.config.ts — запросы на /api уходят на backend, origin один → CORS не нужен
+- [ ] export default defineConfig({
+- [ ] plugins: [react()],
+- [ ] server: {
+- [ ] port: 5173,
+- [ ] proxy: {
+- [ ] "/api": {
+- [ ] target: process.env.VITE_API_TARGET ?? "http://localhost:8000",
+- [ ] changeOrigin: true,
+- [ ] },
+- [ ] },
+- [ ] },
+- [ ] });
+- [ ] // src/api/client.ts — базовый URL относительный: работает и в dev, и за Nginx
+- [ ] const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
+- [ ] Единый формат ошибки и централизованный обработчик
+- [ ] # app/core/errors.py
+- [ ] class AppError(Exception):
+- [ ] status_code = 400
+- [ ] code = "app_error"
+- [ ] def __init__(self, message: str, details: dict | None = None):
+- [ ] self.message, self.details = message, details or {}
+- [ ] class NotFoundError(AppError):      status_code, code = 404, "not_found"
+- [ ] class ConflictError(AppError):      status_code, code = 409, "conflict"
+- [ ] class PermissionError_(AppError):   status_code, code = 403, "forbidden"
+- [ ] # app/main.py
+- [ ] @app.middleware("http")
+- [ ] async def add_request_id(request: Request, call_next):
+- [ ] request.state.request_id = str(uuid4())          # сквозной идентификатор
+- [ ] response = await call_next(request)
+- [ ] response.headers["X-Request-ID"] = request.state.request_id
+- [ ] return response
+- [ ] @app.exception_handler(AppError)
+- [ ] async def app_error_handler(request: Request, exc: AppError):
+- [ ] log.warning("%s %s → %s: %s", request.method, request.url.path, exc.code, exc.message)
+- [ ] return JSONResponse(
+- [ ] status_code=exc.status_code,
+- [ ] content={"code": exc.code, "message": exc.message, "details": exc.details,
+- [ ] "request_id": request.state.request_id},
+- [ ] )
+- [ ] @app.exception_handler(Exception)
+- [ ] async def unhandled_handler(request: Request, exc: Exception):
+- [ ] # в лог — всё; клиенту — ничего внутреннего
+- [ ] log.exception("unhandled error, request_id=%s", request.state.request_id)
+- [ ] return JSONResponse(
+- [ ] status_code=500,
+- [ ] content={"code": "internal_error",
+- [ ] "message": "Внутренняя ошибка сервера. Обратитесь к администратору.",
+- [ ] "request_id": request.state.request_id},
+- [ ] )
+- [ ] // src/shared/lib/errorMessage.ts — код ошибки → текст для пользователя
+- [ ] const MESSAGES: Record<string, string> = {
+- [ ] not_found:  "Запись не найдена. Возможно, её удалили.",
+- [ ] conflict:   "Действие невозможно: данные изменились. Обновите страницу.",
+- [ ] forbidden:  "У вас нет прав на это действие.",
+- [ ] unauthorized:"Сессия истекла. Войдите снова.",
+- [ ] validation_error: "Проверьте правильность заполнения полей.",
+- [ ] };
+- [ ] export function toUserMessage(err: unknown): string {
+- [ ] if (err instanceof ApiError) {
+- [ ] if (err.status === 0) return "Нет соединения с сервером. Проверьте интернет.";
+- [ ] return MESSAGES[err.code] ?? "Не удалось выполнить действие. Попробуйте позже.";
+- [ ] }
+- [ ] return "Произошла непредвиденная ошибка.";
+- [ ] }
+- [ ] Тесты API: изолированная БД, подмена зависимости, тест бизнес-правила
+- [ ] # tests/conftest.py
+- [ ] import pytest
+- [ ] from fastapi.testclient import TestClient
+- [ ] from sqlalchemy import create_engine
+- [ ] from sqlalchemy.orm import sessionmaker
+- [ ] from app.main import app
+- [ ] from app.db import get_db
+- [ ] from app.models import Base
+- [ ] TEST_URL = "postgresql+psycopg://booknest:changeme@localhost:5432/booknest_test"
+- [ ] engine = create_engine(TEST_URL)
+- [ ] TestSession = sessionmaker(engine)
+- [ ] @pytest.fixture(scope="session", autouse=True)
+- [ ] def create_schema():
+- [ ] Base.metadata.create_all(engine)
+- [ ] yield
+- [ ] Base.metadata.drop_all(engine)
+- [ ] @pytest.fixture
+- [ ] def db():
+- [ ] # каждый тест — в своей транзакции, которая откатывается: тесты не влияют друг на друга
+- [ ] connection = engine.connect()
+- [ ] transaction = connection.begin()
+- [ ] session = TestSession(bind=connection)
+- [ ] yield session
+- [ ] session.close(); transaction.rollback(); connection.close()
+- [ ] @pytest.fixture
+- [ ] def client(db):
+- [ ] app.dependency_overrides[get_db] = lambda: db
+- [ ] yield TestClient(app)
+- [ ] app.dependency_overrides.clear()
+- [ ] @pytest.fixture
+- [ ] def librarian_token(client, db):
+- [ ] db.add(User(email="lib@u.kz", password_hash=hash_password("Pass1234"), role="librarian"))
+- [ ] db.commit()
+- [ ] r = client.post("/api/v1/auth/token", data={"username": "lib@u.kz", "password": "Pass1234"})
+- [ ] return r.json()["access_token"]
+- [ ] # tests/test_books.py
+- [ ] def test_create_book_returns_201_and_body(client, librarian_token, author):
+- [ ] r = client.post("/api/v1/books",
+- [ ] json={"title": "Солярис", "year": 1961, "genre": "scifi",
+- [ ] "author_id": author.id, "total_copies": 2},
+- [ ] headers={"Authorization": f"Bearer {librarian_token}"})
+- [ ] assert r.status_code == 201
+- [ ] assert r.json()["title"] == "Солярис"
+- [ ] assert "id" in r.json()
+- [ ] def test_create_book_without_token_returns_401(client, author):
+- [ ] r = client.post("/api/v1/books", json={"title": "X", "year": 2020,
+- [ ] "genre": "cs", "author_id": author.id})
+- [ ] assert r.status_code == 401
+- [ ] def test_create_book_with_invalid_year_returns_422(client, librarian_token, author):
+- [ ] r = client.post("/api/v1/books",
+- [ ] json={"title": "X", "year": 3000, "genre": "cs", "author_id": author.id},
+- [ ] headers={"Authorization": f"Bearer {librarian_token}"})
+- [ ] assert r.status_code == 422
+- [ ] def test_member_cannot_delete_book(client, member_token, book):
+- [ ] r = client.delete(f"/api/v1/books/{book.id}",
+- [ ] headers={"Authorization": f"Bearer {member_token}"})
+- [ ] assert r.status_code == 403
+- [ ] # tests/test_loans.py — главное бизнес-правило проекта
+- [ ] def test_cannot_issue_book_without_free_copies(client, member_token, book_one_copy, other_loan):
+- [ ] r = client.post(f"/api/v1/books/{book_one_copy.id}/loans",
+- [ ] headers={"Authorization": f"Bearer {member_token}"})
+- [ ] assert r.status_code == 409
+- [ ] assert r.json()["code"] == "conflict"
+- [ ] def test_user_cannot_read_foreign_loan(client, member_token, foreign_loan):
+- [ ] r = client.get(f"/api/v1/loans/{foreign_loan.id}",
+- [ ] headers={"Authorization": f"Bearer {member_token}"})
+- [ ] assert r.status_code == 404      # не 403: не подтверждаем существование ресурса
+- [ ] Тест компонента: проверяем поведение, а не разметку
+- [ ] // src/features/loans/LoanForm.test.tsx
+- [ ] import { render, screen } from "@testing-library/react";
+- [ ] import userEvent from "@testing-library/user-event";
+- [ ] import { vi } from "vitest";
+- [ ] import { LoanForm } from "./LoanForm";
+- [ ] vi.mock("../../api/loans", () => ({
+- [ ] loansApi: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+- [ ] }));
+- [ ] test("не отправляет форму с некорректным e-mail и показывает ошибку", async () => {
+- [ ] const onSuccess = vi.fn();
+- [ ] render(<LoanForm onSuccess={onSuccess} />);
+- [ ] await userEvent.type(screen.getByLabelText(/e-mail/i), "не-почта");
+- [ ] await userEvent.click(screen.getByRole("button", { name: /выдать/i }));
+- [ ] expect(await screen.findByRole("alert")).toHaveTextContent(/формат e-mail/i);
+- [ ] expect(onSuccess).not.toHaveBeenCalled();
+- [ ] });
+- [ ] Демонстрация на занятии
+- [ ] «Регрессия за две секунды». Запустить pytest -q — 12 тестов зелёные. Затем внести в сервис выдачи «безобидную» правку: заменить >= на > в проверке числа свободных экземпляров. Повторить запуск — один тест красный, с точным указанием, что ожидалось 409, а получено 201. Подчеркнуть: тот же дефект без теста был бы обнаружен на защите проекта. Вторая часть — vitest --watch: изменить сообщение об ошибке в схеме валидации и увидеть моментальную реакцию теста. Третья часть — показать в логе сервера строку с request_id и найти по этому же идентификатору заголовок ответа в DevTools: так дефект связывается с конкретным запросом пользователя.
+- [ ] Типичные ошибки студентов
+- [ ] Захардкоженные http://localhost:8000 в десятках компонентов.
+- [ ] .env закоммичен в репозиторий; .env.example отсутствует.
+- [ ] Уверенность, что VITE_-переменные секретны (они попадают в сборку и видны любому).
+- [ ] Тесты выполняются на рабочей базе и удаляют реальные данные.
+- [ ] Тесты зависят друг от друга и от порядка запуска; повторный запуск падает из-за уже созданных записей.
+- [ ] Тестируется вывод console.log или структура разметки вместо поведения.
+- [ ] Ответ 500 с полной трассировкой Python отдаётся клиенту.
+- [ ] Единственное сообщение «Ошибка!» на все случаи; пользователь не понимает, что делать дальше.
+- [ ] Погоня за покрытием в 100 % при отсутствии теста на главное бизнес-правило.
+- [ ] Контрольные вопросы
+- [ ] Три способа соединить клиент и сервер в разработке — в чём различие и что выбрать?
+- [ ] Какие значения обязаны быть переменными окружения и почему?
+- [ ] Почему VITE_API_KEY нельзя считать секретом?
+- [ ] Из каких полей должен состоять единый формат ошибки API?
+- [ ] Что допустимо сообщить клиенту при ошибке 500, а что — только записать в лог?
+- [ ] Зачем нужен request_id и как им пользоваться при разборе инцидента?
+- [ ] Что такое пирамида тестирования и почему интеграционных тестов API в учебном проекте больше всего?
+- [ ] Как обеспечить независимость тестов друг от друга?
+- [ ] Зачем подменять зависимость get_db в тестах?
+- [ ] Почему в React Testing Library элементы ищут по роли и метке, а не по классу?
+- [ ] Домашнее задание
+- [ ] (1) Полностью вынести конфигурацию проекта в окружение; добавить .env.example и раздел «Запуск» в README.md, по которому проект поднимается на чужой машине. (2) Реализовать единый формат ошибки и клиентскую функцию toUserMessage; заменить все места, где ошибка выводится как «Ошибка». (3) Довести число тестов до 10: минимум 6 API-тестов (включая 401, 403, 404, 422 и главное бизнес-правило) и 2 клиентских. (4) Приложить к PR вывод pytest -q и npx vitest run.
+- [ ] Материалы
+- [ ] fastapi.tiangolo.com — Testing, Handling Errors, Settings and Environment Variables, Testing a Database.
+- [ ] docs.pytest.org — Fixtures, Parametrizing tests.
+- [ ] vitest.dev — Getting Started; testing-library.com — React Testing Library, Queries priority, user-event.
+- [ ] 12factor.net — разделы Config, Logs, Dev/prod parity.
+- [ ] vite.dev — Env Variables and Modes, Server Proxy.
+
+## lec14
+
+- [ ] Лекция 14 · Неделя 14
+- [ ] Docker, Docker Compose, Nginx и развёртывание на сервере2 ч
+- [ ] Learning objectives
+- [ ] Объяснить, какую задачу решает контейнеризация и чем контейнер отличается от виртуальной машины.
+- [ ] Написать multi-stage Dockerfile для Python-сервиса и для сборки клиента.
+- [ ] Собрать четырёхсервисное приложение в Docker Compose с томами, сетями и healthcheck.
+- [ ] Настроить Nginx как раздатчик статики SPA и reverse proxy для API.
+- [ ] Развернуть приложение на VPS с HTTPS и описать процедуру повторного развёртывания.
+- [ ] Основные понятия
+- [ ] Linux, SSH, права доступа, пакетный менеджер, journalctl, образ, контейнер, слой, кэш сборки, Dockerfile, инструкции FROM/COPY/RUN/CMD/EXPOSE, multi-stage build, .dockerignore, том, bind mount, сеть Docker, DNS сервисов по имени, порты, depends_on, healthcheck, переменные окружения в compose, reverse proxy, try_files, upstream, TLS-сертификат, Let's Encrypt, certbot, firewall, CI/CD, pipeline, GitHub Actions, workflow, артефакт
+- [ ] План лекции
+- [ ] 0–12 мин. «У меня работает» как инженерная проблема: разные версии Python, отсутствующая БД, другой часовой пояс. Контейнер как ответ. Контейнер против виртуальной машины: что переиспользуется, откуда скорость.
+- [ ] 12–25 мин. Linux-минимум для разработчика: подключение по SSH, ключи, права, установка пакетов, чтение журналов, базовые правила firewall.
+- [ ] 25–48 мин. Образ и Dockerfile: слои и кэш (почему COPY requirements.txt идёт до COPY .), .dockerignore, multi-stage для FastAPI, отдельный multi-stage для Vite со сборкой статики.
+- [ ] 48–70 мин. Docker Compose: четыре сервиса (postgres, api, web-builder/nginx), тома для данных БД, именованная сеть и обращение по имени сервиса, depends_on с condition: service_healthy, передача переменных окружения, docker compose logs/exec/ps.
+- [ ] 70–88 мин. Nginx: раздача собранной статики, try_files $uri /index.html — почему без этого при обновлении страницы SPA получается 404, проксирование /api на сервис api, заголовки, ограничение размера тела запроса, gzip.
+- [ ] 88–102 мин. Развёртывание на VPS: подготовка сервера, доменное имя, запуск compose, получение сертификата Let's Encrypt, повторное развёртывание, резервное копирование БД, что делать при падении.
+- [ ] 102–110 мин. CI/CD обзорно: один workflow GitHub Actions — линтер и тесты на каждый Pull Request; упоминание автоматического развёртывания как следующего шага за пределами курса.
+- [ ] Теоретический материал
+- [ ] Неделя 14 замыкает тему воспроизводимости, начатую миграциями и переменными окружения. Формулировка требования проста и проверяема: проект должен запускаться на чистой машине двумя командами — cp .env.example .env и docker compose up -d. Если требуется что-то ещё, конфигурация неполна. Такая постановка избавляет от долгих объяснений «зачем Docker»: студент к этому моменту уже трижды столкнулся с тем, что проект не запускается у соседа.
+- [ ] Три технических акцента. Первый — порядок инструкций в Dockerfile определяет скорость сборки: зависимости копируются и устанавливаются до копирования исходного кода, иначе каждая правка одной строки заново скачивает все пакеты. Второй — multi-stage: в финальный образ попадает результат сборки, а не инструменты сборки; учебный образ клиента уменьшается с ~1,2 ГБ до ~50 МБ, и эту разницу полезно показать командой docker images. Третий — try_files: клиентская маршрутизация недели 8 работает только тогда, когда сервер на любой неизвестный путь отдаёт index.html. Это самая частая причина сообщения «после деплоя всё сломалось», и связь между лекциями 8 и 14 следует проговорить явно.
+- [ ] Практические примеры
+- [ ] Сборка образа api дважды: полная (90 с) и после правки одной строки кода при правильном порядке слоёв (4 с).
+- [ ] docker images: сравнение размера образа клиента при однослойной и multi-stage сборке.
+- [ ] Отключить try_files, обновить страницу /books/42 — 404; включить — работает.
+- [ ] Code examples
+- [ ] Dockerfile для FastAPI: порядок слоёв и непривилегированный пользователь
+- [ ] # backend/Dockerfile
+- [ ] FROM python:3.12-slim AS base
+- [ ] ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+- [ ] WORKDIR /app
+- [ ] # 1. СНАЧАЛА зависимости — этот слой кэшируется и не пересобирается при правке кода
+- [ ] COPY requirements.txt .
+- [ ] RUN pip install --no-cache-dir -r requirements.txt
+- [ ] # 2. ПОТОМ исходный код — меняется часто, но слой дешёвый
+- [ ] COPY app ./app
+- [ ] COPY migrations ./migrations
+- [ ] COPY alembic.ini .
+- [ ] # не запускаем от root
+- [ ] RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+- [ ] USER appuser
+- [ ] EXPOSE 8000
+- [ ] CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+- [ ] # frontend/Dockerfile — multi-stage: инструменты сборки в финальный образ не попадают
+- [ ] FROM node:22-alpine AS build
+- [ ] WORKDIR /app
+- [ ] COPY package*.json ./
+- [ ] RUN npm ci                       # ci, а не install: строго по package-lock.json
+- [ ] COPY . .
+- [ ] ARG VITE_API_BASE_URL=/api/v1
+- [ ] RUN npm run build                # результат — статика в /app/dist
+- [ ] FROM nginx:1.27-alpine AS runtime
+- [ ] COPY --from=build /app/dist /usr/share/nginx/html
+- [ ] COPY nginx.conf /etc/nginx/conf.d/default.conf
+- [ ] EXPOSE 80
+- [ ] # образ ~50 МБ вместо ~1,2 ГБ со всем node_modules
+- [ ] docker-compose.yml: всё приложение одной командой
+- [ ] services:
+- [ ] db:
+- [ ] image: postgres:17-alpine
+- [ ] environment:
+- [ ] POSTGRES_DB: ${POSTGRES_DB}
+- [ ] POSTGRES_USER: ${POSTGRES_USER}
+- [ ] POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+- [ ] volumes:
+- [ ] - pgdata:/var/lib/postgresql/data      # том: данные переживают пересоздание контейнера
+- [ ] healthcheck:                              # api не должен стартовать раньше готовности БД
+- [ ] test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+- [ ] interval: 5s
+- [ ] timeout: 3s
+- [ ] retries: 10
+- [ ] restart: unless-stopped
+- [ ] api:
+- [ ] build: ./backend
+- [ ] environment:
+- [ ] # "db" — имя сервиса, Docker разрешает его во внутренний IP. Не localhost!
+- [ ] DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+- [ ] SECRET_KEY: ${SECRET_KEY}
+- [ ] CORS_ORIGINS: '["https://${DOMAIN}"]'
+- [ ] depends_on:
+- [ ] db:
+- [ ] condition: service_healthy
+- [ ] command: >
+- [ ] sh -c "alembic upgrade head &&
+- [ ] uvicorn app.main:app --host 0.0.0.0 --port 8000"
+- [ ] restart: unless-stopped
+- [ ] web:
+- [ ] build:
+- [ ] context: ./frontend
+- [ ] args:
+- [ ] VITE_API_BASE_URL: /api/v1
+- [ ] depends_on: [api]
+- [ ] ports:
+- [ ] - "80:80"
+- [ ] - "443:443"
+- [ ] volumes:
+- [ ] - ./nginx/certs:/etc/letsencrypt:ro
+- [ ] restart: unless-stopped
+- [ ] volumes:
+- [ ] pgdata:
+- [ ] # Запуск на чистой машине:
+- [ ] #   cp .env.example .env && nano .env
+- [ ] #   docker compose up -d --build
+- [ ] #   docker compose logs -f api
+- [ ] nginx.conf: статика SPA + проксирование API
+- [ ] server {
+- [ ] listen 80;
+- [ ] server_name booknest.example.kz;
+- [ ] client_max_body_size 5m;
+- [ ] gzip on;
+- [ ] gzip_types text/css application/javascript application/json image/svg+xml;
+- [ ] root /usr/share/nginx/html;
+- [ ] # API проксируем на сервис api по внутренней сети Docker
+- [ ] location /api/ {
+- [ ] proxy_pass http://api:8000;
+- [ ] proxy_set_header Host              $host;
+- [ ] proxy_set_header X-Real-IP         $remote_addr;
+- [ ] proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+- [ ] proxy_set_header X-Forwarded-Proto $scheme;
+- [ ] }
+- [ ] # хешированные ассеты можно кэшировать надолго
+- [ ] location /assets/ {
+- [ ] expires 1y;
+- [ ] add_header Cache-Control "public, immutable";
+- [ ] }
+- [ ] # КЛЮЧЕВАЯ СТРОКА для SPA: неизвестный путь → index.html,
+- [ ] # иначе обновление страницы /books/42 даёт 404
+- [ ] location / {
+- [ ] try_files $uri $uri/ /index.html;
+- [ ] }
+- [ ] }
+- [ ] Развёртывание на VPS и CI-workflow
+- [ ] # --- на сервере (Ubuntu 24.04 LTS) ---
+- [ ] ssh deploy@203.0.113.10
+- [ ] sudo apt update && sudo apt install -y docker.io docker-compose-v2 git
+- [ ] sudo ufw allow OpenSSH && sudo ufw allow 80,443/tcp && sudo ufw enable
+- [ ] git clone https://github.com/student/booknest.git && cd booknest
+- [ ] cp .env.example .env && nano .env          # DOMAIN, SECRET_KEY, пароль БД
+- [ ] docker compose up -d --build
+- [ ] docker compose ps && docker compose logs -f api
+- [ ] # HTTPS
+- [ ] sudo certbot certonly --standalone -d booknest.example.kz
+- [ ] docker compose restart web
+- [ ] # повторное развёртывание после изменений
+- [ ] git pull && docker compose up -d --build && docker compose exec api alembic upgrade head
+- [ ] # резервная копия БД
+- [ ] docker compose exec -T db pg_dump -U booknest booknest | gzip > backup-$(date +%F).sql.gz
+- [ ] # .github/workflows/ci.yml — проверка каждого Pull Request
+- [ ] name: CI
+- [ ] on: [push, pull_request]
+- [ ] jobs:
+- [ ] backend:
+- [ ] runs-on: ubuntu-latest
+- [ ] services:
+- [ ] postgres:
+- [ ] image: postgres:17
+- [ ] env: { POSTGRES_PASSWORD: test, POSTGRES_DB: booknest_test, POSTGRES_USER: test }
+- [ ] options: >-
+- [ ] --health-cmd pg_isready --health-interval 5s --health-retries 10
+- [ ] ports: ["5432:5432"]
+- [ ] steps:
+- [ ] - uses: actions/checkout@v4
+- [ ] - uses: actions/setup-python@v5
+- [ ] with: { python-version: "3.12" }
+- [ ] - run: pip install -r backend/requirements.txt
+- [ ] - run: ruff check backend
+- [ ] - run: pytest -q
+- [ ] env:
+- [ ] DATABASE_URL: postgresql+psycopg://test:test@localhost:5432/booknest_test
+- [ ] SECRET_KEY: ci-only-secret
+- [ ] frontend:
+- [ ] runs-on: ubuntu-latest
+- [ ] steps:
+- [ ] - uses: actions/checkout@v4
+- [ ] - uses: actions/setup-node@v4
+- [ ] with: { node-version: "22", cache: "npm", cache-dependency-path: frontend/package-lock.json }
+- [ ] - run: npm ci --prefix frontend
+- [ ] - run: npm run lint --prefix frontend
+- [ ] - run: npx vitest run --prefix frontend
+- [ ] - run: npm run build --prefix frontend
+- [ ] Демонстрация на занятии
+- [ ] «От нуля до публичного адреса». Преподаватель работает на подготовленном чистом VPS с проброшенным экраном терминала. Последовательность: клонирование репозитория → cp .env.example .env → docker compose up -d --build (с комментированием происходящего в логе: скачивание образов, сборка, применение миграций, healthcheck БД) → открытие публичного адреса в браузере → регистрация пользователя → создание записи. Затем демонстрация диагностики: остановить контейнер БД и показать, что видит пользователь и что пишет docker compose logs api; вернуть, показать восстановление. Финал: docker compose down без флага -v, повторный up — данные на месте благодаря тому, что они в томе; и предупреждение о том, что делает down -v.
+- [ ] Типичные ошибки студентов
+- [ ] localhost в строке подключения к БД внутри контейнера вместо имени сервиса db.
+- [ ] COPY . . перед установкой зависимостей — каждая правка кода пересобирает всё.
+- [ ] Отсутствие .dockerignore: node_modules, .git и .env попадают в образ.
+- [ ] Секреты, вписанные прямо в Dockerfile или compose вместо переменных окружения.
+- [ ] Данные БД без тома — при пересоздании контейнера всё теряется.
+- [ ] Отсутствие try_files — SPA возвращает 404 при обновлении любой внутренней страницы.
+- [ ] depends_on без healthcheck: api стартует раньше БД и падает.
+- [ ] Порт 8000 API открыт в интернет напрямую, минуя reverse proxy.
+- [ ] Развёртывание без HTTPS с последующей передачей пароля в открытом виде.
+- [ ] Миграции не применяются автоматически — «на сервере таблиц нет».
+- [ ] Запуск контейнеров от root без необходимости.
+- [ ] Контрольные вопросы
+- [ ] Чем контейнер отличается от виртуальной машины?
+- [ ] Почему COPY requirements.txt должен идти до COPY .?
+- [ ] Что даёт multi-stage сборка и на сколько уменьшает образ клиента?
+- [ ] Как сервис api находит базу данных внутри compose-сети?
+- [ ] Зачем нужен том и что произойдёт при docker compose down -v?
+- [ ] Для чего нужен healthcheck и почему depends_on без него недостаточен?
+- [ ] Объясните строку try_files $uri $uri/ /index.html.
+- [ ] Что делает reverse proxy и почему API не публикуют напрямую?
+- [ ] Как передать секреты в контейнер, не помещая их в образ?
+- [ ] Как выполняется повторное развёртывание после изменений в коде и в схеме БД?
+- [ ] Что должно происходить в CI при каждом Pull Request?
+- [ ] Домашнее задание
+- [ ] Полная контейнеризация собственного проекта (лабораторная 11) и подготовка к развёртыванию: Dockerfile для backend и frontend (оба multi-stage или с обоснованием), .dockerignore, docker-compose.yml с четырьмя сервисами, томом, healthcheck и автоматическим применением миграций, .env.example, раздел «Развёртывание» в README.md. Проверка: удалить локальные образы и тома (docker compose down -v, docker system prune), выполнить docker compose up -d --build и убедиться, что приложение поднимается «с нуля». Приложить вывод docker compose ps и docker images. Настроить workflow CI с линтером и тестами; в PR должна быть зелёная отметка проверки.
+- [ ] Материалы
+- [ ] docs.docker.com — Get started, Building best practices, Multi-stage builds, Compose file reference, Volumes, Networking.
+- [ ] nginx.org/ru/docs — Beginner's Guide, директивы try_files, proxy_pass.
+- [ ] docs.github.com — GitHub Actions: Understanding workflows, Service containers.
+- [ ] Let's Encrypt / certbot — инструкции для nginx; Ubuntu Server Guide — SSH, ufw.
+- [ ] 12factor.net — Build, release, run.
+
+## lec15
+
+- [ ] Лекция 15 · Неделя 15
+- [ ] Code review, оптимизация и профессиональная траектория2 ч
+- [ ] Learning objectives
+- [ ] Провести структурированное code review чужого проекта и сформулировать замечания конструктивно.
+- [ ] Измерить производительность приложения и определить приоритет оптимизаций по данным, а не по интуиции.
+- [ ] Оценить собственное решение: назвать сильные стороны, ограничения и обоснованные альтернативы.
+- [ ] Составить план дальнейшего профессионального развития с опорой на пройденный стек.
+- [ ] Основные понятия
+- [ ] code review, конструктивная обратная связь, читаемость кода, технический долг, метрики Lighthouse (LCP, CLS, TBT), размер бандла, code splitting, ленивая загрузка, кэширование, индексы как оптимизация, профилирование запросов, наблюдаемость, портфолио, техническое интервью, SSR и Next.js (обзор), WebSocket, очереди задач, кэш Redis, Kubernetes, мониторинг
+- [ ] План лекции
+- [ ] 0–20 мин. Code review: зачем он существует, что именно проверяется (корректность, читаемость, безопасность, соответствие договорённостям), как формулировать замечание («этот запрос выполнится N+1 раз» вместо «плохой код»), различие блокирующих замечаний и предложений.
+- [ ] 20–40 мин. Разбор двух анонимизированных проектов прошлого потока: сильные и слабые места, разбор по официальной рубрике.
+- [ ] 40–62 мин. Оптимизация по измерению: Lighthouse на своём приложении, размер бандла и rollup-plugin-visualizer, ленивая загрузка маршрутов, кэширующие заголовки; на backend — план запроса, индекс, устранение N+1, пагинация. Правило: сначала измерить, потом оптимизировать.
+- [ ] 62–80 мин. Что осталось за пределами курса и в каком порядке это изучать: SSR и Next.js, серверное состояние (TanStack Query), управление состоянием, WebSocket, фоновые задачи и очереди, кэш, наблюдаемость, Kubernetes. Честная карта: что действительно требуется на первой работе, а что нет.
+- [ ] 80–95 мин. Портфолио и трудоустройство: как оформить репозиторий проекта, что писать в README, как рассказывать о проекте на интервью, типичные вопросы junior-собеседования по темам курса.
+- [ ] 95–110 мин. Организация защиты: регламент, состав комиссии, критерии, порядок демонстрации, ответы на вопросы.
+- [ ] Теоретический материал
+- [ ] Заключительная лекция переводит студента из режима «выполняю задание» в режим инженерной ответственности за решение. Ключевое умение — говорить о собственном коде критически: назвать, что сделано хорошо, что является техническим долгом и что было бы сделано иначе при наличии времени. На защите это оценивается напрямую: студент, который честно указывает на слабое место своего проекта и предлагает путь исправления, демонстрирует более высокий уровень, чем студент, утверждающий, что всё идеально.
+- [ ] Второй тезис — оптимизация без измерения бессмысленна. К этому моменту студенты уже владеют двумя инструментами измерения (Lighthouse и EXPLAIN ANALYZE), и лекция сводит их в единое правило: измерить, найти самое дорогое, исправить, измерить снова. Наиболее частая находка в учебных проектах — не медленный React, а отсутствующий индекс или N+1, что даёт хороший урок о соотношении усилий и эффекта. Третий тезис — карта дальнейшего пути. Курс сознательно не охватил многое, и об этом следует сказать прямо, указав порядок изучения и связь с пройденным материалом: TanStack Query — как развитие собственных хуков недели 7; SSR — как ответ на ограничения SPA недели 1; очереди — как ответ на долгие операции недели 13.
+- [ ] Практические примеры
+- [ ] Lighthouse на реальном студенческом проекте до и после трёх правок (сжатие изображений, ленивая загрузка маршрутов, кэширующие заголовки).
+- [ ] Один индекс, ускоряющий главную страницу проекта в 30 раз — с планами запроса до и после.
+- [ ] Разбор трёх формулировок одного замечания: обидная, бесполезная и конструктивная.
+- [ ] Code examples
+- [ ] Ленивая загрузка маршрутов: меньше кода в первой загрузке
+- [ ] // было: все страницы в одном бандле — 780 КБ
+- [ ] import { AdminPage } from "./pages/AdminPage";
+- [ ] // стало: страница администратора догружается только тем, кто её открывает
+- [ ] import { lazy, Suspense } from "react";
+- [ ] const AdminPage = lazy(() => import("./pages/AdminPage"));
+- [ ] <Route path="admin" element={
+- [ ] <Suspense fallback={<Spinner label="Загрузка раздела" />}>
+- [ ] <AdminPage />
+- [ ] </Suspense>
+- [ ] } />
+- [ ] // первичный бандл: 780 КБ → 310 КБ
+- [ ] Шаблон конструктивного замечания на code review
+- [ ] # Плохо (оценка личности, без содержания)
+- [ ] "Тут всё написано ужасно, перепиши."
+- [ ] # Бесполезно (нет ни причины, ни пути исправления)
+- [ ] "Не оптимально."
+- [ ] # Конструктивно: место → следствие → предложение → приоритет
+- [ ] "app/repositories/books.py:34 — связь `author` загружается лениво,
+- [ ] поэтому список из 20 книг даёт 21 запрос в БД (виден в логе при echo=True).
+- [ ] Предлагаю добавить `.options(selectinload(Book.author))`.
+- [ ] Приоритет: блокирующее — на 500 книгах страница не откроется."
+- [ ] Демонстрация на занятии
+- [ ] «Ревью в прямом эфире». Преподаватель открывает Pull Request одного из студентов (с его согласия) и проводит ревью по рубрике вслух: сначала запускает проект по README (проверка воспроизводимости), затем смотрит структуру, затем три случайных файла, затем целенаправленно проверяет пять пунктов безопасности, затем оставляет 5–7 комментариев разного приоритета. Демонстрация показывает не только как проверять, но и как выглядит проект со стороны — это сильнейшая мотивация привести собственный репозиторий в порядок перед защитой.
+- [ ] Типичные ошибки студентов
+- [ ] Замечания в форме личной оценки вместо описания технического следствия.
+- [ ] Оптимизация «на глаз» без единого измерения; переписывание React-компонентов при отсутствующем индексе в БД.
+- [ ] README на две строки: проект невозможно запустить, и защита начинается с неудачи.
+- [ ] Демонстрация проекта с локальной машины «на всякий случай» при неработающем публичном адресе.
+- [ ] Ответ «я не знаю, это из интернета» на вопрос о собственном коде.
+- [ ] Утверждение, что в проекте нет недостатков.
+- [ ] Все коммиты сделаны в последние два дня семестра.
+- [ ] Контрольные вопросы
+- [ ] Что проверяется при code review и в каком порядке?
+- [ ] Как сформулировать замечание, чтобы оно было принято и исполнено?
+- [ ] Что означают метрики LCP и TBT и как их улучшить?
+- [ ] Как определить, что тормозит приложение — клиент, сеть или БД?
+- [ ] Что даёт code splitting и когда он оправдан?
+- [ ] Какие ограничения имеет SPA и какую задачу решает SSR?
+- [ ] Назовите три недостатка собственного проекта и способы их устранения.
+- [ ] Какую технологию за пределами курса вы изучите первой и почему?
+- [ ] Что должно быть в README проекта, чтобы его смог запустить незнакомый разработчик?
+- [ ] Домашнее задание
+- [ ] Финальная подготовка к защите: (1) провести code review проекта закреплённого однокурсника по официальной рубрике — не менее 8 содержательных комментариев в PR, из них минимум 2 по безопасности; (2) устранить замечания, полученные от рецензента; (3) привести в порядок README (описание, стек, схема БД, инструкция запуска, скриншоты, публичный адрес, декларация использования AI); (4) подготовить демонстрационный сценарий на 7 минут и один слайд с архитектурной схемой; (5) заполнить самооценку по рубрике итогового проекта из раздела 15.
+- [ ] Материалы
+- [ ] web.dev — Lighthouse, Core Web Vitals, Optimize LCP.
+- [ ] react.dev — Suspense, lazy; vite.dev — Build Optimizations.
+- [ ] Google Engineering Practices — Code Review Developer Guide (перевод доступен).
+- [ ] Обзорно для дальнейшего изучения: nextjs.org, tanstack.com/query, docs.docker.com (Swarm/K8s), redis.io.
+
+## pr9
+
+- [ ] Практика 9 · W9
+- [ ] Проектирование ресурсного API и первые эндпоинты FastAPI
+- [ ] Цель
+- [ ] Научиться проектировать API до написания кода и проверять его в Swagger UI без готового клиента.
+- [ ] Исходные знания
+- [ ] Python, аннотации типов, коды HTTP, REST-соглашения, лекция 9.
+- [ ] ПО
+- [ ] Python 3.12, venv, fastapi, uvicorn, pydantic, Thunder Client, VS Code с расширением Python.
+- [ ] Пошаговое задание
+- [ ] Проектирование на бумаге (12 минут). Для предметной области своего итогового проекта выписать: сущности; для каждой — таблицу «метод / путь / назначение / коды ответов»; отдельно нестандартные действия как переходы состояния подчинённого ресурса.
+- [ ] Взаимная проверка в парах: сосед ищет в вашей спецификации глаголы в URL, отсутствующие коды ошибок и несогласованные имена. Исправить найденное.
+- [ ] Создать проект: виртуальное окружение, requirements.txt, структура app/{main,schemas,routers}, запуск с --reload.
+- [ ] Описать схемы XCreate, XUpdate, XRead для главной сущности с ограничениями через Field.
+- [ ] Реализовать GET /items (с query-параметрами фильтрации и пагинации) и POST /items (код 201) на хранилище в виде словаря в памяти.
+- [ ] Проверить в Swagger UI: корректный запрос (201), нарушение ограничения (422 — изучить структуру detail), несуществующий id (404).
+- [ ] Добавить GET /health и заполнить метаданные приложения (title, version, description).
+- [ ] Экспортировать openapi.json и приложить его в репозиторий.
+- [ ] Пример
+- [ ] @router.post("", response_model=ItemRead, status_code=201)
+- [ ] def create(payload: ItemCreate, store: Store = Depends(get_store)):
+- [ ] return store.add(payload)
+- [ ] Самостоятельная часть
+- [ ] Дописать GET /items/{id}, PATCH (с exclude_unset) и DELETE (204); обеспечить 404 во всех трёх случаях отсутствия записи.
+- [ ] Challenge task
+- [ ] Реализовать зависимость Pagination и применить её к двум разным эндпоинтам без дублирования кода; добавить в ответ конверт Page[T] с полями items/total/page/size, типизированный через дженерик.
+- [ ] Результат и критерии
+- [ ] docs/api-design.md + работающий API. Зачтено, если: в путях нет глаголов; для каждого эндпоинта заданы response_model и status_code; схемы разделены на три роли; ошибка 422 воспроизведена и разобрана; Swagger UI отображает все эндпоинты с описаниями.
+
+## pr10
+
+- [ ] Практика 10 · W10
+- [ ] Проектирование схемы БД и SQL в psql
+- [ ] Цель
+- [ ] Спроектировать нормализованную схему предметной области, реализовать её в PostgreSQL и написать запросы, которые понадобятся приложению.
+- [ ] Исходные знания
+- [ ] Реляционная модель, нормализация, типы связей, синтаксис SQL, лекция 10.
+- [ ] ПО
+- [ ] PostgreSQL 17 (локально либо в Docker), psql, DBeaver/pgAdmin, dbdiagram.io.
+- [ ] Пошаговое задание
+- [ ] Получить «плохую» широкую таблицу от преподавателя; выявить и записать три аномалии (вставки, обновления, удаления) с конкретным примером каждой.
+- [ ] Провести нормализацию до 3NF; нарисовать ER-диаграмму в dbdiagram.io, экспортировать PNG в db/.
+- [ ] Написать DDL-скрипт db/schema.sql: не менее 6 таблиц, связи 1:N, M:N (через таблицу-связку с составным ключом) и 1:1, ограничения NOT NULL/UNIQUE/CHECK, осознанный выбор поведения ON DELETE для каждого внешнего ключа.
+- [ ] Написать db/seed.sql с тестовыми данными: не менее 30 строк в основной таблице и заполненные связи.
+- [ ] Проверить, что ограничения работают: выполнить три заведомо некорректные вставки и записать текст полученных ошибок в отчёт.
+- [ ] Написать 6 запросов из списка преподавателя: соединение трёх таблиц, агрегат с группировкой, HAVING, LEFT JOIN с поиском «сирот», пагинация с сортировкой, вычисляемое поле.
+- [ ] Выполнить операцию из двух шагов в транзакции; повторить с ROLLBACK и убедиться, что данные не изменились.
+- [ ] Пример
+- [ ] -- проверка, что ограничение действительно защищает данные
+- [ ] INSERT INTO loans (book_id, user_id, due_date) VALUES (1, 1, '2020-01-01');
+- [ ] -- ERROR:  new row violates check constraint "loans_dates_ck"
+- [ ] Самостоятельная часть
+- [ ] Написать запрос, воспроизводящий главный экран вашего приложения одним обращением к БД (со всеми связанными данными и признаками, вычисляемыми на стороне сервера).
+- [ ] Challenge task
+- [ ] Сгенерировать 500 000 строк через generate_series, замерить EXPLAIN ANALYZE для запроса вашего главного экрана, создать индекс, замерить снова; приложить оба плана и объяснить, почему планировщик сменил стратегию. Дополнительно: выразить одно бизнес-правило частичным уникальным индексом.
+- [ ] Результат и критерии
+- [ ] Каталог db/ со схемой, данными, запросами и отчётом. Зачтено, если: схема в 3NF без списков в одном поле; все внешние ключи объявлены; присутствуют все три типа связей; не менее 8 ограничений целостности; 6 запросов возвращают корректный результат; продемонстрирован откат транзакции.
+
+## pr11
+
+- [ ] Практика 11 · W11
+- [ ] ORM против SQL: N+1 и цикл миграций
+- [ ] Цель
+- [ ] Научиться видеть SQL за кодом ORM, обнаруживать и устранять N+1, уверенно выполнять цикл миграций.
+- [ ] Исходные знания
+- [ ] Схема БД из практики 10, модели SQLAlchemy, сессии, лекция 11.
+- [ ] ПО
+- [ ] sqlalchemy 2.0, alembic, psycopg, pydantic-settings, PostgreSQL, psql.
+- [ ] Пошаговое задание
+- [ ] Описать 3 модели своей схемы в app/models.py с корректными relationship и back_populates, включая связь M:N через secondary.
+- [ ] Настроить engine с echo=True, фабрику сессий и зависимость get_db.
+- [ ] Инициализировать Alembic, указать target_metadata, создать первую ревизию и применить её. Сравнить результат в psql (\d) с DDL-скриптом практики 10 — расхождения устранить.
+- [ ] Переписать один запрос из практики 10 на select()-стиль; сравнить сгенерированный SQL из лога с рукописным вариантом и записать различия.
+- [ ] Воспроизвести N+1: в цикле обратиться к связанной сущности, посчитать строки SELECT в логе, приложить фрагмент лога.
+- [ ] Устранить через selectinload; приложить лог после устранения и указать итоговое число запросов.
+- [ ] Добавить поле в модель, сгенерировать ревизию, открыть файл ревизии и проверить его вручную, применить, откатить (downgrade -1), применить снова.
+- [ ] Реализовать репозиторий одной сущности с list/get/create/update/delete и пагинацией на стороне БД.
+- [ ] Пример
+- [ ] stmt = select(Book).options(selectinload(Book.author), selectinload(Book.genres))
+- [ ] # 21 запрос → 3 запроса
+- [ ] Самостоятельная часть
+- [ ] Перевести эндпоинты из практики 9 с хранилища в памяти на репозиторий поверх PostgreSQL, сохранив контракт API без изменений (те же пути, схемы и коды ответов).
+- [ ] Challenge task
+- [ ] Написать миграцию с преобразованием данных: разделить поле full_name на first_name и last_name, обеспечив работоспособность downgrade (обратное склеивание) и сохранность существующих значений.
+- [ ] Результат и критерии
+- [ ] Backend на PostgreSQL. Зачтено, если: alembic upgrade head поднимает схему на пустой базе; в репозитории не менее двух ревизий; откат работает; приложены логи до и после устранения N+1; отсутствуют create_all() и сессии на уровне модуля; API возвращает те же ответы, что и на хранилище в памяти.
+
+## pr12
+
+- [ ] Практика 12 · W12
+- [ ] Атака и защита: устранение уязвимостей в собственном коде
+- [ ] Цель
+- [ ] Увидеть работу типовых атак на учебном стенде и закрыть соответствующие уязвимости в своём проекте.
+- [ ] Исходные знания
+- [ ] JWT, хеширование, роли, CORS, классы уязвимостей, лекция 12.
+- [ ] ПО
+- [ ] Учебный уязвимый стенд vuln-lab (предоставляется преподавателем и работает только локально), собственный проект, python-jose, passlib[bcrypt], jwt.io.
+- [ ] Пошаговое задание
+- [ ] Стенд, XSS. Отправить в поле отзыва полезную нагрузку <img src=x onerror="...">, увидеть срабатывание, найти в коде dangerouslySetInnerHTML, устранить, повторить попытку.
+- [ ] Стенд, SQL-инъекция. Ввести ' OR 1=1 -- в поиск, получить все записи, найти строковую интерполяцию в SQL, заменить на параметризованный запрос, повторить попытку.
+- [ ] Стенд, подделка токена. Разобрать свой токен на jwt.io, изменить role на admin, отправить запрос — получить 401; объяснить, что именно не совпало.
+- [ ] Стенд, IDOR. Войти пользователем A, запросить ресурс пользователя B по идентификатору, получить данные; добавить проверку владения, повторить — 404. Объяснить, почему 404, а не 403.
+- [ ] Свой проект. Реализовать хеширование паролей bcrypt, эндпоинты /auth/register и /auth/token, единое сообщение при неудачном входе.
+- [ ] Реализовать зависимость get_current_user и защитить один эндпоинт; проверить в Swagger UI кнопкой Authorize.
+- [ ] Настроить CORS с явным списком origins; воспроизвести ошибку с неверным origin и устранить её.
+- [ ] Проверить, что .env в .gitignore, а SECRET_KEY не имеет значения по умолчанию в коде.
+- [ ] Пример
+- [ ] # уязвимо
+- [ ] db.execute(text(f"SELECT * FROM books WHERE title LIKE '%{q}%'"))
+- [ ] # безопасно
+- [ ] db.execute(text("SELECT * FROM books WHERE title ILIKE :q"), {"q": f"%{q}%"})
+- [ ] Самостоятельная часть
+- [ ] Реализовать зависимость require_role и защитить все изменяющие эндпоинты; проверить каждый тремя запросами: без токена (401), с токеном обычного пользователя (403), с токеном роли (200/201).
+- [ ] Challenge task
+- [ ] Реализовать refresh-токены с раздельными сроками жизни и клиентским перехватчиком, который однократно обновляет access-токен при получении 401 и повторяет исходный запрос; продемонстрировать сценарий, установив срок жизни access-токена в 30 секунд.
+- [ ] Результат и критерии
+- [ ] Отчёт docs/security-review.md + защищённые эндпоинты. Зачтено, если: все четыре атаки на стенде воспроизведены и закрыты с приложенными подтверждениями; в проекте пароли хешируются; вход выдаёт токен; защищённый эндпоинт возвращает 401 без токена и 403 при недостатке прав; секреты отсутствуют в репозитории; CORS ограничен списком.
+
+## pr13
+
+- [ ] Практика 13 · W13
+- [ ] Первые тесты и разбор «красного» теста
+- [ ] Цель
+- [ ] Научиться писать изолированные тесты API и компонентов и использовать их как инструмент диагностики, а не формальное требование.
+- [ ] Исходные знания
+- [ ] Аутентификация, слои backend, состояния клиента, лекция 13.
+- [ ] ПО
+- [ ] pytest, httpx, pytest-cov, отдельная БД *_test; vitest, @testing-library/react, @testing-library/user-event, jsdom.
+- [ ] Пошаговое задание
+- [ ] Создать тестовую БД и tests/conftest.py с фикстурами db (транзакция с откатом), client (подмена get_db), member_token, librarian_token.
+- [ ] Написать тест успешного создания записи (201 и содержимое ответа).
+- [ ] Написать тест 404 для несуществующего идентификатора.
+- [ ] Написать тест 422 для нарушения ограничения схемы.
+- [ ] Написать тест 401 (без токена) и 403 (недостаточная роль).
+- [ ] Написать тест главного бизнес-правила проекта с ожидаемым кодом 409.
+- [ ] Запустить все тесты дважды подряд и убедиться, что второй запуск также зелёный (проверка изоляции).
+- [ ] Настроить Vitest, написать тест формы: невалидный ввод → сообщение об ошибке, отправка не выполняется.
+- [ ] Разбор регрессии. Преподаватель выдаёт патч с внесённым дефектом; применить, увидеть красный тест, прочитать сообщение и по нему найти причину, не читая патч.
+- [ ] Пример
+- [ ] def test_member_cannot_delete(client, member_token, book):
+- [ ] r = client.delete(f"/api/v1/books/{book.id}",
+- [ ] headers={"Authorization": f"Bearer {member_token}"})
+- [ ] assert r.status_code == 403
+- [ ] Самостоятельная часть
+- [ ] Довести число тестов до 10 (не менее 8 API и 2 клиентских); добиться зелёного результата на чистой тестовой базе; приложить вывод обеих команд запуска.
+- [ ] Challenge task
+- [ ] Параметризовать один тест через pytest.mark.parametrize, покрыв 6 комбинаций «роль × операция × ожидаемый код», и оформить результат в виде таблицы прав доступа в docs/permissions.md.
+- [ ] Результат и критерии
+- [ ] Каталог tests/ с зелёным набором. Зачтено, если: тесты выполняются на отдельной БД и не зависят от порядка запуска; повторный запуск проходит; покрыты коды 201, 401, 403, 404, 422 и главное бизнес-правило; клиентский тест проверяет поведение, а не разметку; причина регрессии найдена по сообщению теста.
+
+## pr14
+
+- [ ] Практика 14 · W14
+- [ ] Диагностика контейнеров: почему приложение не поднимается
+- [ ] Цель
+- [ ] Освоить не только запуск, но и диагностику многосервисного приложения: чтение логов, проверка сети, вход в контейнер.
+- [ ] Исходные знания
+- [ ] Образы, контейнеры, тома, сети, Nginx, лекция 14.
+- [ ] ПО
+- [ ] Docker Engine + Compose v2, набор из пяти заведомо сломанных compose-конфигураций от преподавателя, собственный проект.
+- [ ] Пошаговое задание
+- [ ] Запустить эталонный docker compose up и разобрать вывод по фазам: получение образов, сборка, healthcheck, миграции, старт.
+- [ ] Дефект 1. API падает с ошибкой подключения к БД. Прочитать docker compose logs api, найти localhost в строке подключения, заменить на имя сервиса.
+- [ ] Дефект 2. API стартует раньше БД. Добавить healthcheck и condition: service_healthy.
+- [ ] Дефект 3. После down/up данные исчезли. Обнаружить отсутствие тома, добавить его, проверить сохранность.
+- [ ] Дефект 4. Страница /books/42 при обновлении даёт 404. Найти отсутствие try_files в конфигурации Nginx, исправить.
+- [ ] Дефект 5. Сборка образа занимает 3 минуты при правке одной строки. Найти неверный порядок инструкций COPY, исправить, замерить время повторно.
+- [ ] Освоить диагностический набор: docker compose ps, logs -f, exec api sh, exec db psql -U ..., docker images, docker system df.
+- [ ] Применить всё найденное к собственному проекту; выполнить docker compose down -v и полный запуск «с нуля».
+- [ ] Пример
+- [ ] docker compose exec api sh -c 'env | grep DATABASE_URL'
+- [ ] docker compose exec db psql -U booknest -d booknest -c '\dt'
+- [ ] Самостоятельная часть
+- [ ] Довести собственный docker-compose.yml до состояния «запуск двумя командами на чистой машине»; приложить вывод docker compose ps и docker images с размерами образов.
+- [ ] Challenge task
+- [ ] Добавить в compose отдельный профиль для тестов (docker compose --profile test up), поднимающий тестовую БД и выполняющий pytest внутри контейнера, с корректным кодом выхода при падении тестов.
+- [ ] Результат и критерии
+- [ ] Отчёт docs/docker-debug.md + работающий compose проекта. Зачтено, если: все пять дефектов найдены с указанием симптома, причины и исправления; собственный проект поднимается после down -v; данные БД сохраняются между перезапусками; страницы SPA открываются по прямым ссылкам; студент выполнил вход в контейнер и получил доступ к psql.
+
+## pr15
+
+- [ ] Практика 15 · W15
+- [ ] Взаимное code review по официальной рубрике
+- [ ] Цель
+- [ ] Научиться проверять чужой проект структурно и формулировать замечания так, чтобы они были приняты и выполнены.
+- [ ] Исходные знания
+- [ ] Весь материал курса; рубрика итогового проекта (раздел 15).
+- [ ] ПО
+- [ ] GitHub (комментарии к Pull Request), Docker, браузер, Lighthouse; проект закреплённого однокурсника.
+- [ ] Пошаговое задание
+- [ ] Воспроизводимость (7 мин). Клонировать проект и запустить строго по README, ничего не додумывая. Зафиксировать каждый шаг, которого в инструкции не хватило.
+- [ ] Функциональность (8 мин). Пройти основной сценарий: регистрация, вход, создание, просмотр, изменение, удаление, выход. Отметить, где нет обратной связи или где ошибка не обработана.
+- [ ] Безопасность (8 мин). Проверить пять пунктов: секреты в репозитории; ответ /api/users/me на предмет лишних полей; доступ к чужому объекту по идентификатору; изменяющий эндпоинт без токена; хранение пароля в БД.
+- [ ] Код (10 мин). Три файла на выбор: структура и слои, повторяющийся код, обработка ошибок, наличие миграций под изменения моделей.
+- [ ] Оформление (5 мин). История коммитов (распределена по семестру или сделана за два дня), README, наличие тестов и их результат.
+- [ ] Оформить не менее 8 комментариев к PR по шаблону «место → следствие → предложение → приоритет», из них минимум 2 по безопасности.
+- [ ] Заполнить рубрику с баллами по каждому критерию и обосновать три самые низкие оценки.
+- [ ] Обменяться результатами; получить ревью на свой проект и составить план исправлений до защиты.
+- [ ] Пример
+- [ ] Блокирующее · backend/app/routers/loans.py:52
+- [ ] Эндпоинт возвращает выдачу по id без проверки владельца — любой
+- [ ] вошедший пользователь читает чужие данные (проверено токеном member).
+- [ ] Предлагаю зависимость get_own_loan с проверкой loan.user_id == user.id.
+- [ ] Самостоятельная часть
+- [ ] Устранить полученные от рецензента блокирующие замечания и ответить на каждый комментарий ссылкой на коммит с исправлением.
+- [ ] Challenge task
+- [ ] Найти в проверяемом проекте один дефект производительности (N+1, отсутствующий индекс, избыточная загрузка) и подтвердить его измерением — фрагментом лога SQL, планом запроса или отчётом Lighthouse.
+- [ ] Результат и критерии
+- [ ] Ревью в PR однокурсника + заполненная рубрика + план исправлений своего проекта. Зачтено, если: проект рецензента был реально запущен (приложен скриншот); не менее 8 конструктивных комментариев с указанием места и предложения; минимум 2 замечания по безопасности; ни одного замечания в форме личной оценки; на собственные замечания даны ответы.
+
+## lab7
+
+- [ ] Лабораторная 7 · W9
+- [ ] Backend на FastAPI: REST API и CRUD10 баллов
+- [ ] Цель
+- [ ] Научиться проектировать и реализовывать REST API со строгими контрактами данных, корректными кодами ответов и автогенерируемой документацией.
+- [ ] Постановка задачи
+- [ ] Реализовать серверную часть BookNest на FastAPI для двух ресурсов — книги и авторы — с полным CRUD, фильтрацией и пагинацией. Данные хранятся в памяти (словарь), подключение к БД выполняется в ЛР 8. Клиент на этом этапе не подключается: API проверяется через Swagger UI и коллекцию запросов.
+- [ ] Функциональные требования
+- [ ] GET /api/v1/books — список с параметрами q, genre, available_only, page, size, sort; ответ в конверте {items, total, page, size}.
+- [ ] GET /api/v1/books/{id} — детали; 404 при отсутствии.
+- [ ] POST /api/v1/books — создание; 201 и созданный объект; 409 при дублировании ISBN; 422 при нарушении ограничений.
+- [ ] PATCH /api/v1/books/{id} — частичное обновление только переданных полей.
+- [ ] DELETE /api/v1/books/{id} — 204 без тела; 404 при отсутствии.
+- [ ] Полный аналогичный набор для ресурса authors + GET /api/v1/authors/{id}/books.
+- [ ] GET /health для проверки работоспособности.
+- [ ] Swagger UI содержит описания всех эндпоинтов, примеры и перечень возможных кодов ошибок.
+- [ ] Технические требования
+- [ ] Структура: app/{main,config,schemas/,routers/,repositories/,core/}; main.py не длиннее 60 строк.
+- [ ] Схемы разделены на Create, Update, Read; у каждого эндпоинта заданы response_model и status_code.
+- [ ] Валидация — исключительно средствами Pydantic (Field, Literal, собственные валидаторы); не менее двух пользовательских валидаторов.
+- [ ] Пагинация реализована через зависимость и переиспользована минимум в двух эндпоинтах.
+- [ ] В путях нет глаголов; версионирование через префикс /api/v1.
+- [ ] Middleware логирования запросов с временем обработки.
+- [ ] requirements.txt с зафиксированными версиями; README.md с инструкцией запуска; экспортированный openapi.json.
+- [ ] Линтер (ruff) без замечаний; аннотации типов у всех функций.
+- [ ] Пошаговый план
+- [ ] Ветка lab-7/api. Обновить docs/api-design.md (спецификация из практики 9) до окончательного вида.
+- [ ] Создать окружение и структуру пакета; поднять приложение с /health.
+- [ ] Описать схемы книг и авторов с ограничениями.
+- [ ] Реализовать репозиторий в памяти с генерацией идентификаторов.
+- [ ] Реализовать роутер книг: список → детали → создание → обновление → удаление.
+- [ ] Реализовать роутер авторов и вложенный эндпоинт книг автора.
+- [ ] Добавить зависимость пагинации и middleware логирования.
+- [ ] Проверить в Swagger UI все ветки: 200, 201, 204, 404, 409, 422; сохранить коллекцию запросов.
+- [ ] Оформить PR со скриншотом Swagger UI и таблицей проверенных сценариев.
+- [ ] Что демонстрирует студент
+- [ ] Проходит в Swagger UI шесть сценариев подряд (создание, дубликат ISBN, нарушение ограничения, чтение, частичное обновление, удаление) и комментирует получаемые коды; объясняет, зачем схемы разделены на три роли; показывает, что удаление response_model раскрыло бы служебные поля.
+- [ ] Критерии оценивания
+- [ ] 10 б. — все эндпоинты и коды корректны; схемы разделены; пагинация через зависимость; документация полна; студент обосновывает проектные решения.
+- [ ] 8–9 б. — API работает, но есть неточности в кодах (200 вместо 201, тело при 204) или отсутствует один из фильтров.
+- [ ] 6–7 б. — CRUD работает, но одна схема на все операции либо валидация написана «руками» через if.
+- [ ] 4–5 б. — глаголы в путях, отсутствуют коды ошибок, весь код в main.py.
+- [ ] 0–3 б. — API не запускается или реализована лишь часть операций.
+- [ ] Дополнительные задания
+- [ ] + Сортировка по нескольким полям с валидацией допустимых значений параметра sort.
+- [ ] + Единый формат ошибки через централизованный обработчик исключений (задел на ЛР 10).
+- [ ] + Генерация TypeScript-типов клиента из openapi.json и использование их в React.
+- [ ] + Ограничение частоты запросов (простое, в памяти) на изменяющие эндпоинты.
+- [ ] Типичные ошибки
+- [ ] Глаголы в URL и код 200 на любую ситуацию.
+- [ ] Одна схема на создание, обновление и чтение.
+- [ ] Отсутствие response_model — в ответ попадают внутренние поля.
+- [ ] Возврат тела при 204; отсутствие 404 в PATCH и DELETE.
+- [ ] Хранилище как глобальная переменная модуля без зависимости — невозможно подменить в тестах.
+- [ ] Текст исключения Python в ответе клиенту.
+- [ ] Результат
+- [ ] Работающий REST API с полной документацией — контракт, к которому в ЛР 8 подключается PostgreSQL, а в ЛР 10 — React-клиент. Достигнут LO9.
+
+## lab8
+
+- [ ] Лабораторная 8 · W10–W11
+- [ ] PostgreSQL, SQLAlchemy и миграции12 баллов
+- [ ] Цель
+- [ ] Спроектировать реляционную схему предметной области, реализовать её в PostgreSQL и перевести API на постоянное хранилище через ORM с версионированием схемы.
+- [ ] Постановка задачи
+- [ ] Две части. Часть A (W10): проектирование схемы, DDL, тестовые данные и SQL-запросы в psql — без ORM. Часть B (W11): те же таблицы описываются моделями SQLAlchemy, схема создаётся миграциями Alembic, API из ЛР 7 переводится на БД с сохранением контракта.
+- [ ] Функциональные требования
+- [ ] A. ER-диаграмма и схема из не менее 6 таблиц: authors, books, genres, book_genres, users, profiles, loans.
+- [ ] A. Реализованы все три типа связей: 1:N, M:N (таблица-связка с составным ключом), 1:1.
+- [ ] A. Не менее 10 ограничений целостности; для каждого внешнего ключа осознанно выбрано поведение ON DELETE.
+- [ ] A. Скрипт наполнения: 5 авторов, 30 книг, 5 жанров, 10 пользователей, 20 выдач (часть возвращена, часть просрочена).
+- [ ] A. 12 SQL-запросов: каталог с агрегатами, просроченные выдачи, топ авторов, читатели без выдач, статистика по жанрам, пагинация и др.
+- [ ] A. 2 индекса с обоснованием и планами EXPLAIN ANALYZE до и после.
+- [ ] B. Модели SQLAlchemy, полностью соответствующие схеме части A.
+- [ ] B. Не менее двух ревизий Alembic; upgrade head поднимает схему на пустой базе; downgrade -1 работает.
+- [ ] B. Все эндпоинты ЛР 7 работают на PostgreSQL без изменения контракта API; фильтрация, сортировка и пагинация выполняются на стороне БД.
+- [ ] B. Реализована операция выдачи книги в транзакции с проверкой доступности экземпляров и кодом 409 при конфликте.
+- [ ] Технические требования
+- [ ] Схема в 3NF; отсутствуют поля со списками значений и дублирование данных между таблицами.
+- [ ] Слои routers → services → repositories; правила предметной области — только в сервисах; SQL — только в репозиториях.
+- [ ] Сессия — через зависимость get_db, одна на запрос; expire_on_commit=False; отсутствие сессий на уровне модуля.
+- [ ] Запрещён Base.metadata.create_all() в прикладном коде; схема только через миграции.
+- [ ] Все связи в списках загружаются жадно (selectinload); в PR приложены логи SQL, подтверждающие отсутствие N+1.
+- [ ] Строка подключения — из переменных окружения (pydantic-settings), не в коде.
+- [ ] db/README.md с ER-диаграммой, описанием таблиц и порядком запуска.
+- [ ] Пошаговый план
+- [ ] Ветка lab-8a/schema: ER-диаграмма → db/schema.sql → db/seed.sql → db/queries.sql.
+- [ ] Проверить работу ограничений тремя заведомо некорректными вставками; зафиксировать текст ошибок.
+- [ ] Замерить и приложить планы запросов до и после создания индексов. PR части A.
+- [ ] Ветка lab-8b/orm: описать модели, настроить engine и сессии.
+- [ ] Инициализировать Alembic, создать и применить первую ревизию; сравнить схему в psql со схемой части A.
+- [ ] Реализовать репозитории и сервисы; перевести роутеры на них.
+- [ ] Устранить N+1, приложить логи до и после.
+- [ ] Реализовать операцию выдачи в транзакции; проверить конфликтный сценарий.
+- [ ] Создать вторую миграцию, проверить откат. PR части B.
+- [ ] Что демонстрирует студент
+- [ ] Удаляет базу, выполняет alembic upgrade head и seed, показывая воспроизводимость с нуля; объясняет свою ER-диаграмму и выбор ON DELETE для двух связей; демонстрирует конфликтный сценарий выдачи (409); показывает логи SQL до и после устранения N+1; объясняет, что даёт его индекс, по плану запроса.
+- [ ] Критерии оценивания
+- [ ] 11–12 б. — схема нормализована и обоснована; миграции обратимы; слои разделены; N+1 отсутствует; индексы подтверждены планами; транзакция корректна.
+- [ ] 9–10 б. — всё работает, но есть замечания к выбору ON DELETE или отсутствует часть ограничений.
+- [ ] 7–8 б. — API работает на БД, но сохраняется N+1 либо правила предметной области размещены в роутерах.
+- [ ] 5–6 б. — схема создаётся create_all(), миграций нет либо они не откатываются.
+- [ ] 3–4 б. — денормализованная схема, отсутствуют внешние ключи, часть эндпоинтов не переведена.
+- [ ] 0–2 б. — часть A не выполнена или проект не запускается на чистой базе.
+- [ ] Дополнительные задания
+- [ ] + Миграция с преобразованием данных и работающим downgrade.
+- [ ] + Полнотекстовый поиск PostgreSQL (tsvector + GIN-индекс) вместо ILIKE со сравнением производительности.
+- [ ] + Представление (VIEW) для отчёта по просроченным выдачам и его использование в API.
+- [ ] + Скрипт резервного копирования и восстановления БД с проверкой на реальных данных.
+- [ ] + Мягкое удаление (deleted_at) с корректной фильтрацией во всех запросах.
+- [ ] Типичные ошибки
+- [ ] Список жанров строкой через запятую вместо связи M:N.
+- [ ] Отсутствие внешних ключей: целостность «поддерживается кодом».
+- [ ] create_all() вместо миграций; правка уже применённой ревизии.
+- [ ] N+1 при сериализации списков.
+- [ ] commit в цикле по каждой записи; отсутствие commit вовсе.
+- [ ] Пагинация без ORDER BY — нестабильный порядок между запросами.
+- [ ] Строка подключения с паролем в исходном коде.
+- [ ] Результат
+- [ ] Backend с постоянным хранилищем, воспроизводимой схемой и слоистой архитектурой — ядро итогового проекта. Достигнуты LO10, LO11.
+
+## lab9
+
+- [ ] Лабораторная 9 · W12
+- [ ] Аутентификация и авторизация на JWT10 баллов
+- [ ] Цель
+- [ ] Реализовать полный цикл аутентификации, разграничение прав по ролям и защиту от типовых уязвимостей.
+- [ ] Постановка задачи
+- [ ] Добавить в BookNest регистрацию и вход с выдачей JWT, две роли с разными правами (member и librarian), защиту ресурсов на уровне объекта, настройку CORS и провести аудит безопасности собственного кода.
+- [ ] Функциональные требования
+- [ ] POST /auth/register — регистрация с валидацией пароля (минимум 8 символов, буквы и цифры); 409 при занятом e-mail.
+- [ ] POST /auth/token — вход по OAuth2 password flow; выдача access- и refresh-токена; одинаковое сообщение при любой неудаче.
+- [ ] POST /auth/refresh — обновление access-токена по refresh-токену.
+- [ ] GET /auth/me — данные текущего пользователя без служебных полей.
+- [ ] Права: member — читать каталог, брать и возвращать свои книги; librarian — управлять каталогом и видеть все выдачи.
+- [ ] Все изменяющие эндпоинты каталога требуют роль librarian: 401 без токена, 403 при недостатке прав.
+- [ ] GET /loans/{id} возвращает 404 при попытке доступа к чужой выдаче (не 403).
+- [ ] Клиент: страница входа и регистрации, хранение токена, автоматическое добавление заголовка, редирект на /login при 401, реальная работа RequireAuth, скрытие недоступных действий по роли.
+- [ ] CORS настроен явным списком разрешённых источников.
+- [ ] Технические требования
+- [ ] Пароли — только bcrypt через passlib; хеш никогда не покидает сервер.
+- [ ] Токен: HS256, срок жизни access — 15–30 минут, refresh — до 7 дней; в payload только sub, role, exp, iat, type.
+- [ ] Три отдельные зависимости: get_current_user, require_role, проверка владения объектом.
+- [ ] SECRET_KEY — только из окружения, без значения по умолчанию; .env в .gitignore, .env.example в репозитории.
+- [ ] Все эндпоинты возвращают данные через response_model; схема UserRead не содержит хеша пароля.
+- [ ] Клиент добавляет токен в единственном месте (перехватчик в api/client.ts).
+- [ ] Обязательный отчёт docs/security-review.md по 15 пунктам с указанием строк кода.
+- [ ] Пошаговый план
+- [ ] Ветка lab-9/auth. Добавить модель пользователя и миграцию (роль, хеш, флаг активности).
+- [ ] Реализовать модуль core/security.py: хеширование, создание и разбор токенов.
+- [ ] Реализовать роутер auth: регистрация, вход, обновление, текущий пользователь.
+- [ ] Реализовать зависимости аутентификации и авторизации; защитить эндпоинты каталога.
+- [ ] Реализовать проверку владения для выдач; проверить сценарий чужого объекта.
+- [ ] Настроить CORS; воспроизвести и устранить ошибку с неверным источником.
+- [ ] Реализовать клиентскую часть: страницы входа/регистрации, хранение токена, перехватчик, редирект при 401.
+- [ ] Заполнить docs/security-review.md, исправить все обнаруженные дефекты.
+- [ ] PR с таблицей проверки прав: 3 роли (гость, member, librarian) × 6 операций × ожидаемый код.
+- [ ] Что демонстрирует студент
+- [ ] Регистрируется, входит, выполняет действие, получает 403 на операции библиотекаря; входит библиотекарем и выполняет её же успешно; пытается открыть чужую выдачу и получает 404; показывает разбор токена и объясняет, почему туда нельзя помещать чувствительные данные; показывает таблицу пользователей в psql с хешами; демонстрирует отсутствие .env в истории Git.
+- [ ] Критерии оценивания
+- [ ] 10 б. — полный цикл аутентификации; роли и проверка владения; refresh; секреты вне репозитория; отчёт по безопасности заполнен и подтверждён кодом.
+- [ ] 8–9 б. — всё работает, кроме refresh-токенов или единого сообщения об ошибке входа.
+- [ ] 6–7 б. — аутентификация есть, роли есть, но отсутствует проверка владения объектом (IDOR сохраняется).
+- [ ] 4–5 б. — защита реализована только на клиенте: эндпоинты доступны напрямую.
+- [ ] 2–3 б. — пароли хранятся без хеширования либо секрет в репозитории (работа возвращается на доработку).
+- [ ] 0–1 б. — вход не работает.
+- [ ] Дополнительные задания
+- [ ] + Ограничение частоты запросов на /auth/token (например, 5 попыток за 5 минут) с кодом 429.
+- [ ] + Хранение refresh-токена в HttpOnly cookie с обоснованием выбора в отчёте.
+- [ ] + Отзыв токенов через список отозванных (denylist) в БД.
+- [ ] + Подтверждение e-mail «в консоль» (без реальной отправки) со временным токеном.
+- [ ] + Журнал действий (кто, что, когда) для операций библиотекаря.
+- [ ] Типичные ошибки
+- [ ] Проверка только наличия токена без проверки прав на объект.
+- [ ] Секретный ключ со значением по умолчанию в коде; .env в репозитории.
+- [ ] Различные сообщения «нет такого пользователя» и «неверный пароль».
+- [ ] Токен без срока действия; e-mail и телефон в payload.
+- [ ] allow_origins=["*"] вместе с allow_credentials=True.
+- [ ] Скрытие кнопки в интерфейсе как единственная мера защиты.
+- [ ] Утечка password_hash в ответе из-за отсутствия response_model.
+- [ ] Результат
+- [ ] Приложение с разграничением доступа и пройденным аудитом безопасности. Достигнуты LO12, LO13.
+
+## lab10
+
+- [ ] Лабораторная 10 · W13
+- [ ] Full-Stack интеграция и тестирование8 баллов
+- [ ] Цель
+- [ ] Свести клиент и сервер в единое работающее приложение с воспроизводимой конфигурацией, единой обработкой ошибок и набором автоматических тестов.
+- [ ] Постановка задачи
+- [ ] Соединить React-клиент (ЛР 6) и FastAPI-backend (ЛР 8–9) так, чтобы все пользовательские сценарии работали сквозным образом; вынести конфигурацию в окружение; ввести единый формат ошибки; покрыть критический путь тестами.
+- [ ] Функциональные требования
+- [ ] Сквозной сценарий без ручных правок: регистрация → вход → просмотр каталога → создание записи → редактирование → выдача книги → возврат → выход.
+- [ ] Клиент полностью работает с собственным API (внешний Open Library больше не используется как источник каталога).
+- [ ] Единый формат ошибки API (code, message, details, request_id) и его корректное отображение в интерфейсе.
+- [ ] Обработка истечения токена: 401 → однократная попытка обновления → при неудаче переход на страницу входа с сохранением намерения.
+- [ ] Все состояния интерфейса присутствуют на каждой странице с данными: загрузка, успех, пусто, ошибка.
+- [ ] Не менее 10 автоматических тестов: минимум 8 API (включая 201, 401, 403, 404, 422 и главное бизнес-правило с 409) и 2 клиентских.
+- [ ] Запуск проекта на чужой машине по README без правки исходного кода.
+- [ ] Технические требования
+- [ ] Ни одного захардкоженного адреса, порта, пароля или ключа: всё через окружение; .env.example актуален и полон.
+- [ ] В разработке используется dev-proxy Vite; базовый URL клиента — относительный.
+- [ ] Централизованный обработчик исключений на сервере; клиенту не отдаются внутренние трассировки.
+- [ ] Логирование с идентификатором запроса; идентификатор возвращается в заголовке ответа.
+- [ ] Тесты выполняются на отдельной БД, изолированы транзакцией и не зависят от порядка запуска; повторный прогон зелёный.
+- [ ] Клиентские тесты ищут элементы по роли и метке, проверяют поведение, а не разметку.
+- [ ] README содержит разделы: стек, схема БД, переменные окружения, запуск, запуск тестов.
+- [ ] Пошаговый план
+- [ ] Ветка lab-10/integration. Настроить dev-proxy и относительный базовый URL; убедиться, что ошибок CORS в разработке нет.
+- [ ] Вынести всю конфигурацию клиента и сервера в окружение; составить .env.example.
+- [ ] Ввести единый формат ошибки и обработчики исключений; заменить сообщения вида «Ошибка» на осмысленные.
+- [ ] Реализовать обновление токена в перехватчике клиента.
+- [ ] Пройти сквозной сценарий вручную, зафиксировать и устранить все расхождения контрактов клиента и сервера.
+- [ ] Настроить тестовую БД и фикстуры; написать 8 API-тестов.
+- [ ] Настроить Vitest; написать 2 клиентских теста.
+- [ ] Проверить воспроизводимость: клонировать проект в чистый каталог и поднять строго по README.
+- [ ] PR с выводом pytest -q, vitest run и записью прохождения сквозного сценария.
+- [ ] Что демонстрирует студент
+- [ ] Проходит сквозной сценарий целиком; отключает backend и показывает корректное поведение интерфейса; демонстрирует истечение токена (при коротком сроке жизни) и автоматическое обновление; запускает оба набора тестов; находит запись в логе по request_id из заголовка ответа.
+- [ ] Критерии оценивания
+- [ ] 8 б. — сквозной сценарий работает; конфигурация полностью в окружении; единый формат ошибок; 10+ изолированных тестов; проект поднимается по README.
+- [ ] 6–7 б. — интеграция работает, но тестов менее 10 или они зависят от порядка запуска.
+- [ ] 4–5 б. — часть сценария не работает; сохранились захардкоженные адреса.
+- [ ] 2–3 б. — клиент и сервер запускаются, но обмена данными нет либо тесты отсутствуют.
+- [ ] 0–1 б. — интеграция не выполнена.
+- [ ] Дополнительные задания
+- [ ] + ErrorBoundary в React с осмысленным экраном сбоя и кнопкой возврата.
+- [ ] + Один e2e-тест на Playwright, проходящий сценарий «вход → создание → проверка в списке».
+- [ ] + Оптимистичное обновление одной операции с откатом при ошибке сервера.
+- [ ] + Отчёт покрытия (pytest --cov) с анализом двух самых непокрытых модулей.
+- [ ] Типичные ошибки
+- [ ] http://localhost:8000 в десятках файлов клиента.
+- [ ] Тесты запускаются на рабочей базе и уничтожают данные.
+- [ ] Тесты проходят только при первом запуске (нарушена изоляция).
+- [ ] Расхождение контрактов: клиент ждёт author, сервер отдаёт author_id.
+- [ ] Трассировка Python в ответе 500.
+- [ ] README, по которому проект невозможно запустить.
+- [ ] Результат
+- [ ] Целостное Full-Stack-приложение с воспроизводимым запуском и защитой от регрессий. Интегрированы LO6, LO8, LO9, LO12.
+
+## lab11
+
+- [ ] Лабораторная 11 · W14
+- [ ] Контейнеризация приложения8 баллов
+- [ ] Цель
+- [ ] Обеспечить полную воспроизводимость запуска: приложение поднимается на любой машине с Docker двумя командами.
+- [ ] Постановка задачи
+- [ ] Упаковать все компоненты приложения в контейнеры и описать их совместный запуск в Docker Compose: база данных, backend с автоматическим применением миграций, собранный клиент, раздаваемый Nginx с проксированием API.
+- [ ] Функциональные требования
+- [ ] docker compose up -d --build на чистой машине поднимает работоспособное приложение; никаких дополнительных ручных шагов, кроме заполнения .env.
+- [ ] Сервисы: db (PostgreSQL с томом), api (FastAPI, миграции применяются при старте), web (Nginx со собранной статикой и проксированием /api).
+- [ ] Данные БД сохраняются между docker compose down и up.
+- [ ] Клиентская маршрутизация работает: прямое обращение к /books/42 и обновление страницы не дают 404.
+- [ ] Приложение доступно на одном порту; API не публикуется в сеть напрямую.
+- [ ] CI-workflow: линтер и тесты выполняются на каждый Pull Request с отображением статуса.
+- [ ] Технические требования
+- [ ] Multi-stage Dockerfile для клиента (сборка Node → раздача Nginx); итоговый образ менее 100 МБ.
+- [ ] Dockerfile backend с корректным порядком слоёв (зависимости до кода) и запуском от непривилегированного пользователя.
+- [ ] .dockerignore в обоих контекстах: исключены node_modules, .git, .env, кэши, тесты сборки.
+- [ ] Healthcheck БД и depends_on: condition: service_healthy для api.
+- [ ] Все секреты и параметры — через переменные окружения из .env; в образах и в docker-compose.yml нет захардкоженных секретов.
+- [ ] Именованный том для данных PostgreSQL; политика restart: unless-stopped.
+- [ ] Обращения между сервисами — по имени сервиса, не по localhost.
+- [ ] README.md с разделом «Запуск в Docker» и перечнем всех переменных окружения.
+- [ ] Пошаговый план
+- [ ] Ветка lab-11/docker. Написать Dockerfile backend; собрать и запустить контейнер отдельно.
+- [ ] Написать multi-stage Dockerfile клиента и nginx.conf с try_files и proxy_pass.
+- [ ] Добавить .dockerignore; сравнить размеры образов до и после.
+- [ ] Описать docker-compose.yml: три сервиса, том, healthcheck, переменные окружения.
+- [ ] Настроить автоматическое применение миграций при старте api.
+- [ ] Проверить: down -v → up -d --build → приложение работает с нуля; затем down (без -v) → up → данные на месте.
+- [ ] Проверить прямые ссылки на внутренние страницы SPA.
+- [ ] Настроить workflow CI с линтером и тестами.
+- [ ] PR с выводом docker compose ps, docker images и зелёной отметкой CI.
+- [ ] Что демонстрирует студент
+- [ ] Выполняет docker compose down -v, затем полный запуск с нуля на глазах преподавателя; открывает внутреннюю страницу по прямой ссылке; входит в контейнер БД через exec и показывает таблицы; демонстрирует, что данные сохранились после перезапуска; показывает размеры образов и объясняет эффект multi-stage.
+- [ ] Критерии оценивания
+- [ ] 8 б. — запуск с нуля двумя командами; multi-stage; том; healthcheck; миграции автоматически; SPA-маршруты работают; CI зелёный.
+- [ ] 6–7 б. — всё поднимается, но отсутствует healthcheck или миграции применяются вручную.
+- [ ] 4–5 б. — контейнеры собираются, но данные теряются при перезапуске либо прямые ссылки дают 404.
+- [ ] 2–3 б. — контейнеризован только backend; клиент запускается отдельно вне Docker.
+- [ ] 0–1 б. — compose up не приводит к работающему приложению.
+- [ ] Дополнительные задания
+- [ ] + Профиль test в compose, выполняющий тесты в контейнере с корректным кодом выхода.
+- [ ] + Сборка и публикация образа в GitHub Container Registry из CI по тегу.
+- [ ] + Отдельная конфигурация для разработки (docker-compose.override.yml) с горячей перезагрузкой кода.
+- [ ] + Уменьшить образ backend ниже 200 МБ (slim-база, отказ от лишних зависимостей) с фиксацией результата замера.
+- [ ] Типичные ошибки
+- [ ] localhost вместо имени сервиса в строке подключения к БД.
+- [ ] COPY . . до установки зависимостей — пересборка всего при любой правке.
+- [ ] Отсутствие .dockerignore: node_modules и .env внутри образа.
+- [ ] Данные БД без тома — теряются при пересоздании контейнера.
+- [ ] Отсутствие try_files — SPA ломается на прямых ссылках.
+- [ ] Секреты, вписанные прямо в docker-compose.yml.
+- [ ] Публикация порта API напрямую в интернет.
+- [ ] Результат
+- [ ] Полностью воспроизводимое приложение, готовое к развёртыванию на сервере. Достигнут LO15.
+
+## lab12
+
+- [ ] Лабораторная 12 · W14–W15
+- [ ] Развёртывание на VPS за Nginx с HTTPS8 баллов
+- [ ] Цель
+- [ ] Провести приложение через полный цикл вывода в эксплуатацию: сервер, домен, HTTPS, повторное развёртывание, резервное копирование, диагностика.
+- [ ] Постановка задачи
+- [ ] Развернуть приложение на предоставленном VPS (или в бесплатном облачном тарифе) по публичному адресу с действительным TLS-сертификатом и документировать эксплуатационные процедуры в runbook.
+- [ ] Функциональные требования
+- [ ] Приложение доступно по публичному адресу (домен или поддомен) по протоколу HTTPS с действительным сертификатом.
+- [ ] HTTP автоматически перенаправляется на HTTPS.
+- [ ] Работают все функции: регистрация, вход, каталог, создание, выдача, возврат; прямые ссылки на внутренние страницы открываются.
+- [ ] Миграции применены; в базе есть демонстрационные данные и две учётные записи с разными ролями для проверяющего.
+- [ ] Выполнено повторное развёртывание после изменения кода (демонстрируется на защите): git pull → пересборка → применение миграций.
+- [ ] Создана и проверена резервная копия БД (дамп восстановлен в тестовую базу).
+- [ ] Runbook docs/deployment.md: подготовка сервера, переменные окружения, запуск, обновление, резервное копирование, восстановление, диагностика (какие команды выполнять при недоступности приложения).
+- [ ] Технические требования
+- [ ] Доступ к серверу по SSH-ключу; вход по паролю для root отключён; firewall разрешает только 22, 80, 443.
+- [ ] Nginx выступает единственной точкой входа; порты БД и API не доступны из интернета.
+- [ ] Секреты заданы только в .env на сервере и отсутствуют в репозитории и в истории коммитов.
+- [ ] Отдельный SECRET_KEY для эксплуатационной среды (не тот, что использовался в разработке).
+- [ ] Сертификат получен автоматизированно (Let's Encrypt / certbot) с настроенным продлением.
+- [ ] Заданы политика перезапуска контейнеров и ротация журналов.
+- [ ] В README указан публичный адрес и тестовые учётные данные для проверки.
+- [ ] Пошаговый план
+- [ ] Ветка lab-12/deploy. Получить доступ к VPS, настроить SSH-ключ, обновить систему, установить Docker и Compose, настроить firewall.
+- [ ] Привязать доменное имя (учебный поддомен выдаётся кафедрой), проверить разрешение имени.
+- [ ] Клонировать репозиторий, создать .env эксплуатационной среды с новым секретом.
+- [ ] Запустить docker compose up -d --build; проверить журналы и статусы сервисов.
+- [ ] Получить сертификат, настроить перенаправление на HTTPS, перезапустить web-сервис.
+- [ ] Загрузить демонстрационные данные, создать две учётные записи с разными ролями.
+- [ ] Пройти полный сценарий через публичный адрес; замерить Lighthouse.
+- [ ] Выполнить резервное копирование и проверить восстановление дампа.
+- [ ] Внести небольшое изменение в код и выполнить повторное развёртывание; зафиксировать шаги.
+- [ ] Написать runbook; PR со ссылкой на работающее приложение и скриншотами.
+- [ ] Что демонстрирует студент
+- [ ] Открывает публичный адрес с телефона преподавателя и проходит сценарий; показывает действительный сертификат; выполняет повторное развёртывание в реальном времени; демонстрирует создание дампа и восстановление; отвечает на вопрос «приложение недоступно — ваши первые три команды?» по своему runbook.
+- [ ] Критерии оценивания
+- [ ] 8 б. — приложение доступно по HTTPS и полностью работоспособно; повторное развёртывание и резервное копирование продемонстрированы; runbook пригоден для использования посторонним; сервер настроен безопасно.
+- [ ] 6–7 б. — приложение работает по HTTPS, но runbook неполон либо резервное копирование не проверялось.
+- [ ] 4–5 б. — приложение доступно только по HTTP либо часть функций не работает в эксплуатационной среде.
+- [ ] 2–3 б. — развёрнут только один компонент; API недоступен клиенту.
+- [ ] 0–1 б. — приложение не развёрнуто.
+- [ ] Дополнительные задания
+- [ ] + Автоматическое развёртывание из CI по тегу (GitHub Actions + SSH-деплой) с ручным подтверждением.
+- [ ] + Мониторинг: эндпоинт /health + внешняя проверка доступности (uptime-сервис) со скриншотом истории.
+- [ ] + Автоматическое ежедневное резервное копирование по расписанию с ротацией.
+- [ ] + Настройка заголовков безопасности (HSTS, X-Content-Type-Options, базовый CSP) и подтверждение внешним сканером.
+- [ ] + Оптимизация: gzip/brotli, кэширующие заголовки для ассетов, Lighthouse Performance ≥ 90 на мобильном.
+- [ ] Типичные ошибки
+- [ ] Развёртывание без HTTPS с передачей пароля в открытом виде.
+- [ ] Использование того же SECRET_KEY, что и в разработке (или взятого из примера).
+- [ ] Публикация портов БД и API в интернет.
+- [ ] Миграции не применены — «на сервере нет таблиц».
+- [ ] Отсутствие резервного копирования и понимания, что делать при сбое.
+- [ ] Runbook в стиле «запустить docker compose up» без описания переменных и диагностики.
+- [ ] Развёртывание в последний день семестра без запаса времени на устранение проблем.
+- [ ] Результат
+- [ ] Приложение, работающее в реальной среде по публичному адресу, с документированными эксплуатационными процедурами. Достигнут LO16; завершено формирование всех результатов обучения курса.
+
+
+## Обновление ЛР №7
+
+- [x] Проверены отдельный Uvicorn, /health и /docs (200), Swagger UI в Edge; реальный скриншот: docs/lab7/swagger.png.
+- [x] Сгенерированы типы TypeScript; использованы в React; production-сборка прошла.
+- [x] Коммиты: 1dc4d1c, 2a8a4bc; первый push в origin/lab-7/fastapi выполнен.
+- [x] Подготовлены HTTP-коллекция, Markdown и DOCX.
+- [ ] Визуальная проверка DOCX: штатный render_docx.py не запустился, soffice.exe отсутствует. Файл до проверки страниц не считается окончательно проверенным отчётом.
+- [ ] Взаимная проверка в паре, отдельные api-drills и sql-drills: репозитории/участник не предоставлены.
+- [ ] VPS, домен и проект однокурсника отсутствуют (подтверждено пользователем); публичное развёртывание и взаимное ревью не могут быть отмечены выполненными.

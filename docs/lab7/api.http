@@ -1,0 +1,37 @@
+### Проверка процесса
+GET http://localhost:8000/health
+
+### Создание автора 201
+POST http://localhost:8000/api/v1/authors
+Content-Type: application/json
+
+{"name":"Автор демонстрации"}
+
+### Создание книги 201 (при первом авторе с id 1)
+POST http://localhost:8000/api/v1/books
+Content-Type: application/json
+
+{"title":"Учебная книга","author_id":1,"year":2020,"isbn":"9780306406157"}
+
+### Повторить предыдущий POST: ожидается 409
+
+### Ошибка схемы 422
+POST http://localhost:8000/api/v1/books
+Content-Type: application/json
+
+{"title":" ","author_id":1,"year":100}
+
+### Чтение 200
+GET http://localhost:8000/api/v1/books/1
+
+### Частичное обновление 200
+PATCH http://localhost:8000/api/v1/books/1
+Content-Type: application/json
+
+{"year":2021}
+
+### Удаление 204 без тела
+DELETE http://localhost:8000/api/v1/books/1
+
+### Отсутствующая запись 404
+GET http://localhost:8000/api/v1/books/999999

@@ -1,1 +1,12 @@
 node_modules/
+.venv/
+.env
+!.env.example
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.db
+artifacts/
+.tools/
