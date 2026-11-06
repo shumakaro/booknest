@@ -1,0 +1,14 @@
+SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.total_copies, books.description, books.created_at, books.language, books.deleted_at 
+FROM books 
+WHERE books.deleted_at IS NULL ORDER BY books.id 
+ LIMIT %(param_1)s::INTEGER
+
+SELECT books_1.id AS books_1_id, genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM books AS books_1 JOIN book_genres AS book_genres_1 ON books_1.id = book_genres_1.book_id JOIN genres ON genres.id = book_genres_1.genre_id 
+WHERE books_1.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)
+
+SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year 
+FROM authors 
+WHERE authors.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER)
+
+SELECT count: 3

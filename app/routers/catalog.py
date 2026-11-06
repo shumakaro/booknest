@@ -4,7 +4,17 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from app.core.pagination import Pagination
 from app.repositories.memory import MemoryStore, get_store
-from app.schemas import AuthorCreate, AuthorRead, AuthorUpdate, BookCreate, BookRead, BookUpdate, Genre, Page, Sort
+from app.schemas import (
+    AuthorCreate,
+    AuthorRead,
+    AuthorUpdate,
+    BookCreate,
+    BookRead,
+    BookUpdate,
+    Genre,
+    Page,
+    Sort,
+)
 
 router = APIRouter()
 Store = Annotated[MemoryStore, Depends(get_store)]

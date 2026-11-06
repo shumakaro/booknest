@@ -9,3 +9,6 @@ class Settings(BaseSettings):
     version: str = "1.0.0"
     write_limit: int = 60
     cors_origins: list[str] = []
+    database_url: str
+    sql_echo: bool = False
+    test_database_url: str | None = None

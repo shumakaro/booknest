@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import Settings
 from app.core.http import configure_http
-from app.repositories.memory import MemoryStore
-from app.routers.catalog import router
+from app.routers.loans import router as loans_router
+from app.routers.catalog_db import router
 from app.schemas import HealthRead
 
 
@@ -16,7 +16,7 @@ def create_app() -> FastAPI:
     application = FastAPI(
         title=settings.title, version=settings.version, description="Учебный REST API книжного клуба BookNest"
     )
-    application.state.store = MemoryStore()
+    # Данные хранятся в PostgreSQL; схема создаётся только миграциями.
     configure_http(application, settings.write_limit)
     application.add_middleware(
         CORSMiddleware,
@@ -25,6 +25,7 @@ def create_app() -> FastAPI:
         allow_headers=["Authorization", "Content-Type"],
     )
     application.include_router(router, prefix="/api/v1")
+    application.include_router(loans_router, prefix="/api/v1")
 
     @application.get("/health", response_model=HealthRead, status_code=200, tags=["service"])
     def health() -> dict:

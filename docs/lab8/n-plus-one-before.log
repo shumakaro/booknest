@@ -1,0 +1,106 @@
+SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.total_copies, books.description, books.created_at, books.language, books.deleted_at 
+FROM books 
+WHERE books.deleted_at IS NULL ORDER BY books.id 
+ LIMIT %(param_1)s::INTEGER
+
+SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year 
+FROM authors 
+WHERE authors.id = %(pk_1)s::INTEGER
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year 
+FROM authors 
+WHERE authors.id = %(pk_1)s::INTEGER
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year 
+FROM authors 
+WHERE authors.id = %(pk_1)s::INTEGER
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year 
+FROM authors 
+WHERE authors.id = %(pk_1)s::INTEGER
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year 
+FROM authors 
+WHERE authors.id = %(pk_1)s::INTEGER
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name 
+FROM genres, book_genres 
+WHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id
+
+SELECT count: 26

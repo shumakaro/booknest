@@ -1,0 +1,14 @@
+erDiagram
+    AUTHORS ||--o{ BOOKS : writes
+    BOOKS ||--o{ BOOK_GENRES : has
+    GENRES ||--o{ BOOK_GENRES : classifies
+    USERS ||--o| PROFILES : owns
+    USERS ||--o{ LOANS : borrows
+    BOOKS ||--o{ LOANS : issued
+    AUTHORS { int id PK string name UK int birth_year }
+    BOOKS { int id PK int author_id FK string title int year string isbn UK int total_copies timestamp deleted_at }
+    GENRES { int id PK string code UK string name }
+    BOOK_GENRES { int book_id PK,FK int genre_id PK,FK }
+    USERS { int id PK string email UK string password_hash string role boolean is_active }
+    PROFILES { int user_id PK,FK string first_name string last_name string faculty }
+    LOANS { int id PK int book_id FK int user_id FK date issued_at date due_date date returned_at }
