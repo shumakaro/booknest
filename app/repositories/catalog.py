@@ -38,6 +38,10 @@ class CatalogRepository:
             "total_copies": book.total_copies,
             "genre": codes[0] if codes else "fiction",
             "description": book.description,
+            "publisher": book.publisher,
+            "language": book.language,
+            "edition_year": book.edition_year,
+            "pages": book.pages,
             "available": available,
         }
 

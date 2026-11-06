@@ -34,7 +34,7 @@ export function AppLayout() {
         <div>
           <h1>BookNest</h1>
           <p>
-            Каталог книг Open Library
+            Книжный клуб и выдача книг
           </p>
         </div>
 
@@ -56,6 +56,7 @@ export function AppLayout() {
             Желаемое
           </NavLink>
 
+          {user && <NavLink to="/loans" className={getNavClass}>Выдачи</NavLink>}
           {user?.role === "librarian" && (
           <NavLink
             to="/books/new"

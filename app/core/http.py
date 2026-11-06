@@ -16,6 +16,7 @@ log = logging.getLogger("booknest")
 def error_response(request: Request, status: int, message: str, details: object = None) -> JSONResponse:
     return JSONResponse(
         status_code=status,
+        headers={"X-Request-ID": getattr(request.state, "request_id", "")},
         content={
             "code": f"HTTP_{status}",
             "message": message,
@@ -33,6 +34,16 @@ def configure_http(app: FastAPI, write_limit: int) -> None:
     async def trace(request: Request, call_next) -> Response:
         started = time.perf_counter()
         request.state.request_id = str(uuid4())
+
+        async def handle() -> Response:
+            try:
+                return await call_next(request)
+            except Exception:
+                log.exception("Сбой запроса request_id=%s", request.state.request_id)
+                return error_response(
+                    request, 500, "Внутренняя ошибка сервера. Сообщите идентификатор запроса"
+                )
+
         if request.method in ["POST", "PATCH", "DELETE"]:
             host = request.client.host if request.client else "unknown"
             queue = requests[host]
@@ -44,9 +55,9 @@ def configure_http(app: FastAPI, write_limit: int) -> None:
                 response.headers["Retry-After"] = "60"
             else:
                 queue.append(now)
-                response = await call_next(request)
+                response = await handle()
         else:
-            response = await call_next(request)
+            response = await handle()
         elapsed = (time.perf_counter() - started) * 1000
         response.headers["X-Request-ID"] = request.state.request_id
         response.headers["X-Process-Time-ms"] = f"{elapsed:.1f}"

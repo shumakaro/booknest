@@ -7,6 +7,7 @@ export interface Book {
   authors: string[];
   year?: number;
   coverId?: number;
+  record?: BookRead;
 }
 
 // Результат поиска Open Library.
@@ -52,4 +53,5 @@ export interface BookDetails {
   title: BookRead["title"];
   description: string;
   authors: Author[];
+  record?: BookRead;
 }

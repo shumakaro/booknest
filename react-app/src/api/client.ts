@@ -48,6 +48,15 @@ export function toUserMessage(error: unknown): string {
   return "Не удалось выполнить действие. Повторите попытку.";
 }
 
+function endSession() {
+  setAccessToken(null);
+  globalThis.dispatchEvent(new Event("booknest:logout"));
+  if (!location.pathname.startsWith("/login")) {
+    const returnTo = location.pathname + location.search + location.hash;
+    location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+  }
+}
+
 export async function apiFetch<T>(path: string, options: RequestInit = {}, retry = true): Promise<T> {
   const headers = new Headers(options.headers);
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
@@ -61,36 +70,23 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}, retry
     if (error instanceof DOMException && error.name === "AbortError") throw error;
     throw new ApiError("Не удалось связаться с сервером. Проверьте соединение и повторите попытку.", 0);
   }
-  if (response.status === 401 && retry && !path.startsWith("/auth/")) {
-    try {
-      await refreshAccess();
-      return await apiFetch<T>(path, options, false);
-    } catch (error) {
-      setAccessToken(null);
-      globalThis.dispatchEvent(new Event("booknest:logout"));
-      if (!location.pathname.startsWith("/login")) {
-        const returnTo = location.pathname + location.search + location.hash;
-        location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);
-      }
-      throw error;
+  if (response.status === 401 && !path.startsWith("/auth/")) {
+    if (retry) {
+      try { await refreshAccess(); }
+      catch (error) { endSession(); throw error; }
+      // Ошибку повторного запроса не смешиваем с ошибкой refresh.
+      return apiFetch<T>(path, options, false);
     }
+    endSession();
   }
   if (!response.ok) throw await readError(response);
   if (response.status === 204) return undefined as T;
   return await response.json() as T;
 }
 
-// На этапе ЛР №9 старый каталог ещё использует внешний API; переход завершается в ЛР №10.
+// Совместимая обёртка старых хуков теперь обращается только к собственному API.
 export async function request<T>(path: string, params?: Record<string, string | number>, signal?: AbortSignal): Promise<T> {
-  const url = new URL(path, "https://openlibrary.org");
-  if (params) for (const [key, value] of Object.entries(params)) url.searchParams.set(key, String(value));
-  try {
-    const response = await fetch(url, { signal });
-    if (!response.ok) throw new ApiError(`Внешний каталог не ответил (${response.status})`, response.status);
-    return await response.json() as T;
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") throw error;
-    if (error instanceof ApiError) throw error;
-    throw new ApiError("Не удалось загрузить каталог. Проверьте соединение.", 0);
-  }
+  const query = new URLSearchParams();
+  if (params) for (const [key, value] of Object.entries(params)) query.set(key, String(value));
+  return apiFetch<T>(path + (query.size ? `?${query}` : ""), { signal });
 }

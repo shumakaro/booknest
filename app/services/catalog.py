@@ -2,9 +2,12 @@
 
 from datetime import date
 from fastapi import HTTPException
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.repositories.catalog import CatalogRepository, LoanRepository
+from app.schemas import BookCreate
 
 
 class CatalogService:
@@ -28,6 +31,16 @@ class CatalogService:
         try:
             item = self.get(resource, item_id, lock=True) if item_id is not None else None
             if resource == "books":
+                if item is not None:
+                    # Межполевую проверку PATCH выполняем той же схемой с сохранёнными значениями.
+                    current = self.repo.book_dict(item, 0)
+                    merged = {key: current[key] for key in BookCreate.model_fields}
+                    merged.update(data)
+                    try:
+                        validated = BookCreate.model_validate(merged).model_dump()
+                    except ValidationError as error:
+                        raise RequestValidationError(error.errors()) from None
+                    data = {key: validated[key] for key in data}
                 author_id = data.get("author_id")
                 if author_id is not None:
                     self.get("authors", author_id)

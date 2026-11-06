@@ -1,3 +1,4 @@
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { BrowserRouter } from "react-router-dom";
 
 import "./App.css";
@@ -5,9 +6,9 @@ import { AppRouter } from "./app/router/AppRouter";
 
 function App() {
   return (
-    <BrowserRouter>
+    <ErrorBoundary><BrowserRouter>
       <AppRouter />
-    </BrowserRouter>
+    </BrowserRouter></ErrorBoundary>
   );
 }
 

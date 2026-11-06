@@ -1,5 +1,6 @@
 """Создаёт TypeScript-типы моделей из сохранённой OpenAPI-схемы."""
 import json
+import argparse
 from pathlib import Path
 
 def typescript(schema: dict) -> str:
@@ -15,7 +16,10 @@ def typescript(schema: dict) -> str:
     return {'integer': 'number', 'number': 'number', 'string': 'string', 'boolean': 'boolean', 'null': 'null'}.get(kind, 'unknown')
 
 def main() -> None:
-    source = json.loads(Path('docs/lab7/openapi.json').read_text(encoding='utf-8'))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--schema', default='docs/lab7/openapi.json')
+    args = parser.parse_args()
+    source = json.loads(Path(args.schema).read_text(encoding='utf-8'))
     lines = ['// Файл создан tools/generate_api_types.py из OpenAPI. Правки вносятся в схемы Python.']
     for name, schema in source['components']['schemas'].items():
         lines.append(f'export interface {name} {{')
