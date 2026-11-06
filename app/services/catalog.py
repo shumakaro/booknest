@@ -13,7 +13,9 @@ class CatalogService:
         self.repo = CatalogRepository(db)
 
     def get(self, resource: str, item_id: int, lock: bool = False):
-        item = self.repo.get_book(item_id, lock=lock) if resource == "books" else self.repo.get_author(item_id)
+        item = (
+            self.repo.get_book(item_id, lock=lock) if resource == "books" else self.repo.get_author(item_id)
+        )
         if item is None:
             raise HTTPException(404, "Запись не найдена")
         return item

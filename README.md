@@ -26,3 +26,10 @@ Swagger UI: `/docs`, ReDoc: `/redoc`, спецификация: `/openapi.json`,
 Клиент предыдущих работ: `cd react-app`, `npm ci`, `npm run dev`. На этапе ЛР №7 клиент ещё использует Open Library — это предусмотрено заданием.
 
 Подробные требования и незавершённые внешние проверки: `PROGRESS.md`. Использование ИИ раскрыто в `AI_USAGE.md`.
+# Запуск PostgreSQL и миграций
+
+Перед запуском сервера следует скопировать .env.example в .env и задать DATABASE_URL. PostgreSQL 17 должна быть запущена отдельно. Схема приложения создаётся командой `.venv/Scripts/python -m alembic upgrade head`, демонстрационные данные — `.venv/Scripts/python -m tools.seed`.
+
+Нельзя применять db/schema.sql поверх мигрированной базы: это самостоятельная часть SQL-упражнений. Подробности схемы, проверок и индексов находятся в db/README.md.
+
+Для тестов создаётся отдельная booknest_test и заполняется TEST_DATABASE_URL. Команда тестирования: `.venv/Scripts/python -m pytest -q`. Схема тестовой БД поднимается Alembic, данные каждого теста откатываются внешней транзакцией; commit в сервисе использует savepoint.

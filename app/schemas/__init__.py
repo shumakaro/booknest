@@ -1,4 +1,3 @@
-
 """Контракты запросов и ответов BookNest."""
 
 from datetime import date

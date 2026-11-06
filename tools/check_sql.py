@@ -1,9 +1,19 @@
 """Проверяет SQL на изолированных учебных базах и сохраняет настоящий вывод."""
 from pathlib import Path
 import os
+import argparse
+import re
 import subprocess
 import psycopg
 from dotenv import dotenv_values
+
+parser = argparse.ArgumentParser(description='Новая SQL-практика без изменения существующих БД')
+parser.add_argument('--scratch-prefix', required=True)
+args = parser.parse_args()
+if not re.fullmatch(r'booknest_[a-z0-9]{1,24}', args.scratch_prefix):
+    raise SystemExit('Префикс должен иметь вид booknest_<новое имя>')
+sql_name = args.scratch_prefix + '_sql'
+restore_name = args.scratch_prefix + '_restore'
 
 config = dotenv_values('.env')
 url = config['DATABASE_URL'].replace('postgresql+psycopg://', 'postgresql://')
@@ -23,17 +33,15 @@ def run_script(connection, path: str, log) -> None:
             log.write(cursor.statusmessage+'\n')
 
 with psycopg.connect(base+'/postgres', autocommit=True) as admin:
-    for name in ['booknest','booknest_test','booknest_sql','booknest_restore']:
-        if not admin.execute('SELECT 1 FROM pg_database WHERE datname=%s',(name,)).fetchone():
-            admin.execute(psycopg.sql.SQL('CREATE DATABASE {}').format(psycopg.sql.Identifier(name)))
+    for name in [sql_name, restore_name]:
+        if admin.execute('SELECT 1 FROM pg_database WHERE datname=%s', (name,)).fetchone():
+            raise SystemExit('База уже существует. Выберите новый префикс: существующие данные не изменяются.')
+    for name in [sql_name, restore_name]:
+        admin.execute(psycopg.sql.SQL('CREATE DATABASE {}').format(psycopg.sql.Identifier(name)))
 
-with Path('docs/lab8/sql-results.txt').open('w',encoding='utf-8') as log:
-    with psycopg.connect(base+'/booknest_sql', autocommit=True) as connection:
+with Path('.tools/'+args.scratch_prefix+'-sql-results.txt').open('w',encoding='utf-8') as log:
+    with psycopg.connect(base+'/'+sql_name, autocommit=True) as connection:
         log.write(connection.execute('SELECT version()').fetchone()[0]+'\n')
-        # Только собственная одноразовая база SQL-упражнений, не база приложения.
-        assert connection.info.dbname == 'booknest_sql'
-        connection.execute('DROP SCHEMA public CASCADE')
-        connection.execute('CREATE SCHEMA public')
         run_script(connection,'db/schema.sql',log)
         run_script(connection,'db/seed.sql',log)
         run_script(connection,'db/queries.sql',log)
@@ -56,15 +64,15 @@ with Path('docs/lab8/sql-results.txt').open('w',encoding='utf-8') as log:
         log.write('\nROLLBACK verified: both operations cancelled\n')
         run_script(connection,'db/benchmark.sql',log)
     # pg_dump и pg_restore получают пароль через окружение дочернего процесса.
-    info=psycopg.conninfo.conninfo_to_dict(base+'/booknest_sql')
+    info=psycopg.conninfo.conninfo_to_dict(base+'/'+sql_name)
     env=os.environ.copy()
     env['PGPASSWORD']=info['password']
     binaries=Path('.tools/postgresql/pgsql/bin')
     dump=Path('.tools/booknest-sql.dump')
     common=['-h',info['host'],'-p',info['port'],'-U',info['user']]
-    subprocess.run([str(binaries/'pg_dump.exe'),*common,'-Fc','-f',str(dump),'booknest_sql'],env=env,check=True)
-    subprocess.run([str(binaries/'pg_restore.exe'),*common,'--clean','--if-exists','-d','booknest_restore',str(dump)],env=env,check=True)
-    with psycopg.connect(base+'/booknest_restore') as restored:
+    subprocess.run([str(binaries/'pg_dump.exe'),*common,'-Fc','-f',str(dump),sql_name],env=env,check=True)
+    subprocess.run([str(binaries/'pg_restore.exe'),*common,'-d',restore_name,str(dump)],env=env,check=True)
+    with psycopg.connect(base+'/'+restore_name) as restored:
         counts=restored.execute('SELECT (SELECT count(*) FROM books),(SELECT count(*) FROM loans)').fetchone()
         assert counts==(30,20)
         log.write('\nBackup restored into separate database: '+str(counts)+'\n')

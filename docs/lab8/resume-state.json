@@ -1,0 +1,53 @@
+{
+  "booknest": {
+    "authors": 5,
+    "books": 30,
+    "users": 10,
+    "loans": 20,
+    "revisions": [
+      [
+        "002_profile_names"
+      ]
+    ]
+  },
+  "booknest_test": {
+    "authors": 0,
+    "books": 0,
+    "users": 0,
+    "loans": 0,
+    "revisions": [
+      [
+        "002_profile_names"
+      ]
+    ]
+  },
+  "booknest_sql": {
+    "authors": 5,
+    "books": 30,
+    "users": 10,
+    "loans": 20,
+    "revisions": []
+  },
+  "booknest_restore": {
+    "authors": 5,
+    "books": 30,
+    "users": 10,
+    "loans": 20,
+    "revisions": []
+  },
+  "booknest_migration_test": {
+    "authors": 5,
+    "books": 31,
+    "users": 12,
+    "loans": 21,
+    "revisions": [
+      [
+        "002_profile_names"
+      ]
+    ]
+  },
+  "running_api": {
+    "status": 200,
+    "total": 0
+  }
+}

@@ -4,8 +4,9 @@ import os
 import pytest
 from alembic import command
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 from app.config import Settings
@@ -23,16 +24,26 @@ def test_engine():
     # Двойная проверка защищает рабочую БД от ошибочной конфигурации тестов.
     if not test_url.database.endswith("_test") or settings.test_database_url == settings.database_url:
         raise RuntimeError("Тестовая БД должна быть отдельной и оканчиваться на _test")
+    engine = create_engine(settings.test_database_url)
+    cfg = Config("alembic.ini")
+    with engine.connect() as connection:
+        current = (
+            set(connection.scalars(text("SELECT version_num FROM alembic_version")))
+            if inspect(connection).has_table("alembic_version")
+            else set()
+        )
+    required = set(ScriptDirectory.from_config(cfg).get_heads())
     previous = os.environ.get("DATABASE_URL")
     os.environ["DATABASE_URL"] = settings.test_database_url
     try:
-        command.upgrade(Config("alembic.ini"), "head")
+        # Уже применённые миграции при повторном тестировании не запускаются.
+        if current != required:
+            command.upgrade(cfg, "head")
     finally:
         if previous is None:
             os.environ.pop("DATABASE_URL", None)
         else:
             os.environ["DATABASE_URL"] = previous
-    engine = create_engine(settings.test_database_url)
     yield engine
     engine.dispose()
 

@@ -1,7 +1,7 @@
 """SQL находится в репозитории; пагинация выполняется самой PostgreSQL."""
 
 from datetime import datetime, timezone
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session, selectinload
 from app.models import Author, Book, Genre, Loan, User
 
@@ -156,6 +156,19 @@ class CatalogRepository:
 class LoanRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
+
+    def overdue(self, page: int, size: int) -> dict:
+        # Используем представление из DDL, а не повторяем его условие в роутере.
+        total = self.db.scalar(text("SELECT count(*) FROM overdue_loans"))
+        rows = (
+            self.db.execute(
+                text("SELECT * FROM overdue_loans ORDER BY due_date,id LIMIT :size OFFSET :offset"),
+                {"size": size, "offset": (page - 1) * size},
+            )
+            .mappings()
+            .all()
+        )
+        return {"items": [dict(row) for row in rows], "total": total, "page": page, "size": size}
 
     def get(self, item_id: int, lock: bool = False) -> Loan | None:
         stmt = select(Loan).where(Loan.id == item_id)

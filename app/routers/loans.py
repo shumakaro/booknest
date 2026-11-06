@@ -12,6 +12,12 @@ router = APIRouter(tags=["loans"])
 Database = Annotated[Session, Depends(get_db)]
 
 
+@router.get("/reports/overdue-loans", response_model=Page[LoanRead], status_code=200)
+def overdue_loans(db: Database, pagination: Annotated[Pagination, Depends()]) -> dict:
+    """Отчёт по просроченным выдачам из представления PostgreSQL."""
+    return LoanService(db).repo.overdue(pagination.page, pagination.size)
+
+
 @router.post("/books/{item_id}/loans", response_model=LoanRead, status_code=201)
 def issue_book(item_id: int, payload: LoanCreate, db: Database):
     """Выдать экземпляр с проверкой доступности внутри транзакции."""

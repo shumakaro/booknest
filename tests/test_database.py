@@ -48,3 +48,21 @@ def test_database_integrity_and_null(db_client, db_book):
     assert db_client.patch(path, json={"title": None}).status_code == 422
     assert db_client.patch(path, json={"author_id": 999999}).status_code == 404
     assert db_client.get("/api/v1/books?genre=unknown").status_code == 422
+
+
+def test_overdue_view(db_client, db, db_book, db_reader):
+    from app.models import Loan
+
+    # Просроченная запись добавляется только в изолированную транзакцию теста.
+    loan = Loan(
+        book_id=db_book["id"],
+        user_id=db_reader.id,
+        issued_at=date.today() - timedelta(days=20),
+        due_date=date.today() - timedelta(days=10),
+    )
+    db.add(loan)
+    db.commit()
+    result = db_client.get("/api/v1/reports/overdue-loans")
+    assert result.status_code == 200
+    assert result.json()["items"][0]["id"] == loan.id
+    assert result.json()["total"] == 1

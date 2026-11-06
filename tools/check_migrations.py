@@ -1,5 +1,7 @@
 """Проверяет цикл миграций, данные имён и параллельные выдачи на собственной scratch-БД."""
 import os
+import argparse
+import re
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
@@ -14,16 +16,18 @@ from app.config import Settings
 from app.models import Book, User
 from app.services.catalog import LoanService
 
+parser = argparse.ArgumentParser(description='Испытание миграций только на новой отдельной БД')
+parser.add_argument('--scratch-name', required=True)
+args = parser.parse_args()
+if not re.fullmatch(r'booknest_[a-z0-9]{1,20}_migration_test', args.scratch_name):
+    raise SystemExit('Нужно новое имя вида booknest_<имя>_migration_test')
 settings=Settings()
 root=settings.database_url.rsplit('/',1)[0]
-url=root+'/booknest_migration_test'
+url=root+'/'+args.scratch_name
 with psycopg.connect(root.replace('+psycopg','')+'/postgres',autocommit=True) as admin:
-    if not admin.execute("SELECT 1 FROM pg_database WHERE datname='booknest_migration_test'").fetchone():
-        admin.execute('CREATE DATABASE booknest_migration_test')
-with psycopg.connect(url.replace('+psycopg',''),autocommit=True) as db:
-    assert db.info.dbname=='booknest_migration_test'
-    db.execute('DROP SCHEMA public CASCADE')
-    db.execute('CREATE SCHEMA public')
+    if admin.execute('SELECT 1 FROM pg_database WHERE datname=%s', (args.scratch_name,)).fetchone():
+        raise SystemExit('База уже существует: испытание остановлено без изменений')
+    admin.execute(psycopg.sql.SQL('CREATE DATABASE {}').format(psycopg.sql.Identifier(args.scratch_name)))
 os.environ['DATABASE_URL']=url
 cfg=Config('alembic.ini')
 command.upgrade(cfg,'001_schema')
@@ -56,6 +60,6 @@ def issue(user_id: int) -> int:
 with ThreadPoolExecutor(max_workers=2) as pool:
     codes=list(pool.map(issue,user_ids))
 assert sorted(codes)==[201,409],codes
-Path('docs/lab8/migrations-results.txt').write_text('upgrade 001 -> seed -> upgrade head -> downgrade 001 -> upgrade head: OK\nFull names including repeated and trailing spaces preserved: OK\nAlembic check: no new upgrade operations\nConcurrent last-copy issue: '+str(codes)+'\n',encoding='utf-8')
+Path('.tools/'+args.scratch_name+'-results.txt').write_text('upgrade 001 -> seed -> upgrade head -> downgrade 001 -> upgrade head: OK\nFull names including repeated and trailing spaces preserved: OK\nAlembic check: no new upgrade operations\nConcurrent last-copy issue: '+str(codes)+'\n',encoding='utf-8')
 print('Migration roundtrip, name preservation, schema match, concurrent issue: OK',codes)
 engine.dispose()
