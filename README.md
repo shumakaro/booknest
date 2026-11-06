@@ -53,7 +53,7 @@ npm --prefix react-app run test:e2e
 Для e2e API и клиент должны быть запущены; нужны локальные демонстрационные роли и подходящий браузер. Без Edge Chromium устанавливается командой `npx playwright install chromium` из react-app. Сквозная проверка создаёт новую книгу, выполняет операции только с ней и затем мягко скрывает её; исходный каталог не удаляется.
 
 ## Документация и защита
-[PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Markdown и DOCX различаются только форматом; визуальная проверка DOCX требует рендерера и пока не подтверждена. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
+[PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Markdown и DOCX различаются только форматом; визуальная проверка всех 52 страниц DOCX завершена; протокол в docs/report-qa.md. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
 
 Публичный адрес пока отсутствует: VPS и домен не предоставлены. Итоговый BookNest нельзя объявлять развёрнутым до фактической проверки HTTPS.
 

@@ -1,0 +1,44 @@
+[
+  {
+    "lab": 7,
+    "file": "docs/lab7/report.docx",
+    "sha256": "f5e35603ab0db31a6dc4b10831a2c20f3e0a25d5d93403d1b06d780b28d519f3",
+    "pages": 6,
+    "all_pages_visually_reviewed": true
+  },
+  {
+    "lab": 8,
+    "file": "docs/lab8/report.docx",
+    "sha256": "49a6cf9f9fe228778cb01142ca97ddedbc9f35db5ff80dc6a1d1d7b5e8c8bbc6",
+    "pages": 12,
+    "all_pages_visually_reviewed": true
+  },
+  {
+    "lab": 9,
+    "file": "docs/lab9/report.docx",
+    "sha256": "66f08976c7c7cbc0efb60eb57852473738cb39c41016a3983f4da1e0a6113f58",
+    "pages": 9,
+    "all_pages_visually_reviewed": true
+  },
+  {
+    "lab": 10,
+    "file": "docs/lab10/report.docx",
+    "sha256": "987f32bfbb569a1c0f6162df06d163ce2c7fa93f67cf4d14a66cdb4301c078ba",
+    "pages": 8,
+    "all_pages_visually_reviewed": true
+  },
+  {
+    "lab": 11,
+    "file": "docs/lab11/report.docx",
+    "sha256": "bbc9b64a16d64fd2c8f94c5e67fce61cb0f1122b40b8ec84e499b30b6ea29c9e",
+    "pages": 8,
+    "all_pages_visually_reviewed": true
+  },
+  {
+    "lab": 12,
+    "file": "docs/lab12/report.docx",
+    "sha256": "82311076dad78d81ad9f72c6a3ae77368a27664e9c51130831b398a0a81e15f6",
+    "pages": 9,
+    "all_pages_visually_reviewed": true
+  }
+]
