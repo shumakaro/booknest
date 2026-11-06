@@ -1,0 +1,16 @@
+Реальный GitHub Actions: https://github.com/shumakaro/booknest/actions/runs/42224231074
+Commit: 54f7b5dfcc7b9b750567b6a5fca7f9ba12bb1a76
+checks: success; containers: success
+
+containers/7_Smoke and persistence without deleting volumes.txt
+2026-11-06T13:18:35.6734594Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-06T13:18:58.2099530Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-06T13:18:58.5104877Z booknest-web:local inspect: 26.21 MB; image ls: 93.3MB
+2026-11-06T13:18:58.5105400Z booknest-api:local inspect: 38.42 MB; image ls: 165MB
+
+containers/8_Browser scenario inside clean container environment.txt
+2026-11-06T13:19:21.2927667Z   1 passed (3.9s)
+
+containers/9_Test profile with independent database.txt
+2026-11-06T13:19:46.4380346Z test-1  | 49 passed, 2 warnings in 4.81s
+2026-11-06T13:19:46.9757683Z [Ktest-1 exited with code 0
