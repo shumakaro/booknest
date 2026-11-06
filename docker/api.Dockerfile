@@ -1,10 +1,11 @@
 # Зависимости собираются отдельно: изменение исходников не отменяет кэш установки.
-FROM python:3.12-slim AS dependencies
+FROM python:3.12-alpine AS dependencies
 WORKDIR /build
 COPY requirements-runtime.txt requirements-lock.txt ./
 RUN pip install --no-cache-dir --no-compile --prefix=/install -r requirements-runtime.txt -c requirements-lock.txt
 
-FROM python:3.12-slim AS runtime
+FROM python:3.12-alpine AS runtime
+RUN apk add --no-cache libstdc++
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY --from=dependencies /install /usr/local
@@ -13,7 +14,7 @@ COPY migrations ./migrations
 COPY alembic.ini ./
 COPY tools/seed.py tools/create_demo_users.py tools/apply_pending.py ./tools/
 COPY docker/entrypoint.sh ./docker/entrypoint.sh
-RUN adduser --disabled-password --gecos "" appuser && mkdir -p /app/.tools && chown -R appuser /app
+RUN adduser -D appuser && mkdir -p /app/.tools && chown -R appuser /app
 USER appuser
 EXPOSE 8000
 ENTRYPOINT ["sh", "/app/docker/entrypoint.sh"]

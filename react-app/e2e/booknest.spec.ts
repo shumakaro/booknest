@@ -45,16 +45,23 @@ test('вход создание редактирование выдача воз
   await page.getByRole('button', { name: 'Взять книгу', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Книга выдана');
   await page.screenshot({ path: '../docs/lab10/fullstack-success.png', fullPage: true });
-  await page.getByRole('link', { name: 'Перейти к выдачам', exact: true }).click();
-  // Найдём созданную выдачу по страницам, не предполагая номера чужих/старых записей.
-  const returnButton = page.getByRole('button', { name: `Вернуть книгу №${id}`, exact: true });
-  for (let index = 0; index < 20 && !(await returnButton.isVisible()); index++) {
-    const next = page.getByRole('button', { name: 'Следующая', exact: true });
-    await expect(next).toBeEnabled();
-    await next.click();
-    await page.getByRole('heading', { name: 'Выдачи книг' }).waitFor();
-    await expect(page.getByText('Загружаем выдачи...')).toHaveCount(0);
+  function isLoansResponse(response: import('@playwright/test').Response, pageNumber: number) {
+    const url = new URL(response.url());
+    return response.status() === 200 && url.pathname.endsWith('/loans') && url.searchParams.get('page') === String(pageNumber);
   }
+  const initialLoans = page.waitForResponse(response => isLoansResponse(response, 1));
+  await page.getByRole('link', { name: 'Перейти к выдачам', exact: true }).click();
+  let loanPage = await (await initialLoans).json() as { items: { book_id: number; returned_at: string | null }[]; total: number };
+  let pageNumber = 1;
+  while (!loanPage.items.some(loan => String(loan.book_id) === id && !loan.returned_at)) {
+    if (pageNumber * 20 >= loanPage.total) throw new Error('Созданная выдача отсутствует в списке');
+    pageNumber += 1;
+    const loaded = page.waitForResponse(response => isLoansResponse(response, pageNumber));
+    await page.getByRole('button', { name: 'Следующая', exact: true }).click();
+    loanPage = await (await loaded).json();
+  }
+  const returnButton = page.getByRole('button', { name: `Вернуть книгу №${id}`, exact: true });
+  await expect(returnButton).toBeVisible();
   await returnButton.click();
   await expect(returnButton).toHaveCount(0);
   await page.goto(`/books/${id}`);
