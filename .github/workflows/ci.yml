@@ -80,6 +80,15 @@ jobs:
           docker image ls booknest-api:local
           docker image ls booknest-web:local
           python tools/check_image_sizes.py
+      - name: Verify backup and restore into a new database
+        run: |
+          COMPOSE_ENV_FILE=.env BACKUP_DIR=.tools/backups sh deployment/backup.sh
+          dump=$(find .tools/backups -name '*.dump' -type f | head -n 1)
+          COMPOSE_ENV_FILE=.env sh deployment/restore.sh "$dump" booknest_ci_restore_test
+          if COMPOSE_ENV_FILE=.env sh deployment/restore.sh "$dump" booknest_ci_restore_test; then
+            echo "Restore must refuse an existing database"
+            exit 1
+          fi
       - name: Browser scenario inside clean container environment
         run: |
           mkdir -p .tools
@@ -88,6 +97,11 @@ jobs:
           cd react-app
           npx playwright install --with-deps chromium
           npm run test:e2e
+      - name: Verify trusted proxy rate limit
+        run: |
+          docker compose restart api
+          docker compose up -d --wait
+          python tools/check_proxy_rate.py
       - name: Test profile with independent database
         run: docker compose --profile test up --build --abort-on-container-exit --exit-code-from test test
       - name: Diagnostics

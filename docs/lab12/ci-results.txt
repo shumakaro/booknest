@@ -1,0 +1,8 @@
+Run: https://github.com/shumakaro/booknest/actions/runs/42236984907
+Commit: 92c16e5
+Checks and containers: success
+2026-11-06T14:49:28.8017649Z Резервная копия создана: .tools/backups/booknest-20261106T144928Z.dump
+2026-11-06T14:49:29.3714899Z Восстановление в новую тестовую БД проверено: 30|20
+2026-11-06T14:49:29.4855592Z Целевая БД уже существует; восстановление остановлено без изменений
+2026-11-06T14:50:39.6011811Z Forged forwarded headers cannot bypass login limit: [401, 401, 401, 401, 401, 429]
+2026-11-06T14:51:04.3601395Z test-1  | 49 passed, 2 warnings in 8.44s

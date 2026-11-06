@@ -20,8 +20,18 @@ def build(source: Path) -> None:
         style.font.size = Pt(14)
         style.font.color.rgb = RGBColor(0, 0, 0)
         style.element.get_or_add_rPr().rFonts.set(qn('w:eastAsia'), 'Times New Roman')
+        # Тематические шрифты Word иначе переопределяют Times New Roman в заголовках.
+        fonts = style.element.get_or_add_rPr().rFonts
+        for attr in list(fonts.attrib):
+            if 'theme' in attr.lower():
+                del fonts.attrib[attr]
+        for attr in ['ascii', 'hAnsi', 'eastAsia', 'cs']:
+            fonts.set(qn('w:' + attr), 'Times New Roman')
         style.paragraph_format.space_after = Pt(6)
     document.styles['Normal'].paragraph_format.line_spacing = 1.15
+    # Удаляется декоративная граница из шаблона Word: всё оформление чёрное.
+    for border in list(document.styles.element.iter(qn('w:pBdr'))):
+        border.getparent().remove(border)
     document.add_paragraph('Место для титульного листа', 'Title')
     document.add_paragraph('Учебное заведение __________________________')
     document.add_paragraph('Дисциплина Современные веб технологии')

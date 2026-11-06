@@ -1,0 +1,52 @@
+name: Deploy approved release tag
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tested tag, for example v1.0.0'
+        required: true
+        type: string
+      approved:
+        description: 'Deployment of this tag has been reviewed and approved'
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+  checks: read
+jobs:
+  deploy:
+    if: inputs.approved
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - name: Verify successful checks for this exact tag commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/verify_release.py
+      - name: Deploy by SSH with pinned host key
+        env:
+          DEPLOY_TAG: ${{ inputs.tag }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -eu
+          [[ "$DEPLOY_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
+          [[ "$DEPLOY_USER" =~ ^[a-zA-Z0-9_-]+$ ]]
+          [[ "$DEPLOY_PATH" =~ ^/[a-zA-Z0-9/_-]+$ ]]
+          test -n "$DEPLOY_SSH_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$RUNNER_TEMP/booknest-deploy-key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$RUNNER_TEMP/booknest-known-hosts"
+          chmod 600 "$RUNNER_TEMP/booknest-deploy-key" "$RUNNER_TEMP/booknest-known-hosts"
+          ssh -i "$RUNNER_TEMP/booknest-deploy-key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/booknest-known-hosts" "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && sh deployment/update.sh '$DEPLOY_TAG'"

@@ -9,6 +9,18 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
+from app.schemas import ErrorRead
+
+# Один документированный конверт для общих HTTP-ошибок всех ресурсов.
+ERROR_RESPONSES = {
+    401: {"model": ErrorRead, "description": "Требуется действительный токен"},
+    403: {"model": ErrorRead, "description": "Недостаточно прав"},
+    404: {"model": ErrorRead, "description": "Ресурс не найден"},
+    409: {"model": ErrorRead, "description": "Конфликт состояния или уникальности"},
+    422: {"model": ErrorRead, "description": "Ошибка серверной проверки данных"},
+    429: {"model": ErrorRead, "description": "Слишком много запросов"},
+    500: {"model": ErrorRead, "description": "Внутренняя ошибка без раскрытия подробностей"},
+}
 
 log = logging.getLogger("booknest")
 

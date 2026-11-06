@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily BookNest backup at 03 UTC
+[Timer]
+OnCalendar=*-*-* 03:00:00 UTC
+Persistent=true
+Unit=booknest-backup.service
+[Install]
+WantedBy=timers.target
