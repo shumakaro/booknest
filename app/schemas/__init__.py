@@ -1,6 +1,7 @@
+
 """Контракты запросов и ответов BookNest."""
 
-
+from datetime import date
 from typing import Annotated, Generic, Literal, TypeVar
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -123,3 +124,31 @@ class ErrorRead(BaseModel):
     details: object | None = None
     request_id: str
 
+
+# Контракты выдачи отделены от контрактов каталога.
+
+
+class LoanCreate(BaseModel):
+    user_id: int = Field(gt=0)
+    due_date: date
+
+    @field_validator("due_date")
+    @classmethod
+    def future_date(cls, value: date) -> date:
+        if value <= date.today():
+            raise ValueError("Срок возврата должен быть в будущем")
+        return value
+
+
+class LoanReturn(BaseModel):
+    state: Literal["returned"]
+
+
+class LoanRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    book_id: int
+    user_id: int
+    issued_at: date
+    due_date: date
+    returned_at: date | None
