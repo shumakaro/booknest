@@ -1,14 +1,11 @@
 import { createContext } from "react";
 
-export interface User {
-  id: string;
-  name: string;
-}
-
+// Поля текущего пользователя получаются от сервера, роль не назначается клиентом.
+export interface User { id: number; email: string; role: "member" | "librarian"; name: string; }
 export interface AuthContextValue {
   user: User | null;
-  login: () => void;
-  logout: () => void;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
-
 export const AuthContext = createContext<AuthContextValue | null>(null);

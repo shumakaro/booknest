@@ -10,6 +10,7 @@ from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 from app.config import Settings
+from app.core.security import create_token
 from app.db import get_db
 from app.main import create_app
 from app.models import Author, User
@@ -60,7 +61,7 @@ def db(test_engine):
 
 
 @pytest.fixture
-def db_client(db):
+def db_client(db, librarian_token):
     application = create_app()
 
     def override_db():
@@ -68,6 +69,7 @@ def db_client(db):
 
     application.dependency_overrides[get_db] = override_db
     with TestClient(application) as client:
+        client.headers["Authorization"] = "Bearer " + librarian_token
         yield client
     application.dependency_overrides.clear()
 
@@ -86,3 +88,16 @@ def db_reader(db):
     db.add(reader)
     db.commit()
     return reader
+
+
+@pytest.fixture
+def librarian_token(db):
+    user = User(email="librarian@example.com", password_hash="disabled-test-account", role="librarian")
+    db.add(user)
+    db.commit()
+    return create_token(user.id, user.role, "access", 900)
+
+
+@pytest.fixture
+def member_token(db, db_reader):
+    return create_token(db_reader.id, "member", "access", 900)

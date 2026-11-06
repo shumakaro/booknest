@@ -93,6 +93,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(20), server_default="member")
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    email_verified: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     profile: Mapped["Profile | None"] = relationship(back_populates="user", passive_deletes=True)
     loans: Mapped[list["Loan"]] = relationship(back_populates="user", passive_deletes=True)
@@ -129,3 +130,22 @@ class Loan(Base):
     returned_at: Mapped[date | None] = mapped_column(Date)
     book: Mapped[Book] = relationship(back_populates="loans")
     user: Mapped[User] = relationship(back_populates="loans")
+
+
+class DeniedToken(Base):
+    """Хранятся только SHA-256 токенов, а не действительные секреты доступа."""
+
+    __tablename__ = "denied_tokens"
+    digest: Mapped[str] = mapped_column(String(64), primary_key=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class AuditEvent(Base):
+    """Журнал действий библиотекаря не включает тела запросов или пароли."""
+
+    __tablename__ = "audit_events"
+    id: Mapped[int] = mapped_column(Integer, Identity(), primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    method: Mapped[str] = mapped_column(String(10))
+    path: Mapped[str] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

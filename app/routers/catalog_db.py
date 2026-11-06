@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 from app.core.pagination import Pagination
+from app.core.auth import Librarian
 from app.db import get_db
 from app.schemas import (
     AuthorCreate,
@@ -63,19 +64,19 @@ def get_book(item_id: int, service: Catalog) -> dict:
 
 
 @router.post("/books", response_model=BookRead, status_code=201, tags=["books"], responses=ERRORS)
-def create_book(payload: BookCreate, service: Catalog) -> dict:
+def create_book(payload: BookCreate, service: Catalog, user: Librarian) -> dict:
     """Создание книги и её связи с жанром в одной транзакции."""
     return service.save("books", payload.model_dump())
 
 
 @router.patch("/books/{item_id}", response_model=BookRead, status_code=200, tags=["books"], responses=ERRORS)
-def update_book(item_id: int, payload: BookUpdate, service: Catalog) -> dict:
+def update_book(item_id: int, payload: BookUpdate, service: Catalog, user: Librarian) -> dict:
     """Частичное изменение без затирания отсутствующих полей."""
     return service.save("books", payload.model_dump(exclude_unset=True), item_id)
 
 
 @router.delete("/books/{item_id}", response_model=None, status_code=204, tags=["books"], responses=ERRORS)
-def delete_book(item_id: int, service: Catalog) -> Response:
+def delete_book(item_id: int, service: Catalog, user: Librarian) -> Response:
     """Мягкое удаление скрывает книгу, сохраняя историю выдач."""
     service.delete("books", item_id)
     return Response(status_code=204)
@@ -96,7 +97,7 @@ def get_author(item_id: int, service: Catalog) -> dict:
 
 
 @router.post("/authors", response_model=AuthorRead, status_code=201, tags=["authors"], responses=ERRORS)
-def create_author(payload: AuthorCreate, service: Catalog) -> dict:
+def create_author(payload: AuthorCreate, service: Catalog, user: Librarian) -> dict:
     """Создание автора."""
     return service.save("authors", payload.model_dump())
 
@@ -104,13 +105,13 @@ def create_author(payload: AuthorCreate, service: Catalog) -> dict:
 @router.patch(
     "/authors/{item_id}", response_model=AuthorRead, status_code=200, tags=["authors"], responses=ERRORS
 )
-def update_author(item_id: int, payload: AuthorUpdate, service: Catalog) -> dict:
+def update_author(item_id: int, payload: AuthorUpdate, service: Catalog, user: Librarian) -> dict:
     """Изменение полей автора."""
     return service.save("authors", payload.model_dump(exclude_unset=True), item_id)
 
 
 @router.delete("/authors/{item_id}", response_model=None, status_code=204, tags=["authors"], responses=ERRORS)
-def delete_author(item_id: int, service: Catalog) -> Response:
+def delete_author(item_id: int, service: Catalog, user: Librarian) -> Response:
     """Удаление автора без зависимых книг."""
     service.delete("authors", item_id)
     return Response(status_code=204)

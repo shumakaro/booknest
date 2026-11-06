@@ -67,16 +67,17 @@ export function AppRouter() {
         />
 
         <Route
-          path="books/new"
-          element={
-            <LazyBookFormPage />
-          }
-        />
-
-        <Route
           path="books/:bookId"
           element={
             <BookDetailsPage />
+          }
+        />
+
+        <Route element={<RequireAuth role="librarian" />}>
+        <Route
+          path="books/new"
+          element={
+            <LazyBookFormPage />
           }
         />
 
@@ -87,6 +88,7 @@ export function AppRouter() {
           }
         />
 
+        </Route>
         <Route
           element={<RequireAuth />}
         >
@@ -97,6 +99,8 @@ export function AppRouter() {
             }
           />
         </Route>
+
+        <Route path="register" element={<LoginPage register />} />
 
         <Route
           path="login"

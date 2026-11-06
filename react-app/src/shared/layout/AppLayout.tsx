@@ -56,12 +56,14 @@ export function AppLayout() {
             Желаемое
           </NavLink>
 
+          {user?.role === "librarian" && (
           <NavLink
             to="/books/new"
             className={getNavClass}
           >
             Добавить книгу
           </NavLink>
+          )}
         </nav>
 
         <div className="site-header__actions">

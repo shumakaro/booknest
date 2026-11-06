@@ -128,7 +128,7 @@ class ErrorRead(BaseModel):
 
 
 class LoanCreate(BaseModel):
-    user_id: int = Field(gt=0)
+    user_id: int | None = Field(default=None, gt=0)
     due_date: date
 
     @field_validator("due_date")
