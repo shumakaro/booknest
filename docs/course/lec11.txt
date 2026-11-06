@@ -1,0 +1,251 @@
+Лекция 11 · Неделя 11
+SQLAlchemy 2.0, миграции Alembic и слоистая архитектура backend2 ч
+  Learning objectives
+    
+Описать таблицы БД декларативными моделями SQLAlchemy и настроить связи между ними.
+    
+Выполнять запросы в стиле select() и управлять жизненным циклом сессии.
+    
+Диагностировать и устранять проблему N+1 запросов средствами жадной загрузки.
+    
+Версионировать схему БД миграциями Alembic, включая откат.
+    
+Разделять код backend на слои маршрутов, сервисов и репозиториев и объяснять пользу такого разделения.
+  
+  Основные понятия
+ORM, объектно-реляционное отображение, DeclarativeBase, Mapped/mapped_column, relationship, back_populates, engine, сессия, единица работы, identity map, select(), where, join, options, ленивая и жадная загрузка, selectinload/joinedload, N+1, транзакция и commit/rollback, refresh, миграция, ревизия, autogenerate, upgrade/downgrade, слой репозитория, слой сервиса, DTO, инверсия зависимостей
+  План лекции
+    
+0–12 мин. Зачем ORM: сравнение кода с psycopg вручную и через SQLAlchemy. Что ORM даёт (типы, связи, безопасность от инъекций) и чего стоит (скрытые запросы, кривая обучения).
+    
+12–35 мин. Декларативные модели: Mapped-аннотации, соответствие типов, relationship в обе стороны, back_populates, M:N через secondary. Перенос схемы недели 10 в код.
+    
+35–50 мин. Сессия: engine, фабрика сессий, зависимость FastAPI get_db, границы транзакции, commit и rollback, почему нельзя создавать сессию на уровне модуля.
+    
+50–70 мин. Запросы: select().where().order_by().limit(), соединения, агрегаты, scalars(). Включение echo=True и сравнение сгенерированного SQL с собственным запросом из лабораторной 8.
+    
+70–85 мин. Проблема N+1: воспроизвести (список 20 книг → 21 запрос), обнаружить по логу, устранить через selectinload. Почему это самая дорогая ошибка backend-новичка.
+    
+85–100 мин. Alembic: инициализация, autogenerate, чтение и правка ревизии, upgrade head, downgrade -1, миграция с данными, конфликты ревизий в командной работе. Правило: изменение модели без миграции — не изменение.
+    
+100–110 мин. Слоистая архитектура: router (HTTP) → service (правила предметной области) → repository (доступ к данным). Где живёт правило «нельзя выдать выданную книгу». Задание на лабораторную 8 (часть 2).
+  
+  Теоретический материал
+    
+ORM подаётся строго после недели SQL и именно как надстройка, а не замена. Главное умение, которое требует курс, — видеть SQL за объектным кодом. Отсюда обязательное упражнение: включить echo=True, выполнить запрос через ORM и сравнить лог с рукописным SQL той же задачи. Студент, который не может ответить «сколько запросов уйдёт в базу при отрисовке этой страницы», ORM ещё не освоил.
+    
+Второй сюжет — миграции как часть кода. Схема БД должна воспроизводиться из репозитория одной командой на любой машине: это то же требование воспроизводимости, которое на неделе 14 приведёт к Docker. Правило курса: изменение модели, не сопровождённое ревизией Alembic, считается несделанным и не проходит code review. Третий сюжет — слои. Разделение вводится не «ради красоты», а через задачу: правило «нельзя выдать книгу, если нет свободных экземпляров» нельзя разместить в маршруте (иначе оно не действует при импорте данных) и нельзя в репозитории (тот не знает о правилах). Ему место в сервисе. После этого объяснения студенты начинают строить слои осознанно.
+  
+  Практические примеры
+    
+Один и тот же каталог: рукописный SQL из недели 10 и вариант на SQLAlchemy — сравнение логов.
+    
+N+1 в живом виде: 21 строка в логе на 20 книг, затем 2 строки после selectinload.
+    
+Полный цикл миграции: добавить поле books.language, сгенерировать ревизию, применить, откатить, применить снова.
+  
+  Code examples
+    Модели: 1:N, M:N и 1:1 в SQLAlchemy 2.0
+# app/models.py
+from datetime import date, datetime
+from typing import Optional
+from sqlalchemy import ForeignKey, String, Table, Column, CheckConstraint, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+class Base(DeclarativeBase):
+    pass
+
+book_genres = Table(                       # таблица-связка для M:N
+    "book_genres", Base.metadata,
+    Column("book_id",  ForeignKey("books.id",  ondelete="CASCADE"), primary_key=True),
+    Column("genre_id", ForeignKey("genres.id", ondelete="CASCADE"), primary_key=True),
+)
+
+class Author(Base):
+    __tablename__ = "authors"
+    id:   Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), unique=True)
+
+    books: Mapped[list["Book"]] = relationship(back_populates="author")
+
+class Book(Base):
+    __tablename__ = "books"
+    __table_args__ = (CheckConstraint("year BETWEEN 1450 AND 2100", name="books_year_ck"),)
+
+    id:           Mapped[int] = mapped_column(primary_key=True)
+    title:        Mapped[str] = mapped_column(String(200), index=True)
+    year:         Mapped[int]
+    isbn:         Mapped[Optional[str]] = mapped_column(String(13), unique=True)
+    total_copies: Mapped[int] = mapped_column(default=1)
+    author_id:    Mapped[int] = mapped_column(ForeignKey("authors.id", ondelete="RESTRICT"))
+    created_at:   Mapped[datetime] = mapped_column(server_default=func.now())
+
+    author: Mapped["Author"]       = relationship(back_populates="books")
+    genres: Mapped[list["Genre"]]  = relationship(secondary=book_genres, back_populates="books")
+    loans:  Mapped[list["Loan"]]   = relationship(back_populates="book")
+
+class Loan(Base):
+    __tablename__ = "loans"
+    id:          Mapped[int]  = mapped_column(primary_key=True)
+    book_id:     Mapped[int]  = mapped_column(ForeignKey("books.id"))
+    user_id:     Mapped[int]  = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    issued_at:   Mapped[date] = mapped_column(server_default=func.current_date())
+    due_date:    Mapped[date]
+    returned_at: Mapped[Optional[date]]
+
+    book: Mapped["Book"] = relationship(back_populates="loans")
+    user: Mapped["User"] = relationship(back_populates="loans")
+    Сессия как зависимость, репозиторий и устранение N+1
+# app/db.py
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+from app.config import settings
+
+engine = create_engine(settings.database_url, echo=settings.sql_echo, pool_pre_ping=True)
+SessionLocal = sessionmaker(engine, autoflush=False, expire_on_commit=False)
+
+def get_db():                       # зависимость FastAPI: сессия на один запрос
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# app/repositories/books.py
+from sqlalchemy import select, func
+from sqlalchemy.orm import Session, selectinload
+
+class BookRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def list(self, *, q=None, genre=None, offset=0, limit=20) -> tuple[list[Book], int]:
+        stmt = (
+            select(Book)
+            # БЕЗ этой строки: 1 запрос на книги + 20 на авторов + 20 на жанры = N+1
+            .options(selectinload(Book.author), selectinload(Book.genres))
+        )
+        if q:
+            stmt = stmt.where(Book.title.ilike(f"%{q}%"))
+        if genre:
+            stmt = stmt.join(Book.genres).where(Genre.code == genre)
+
+        total = self.db.scalar(select(func.count()).select_from(stmt.subquery()))
+        items = self.db.scalars(
+            stmt.order_by(Book.title).offset(offset).limit(limit)
+        ).all()
+        return list(items), total
+
+    def get(self, book_id: int) -> Book | None:
+        return self.db.get(Book, book_id)          # get() использует identity map
+
+    def active_loans_count(self, book_id: int) -> int:
+        return self.db.scalar(
+            select(func.count()).select_from(Loan)
+            .where(Loan.book_id == book_id, Loan.returned_at.is_(None))
+        )
+    Сервисный слой: место правил предметной области
+# app/services/loans.py
+class BookUnavailableError(Exception): ...
+class AlreadyBorrowedError(Exception): ...
+
+class LoanService:
+    def __init__(self, books: BookRepository, loans: LoanRepository, db: Session):
+        self.books, self.loans, self.db = books, loans, db
+
+    def issue(self, *, book_id: int, user_id: int, days: int = 14) -> Loan:
+        book = self.books.get(book_id)
+        if book is None:
+            raise NotFoundError("Книга не найдена")
+
+        # ПРАВИЛО ПРЕДМЕТНОЙ ОБЛАСТИ живёт здесь, а не в маршруте и не в SQL
+        if self.books.active_loans_count(book_id) >= book.total_copies:
+            raise BookUnavailableError("Свободных экземпляров нет")
+        if self.loans.has_active(book_id=book_id, user_id=user_id):
+            raise AlreadyBorrowedError("Эта книга уже у вас на руках")
+
+        loan = self.loans.create(book_id=book_id, user_id=user_id,
+                                 due_date=date.today() + timedelta(days=days))
+        self.db.commit()            # граница транзакции — на уровне сервиса
+        self.db.refresh(loan)
+        return loan
+
+# app/routers/loans.py — маршрут только переводит исключения в коды HTTP
+@router.post("/books/{book_id}/loans", response_model=LoanRead, status_code=201)
+def issue_loan(book_id: int, user: User = Depends(get_current_user),
+               service: LoanService = Depends(get_loan_service)):
+    try:
+        return service.issue(book_id=book_id, user_id=user.id)
+    except NotFoundError as e:
+        raise HTTPException(404, str(e))
+    except (BookUnavailableError, AlreadyBorrowedError) as e:
+        raise HTTPException(409, str(e))
+    Alembic: рабочий цикл миграции
+# однократная настройка
+alembic init -t async migrations        # или без -t для синхронного варианта
+# в migrations/env.py: target_metadata = Base.metadata
+
+# рабочий цикл при каждом изменении моделей
+alembic revision --autogenerate -m "add language column to books"
+# ОБЯЗАТЕЛЬНО открыть сгенерированный файл и проверить: autogenerate
+# не видит переименований и не всегда правильно определяет типы
+alembic upgrade head
+alembic downgrade -1                    # проверка обратимости — требование курса
+alembic upgrade head
+alembic current && alembic history --verbose
+  
+  Демонстрация на занятии
+«Считаем запросы». Включить echo=True, открыть эндпоинт списка книг и посчитать строки SELECT в логе: 21 запрос на 20 книг. Задать вопрос «что произойдёт на 1000 книгах» и получить оценку. Добавить selectinload — в логе 3 запроса. Затем показать joinedload и разницу в форме SQL. Вторая часть — полный цикл миграции: добавить поле в модель, сгенерировать ревизию, открыть файл ревизии и найти в нём ошибку (autogenerate не увидел значение по умолчанию для существующих строк), исправить вручную, применить, откатить, применить снова, показать таблицу alembic_version в psql.
+  Типичные ошибки студентов
+    
+N+1 запросов из-за ленивой загрузки связей в цикле сериализации.
+    
+Одна сессия на всё приложение либо сессия, создаваемая внутри каждой функции репозитория.
+    
+Отсутствие commit («данные не сохраняются») или commit в цикле по каждой записи.
+    
+Использование Base.metadata.create_all() в продуктивном коде вместо миграций.
+    
+Правка уже применённой на другой машине ревизии вместо создания новой.
+    
+Слепое доверие autogenerate: неучтённые переименования, потеря данных при смене типа.
+    
+Возврат ORM-объектов напрямую в ответе API без схемы Pydantic — утечка полей и ошибки сериализации.
+    
+Правила предметной области в маршруте: маршрут на 60 строк, сервисного слоя нет.
+    
+Строковая интерполяция в SQL при переходе на text() — возвращение уязвимости к инъекциям.
+  
+  Контрольные вопросы
+    
+Что даёт ORM по сравнению с рукописным SQL и что при этом теряется?
+    
+Зачем нужен back_populates и что произойдёт без него?
+    
+Что такое сессия SQLAlchemy и почему она должна создаваться на один запрос?
+    
+Опишите проблему N+1 и два способа её устранения.
+    
+Чем selectinload отличается от joinedload?
+    
+Почему create_all() недопустим вместо миграций?
+    
+Что делает alembic revision --autogenerate и чего он не умеет?
+    
+Как проверить обратимость миграции и зачем это нужно?
+    
+В каком слое размещается правило «нельзя выдать книгу без свободных экземпляров» и почему не в двух других?
+    
+Где в вашем коде находится граница транзакции?
+  
+  Домашнее задание
+(1) Перенести схему БД собственного проекта из DDL-скрипта недели 10 в модели SQLAlchemy, добиться идентичности схем (сравнить \d в psql до и после применения миграции). (2) Реализовать репозиторий одной сущности с методами list (фильтр + пагинация + сортировка), get, create, update, delete. (3) Сознательно воспроизвести N+1 в своём коде, приложить лог запросов, устранить и приложить лог после устранения — оба лога в описании PR. (4) Создать две миграции, вторую откатить и применить повторно; приложить вывод alembic history.
+  Материалы
+    
+docs.sqlalchemy.org — ORM Quick Start, Declarative Mapping, Relationship Patterns, Relationship Loading Techniques, Session Basics.
+    
+alembic.sqlalchemy.org — Tutorial, Auto Generating Migrations, Operation Reference.
+    
+fastapi.tiangolo.com — SQL (Relational) Databases, Dependencies with yield.
+    
+Architecture Patterns with Python (Percival, Gregory) — главы о репозитории и сервисном слое, обзорно.

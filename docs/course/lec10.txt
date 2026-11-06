@@ -1,0 +1,221 @@
+Лекция 10 · Неделя 10
+PostgreSQL и проектирование реляционной базы данных2 ч
+  Learning objectives
+    
+Спроектировать схему предметной области в третьей нормальной форме и обосновать её.
+    
+Реализовать связи 1:1, 1:N и M:N средствами внешних ключей и таблицы-связки.
+    
+Написать запросы с соединениями, группировкой и агрегатами.
+    
+Определить необходимость индекса и подтвердить эффект планом запроса.
+    
+Объяснить роль транзакции и свойства ACID на примере операции выдачи книги.
+  
+  Основные понятия
+отношение, кортеж, атрибут, домен, первичный ключ, естественный и суррогатный ключ, внешний ключ, ссылочная целостность, ON DELETE, ограничения NOT NULL/UNIQUE/CHECK, нормализация (1NF, 2NF, 3NF), аномалии, связи 1:1 / 1:N / M:N, таблица-связка, JOIN (INNER, LEFT), GROUP BY, агрегатные функции, подзапрос, транзакция, ACID, уровень изоляции (обзорно), индекс, B-tree, EXPLAIN ANALYZE, seq scan и index scan, типы PostgreSQL (serial/identity, text, numeric, timestamptz, boolean, jsonb — обзорно)
+  План лекции
+    
+0–10 мин. Почему не файлы и не «список в памяти»: параллельный доступ, целостность, отказоустойчивость, запросы. Место БД в архитектуре недели 1.
+    
+10–30 мин. Реляционная модель и типы данных PostgreSQL. Первичный ключ: суррогатный против естественного. Ограничения как способ переложить проверку правил на СУБД.
+    
+30–55 мин. Проектирование от предметной области: сущности → атрибуты → связи → ключи. Разбор аномалий на заведомо плохой таблице «Выдачи» с дублированием данных читателя и книги; поэтапная нормализация до 3NF.
+    
+55–70 мин. Три типа связей на схеме BookNest: 1:N (автор → книги), M:N (книги ↔ жанры через таблицу-связку), 1:1 (пользователь → профиль). Поведение ON DELETE CASCADE / RESTRICT / SET NULL и как выбрать.
+    
+70–90 мин. SQL для приложения: SELECT с фильтрами и сортировкой, INNER и LEFT JOIN, GROUP BY с агрегатами, LIMIT/OFFSET для пагинации, COUNT(*) OVER() для общего числа. Разбор запросов, которые понадобятся в лабораторной 8.
+    
+90–102 мин. Транзакции: операция выдачи книги как две согласованные записи; демонстрация BEGIN … ROLLBACK; ACID своими словами.
+    
+102–110 мин. Индексы: зачем, чем платим, где создавать. Демонстрация EXPLAIN ANALYZE на таблице в 500 000 строк до и после создания индекса. Задание на лабораторную 8 (часть 1).
+  
+  Теоретический материал
+    
+Нормализация подаётся не как формальная процедура, а как средство устранения наблюдаемых аномалий. Методический приём: показать одну «широкую» таблицу выдач, где имя читателя и название книги повторяются в каждой строке, и задать три вопроса — «как переименовать книгу», «как добавить читателя без выдачи», «что произойдёт при удалении единственной выдачи читателя». Аномалии обновления, вставки и удаления студенты обнаруживают сами, после чего 3NF воспринимается как решение конкретной проблемы, а не как требование учебника.
+    
+Второй тезис — ограничения целостности принадлежат базе данных. Проверка «количество экземпляров не отрицательно» может стоять в React, в Pydantic и в SQL, но только последняя работает всегда — независимо от того, какой клиент и какой скрипт обращается к данным. Отсюда правило курса: инварианты предметной области выражаются через NOT NULL, UNIQUE, CHECK и FOREIGN KEY, а прикладная валидация лишь даёт пользователю понятное сообщение раньше. Третий тезис — индекс это компромисс: ускоряет чтение, замедляет запись и занимает место. Курс требует не «расставить индексы», а обосновать каждый индекс конкретным запросом и подтвердить эффект через EXPLAIN ANALYZE.
+  
+  Практические примеры
+    
+Пошаговая нормализация «широкой» таблицы выдач до пяти таблиц с проверкой исчезновения аномалий.
+    
+Запрос «топ-5 авторов по числу выдач за семестр» — с JOIN, GROUP BY, HAVING и сортировкой.
+    
+Замер: поиск по title без индекса и с индексом на таблице 500 тыс. строк; сравнение планов и времени.
+  
+  Code examples
+    DDL-схема BookNest: три типа связей и ограничения целостности
+CREATE TABLE authors (
+    id         integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name       text NOT NULL,
+    birth_year integer CHECK (birth_year BETWEEN 1000 AND 2100),
+    CONSTRAINT authors_name_uniq UNIQUE (name)
+);
+
+CREATE TABLE books (
+    id            integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title         text    NOT NULL,
+    year          integer NOT NULL CHECK (year BETWEEN 1450 AND 2100),
+    isbn          char(13) UNIQUE,
+    total_copies  integer NOT NULL DEFAULT 1 CHECK (total_copies >= 0),
+    -- связь 1:N — у книги один автор, у автора много книг.
+    -- RESTRICT: не позволяем удалить автора, пока есть его книги.
+    author_id     integer NOT NULL REFERENCES authors(id) ON DELETE RESTRICT,
+    created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE genres (
+    id   integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    code text NOT NULL UNIQUE,
+    name text NOT NULL
+);
+
+-- связь M:N — книга во многих жанрах, жанр у многих книг.
+-- Составной первичный ключ исключает дубликаты пары.
+CREATE TABLE book_genres (
+    book_id  integer NOT NULL REFERENCES books(id)  ON DELETE CASCADE,
+    genre_id integer NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    PRIMARY KEY (book_id, genre_id)
+);
+
+CREATE TABLE users (
+    id            integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email         text NOT NULL UNIQUE,
+    password_hash text NOT NULL,
+    role          text NOT NULL DEFAULT 'member'
+                  CHECK (role IN ('member', 'librarian', 'admin')),
+    is_active     boolean NOT NULL DEFAULT true,
+    created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- связь 1:1 — профиль расширяет пользователя (UNIQUE на внешнем ключе)
+CREATE TABLE profiles (
+    user_id    integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    full_name  text NOT NULL,
+    faculty    text,
+    avatar_url text
+);
+
+CREATE TABLE loans (
+    id         integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    book_id    integer NOT NULL REFERENCES books(id) ON DELETE RESTRICT,
+    user_id    integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    issued_at  date NOT NULL DEFAULT current_date,
+    due_date   date NOT NULL,
+    returned_at date,
+    CONSTRAINT loans_dates_ck   CHECK (due_date > issued_at),
+    CONSTRAINT loans_return_ck  CHECK (returned_at IS NULL OR returned_at >= issued_at)
+);
+
+-- бизнес-правило средствами БД: одна невозвращённая выдача на пару книга+читатель
+CREATE UNIQUE INDEX loans_active_uniq
+    ON loans (book_id, user_id)
+    WHERE returned_at IS NULL;
+    Запросы уровня приложения
+-- 1. Каталог: книга, автор, жанры одной строкой + признак доступности
+SELECT b.id, b.title, b.year,
+       a.name AS author,
+       string_agg(g.name, ', ' ORDER BY g.name) AS genres,
+       b.total_copies - count(l.id) FILTER (WHERE l.returned_at IS NULL) AS available
+FROM books b
+JOIN authors a       ON a.id = b.author_id
+LEFT JOIN book_genres bg ON bg.book_id = b.id
+LEFT JOIN genres g       ON g.id = bg.genre_id
+LEFT JOIN loans l        ON l.book_id = b.id
+WHERE (b.title ILIKE '%' || $1 || '%' OR $1 IS NULL)
+GROUP BY b.id, a.name
+ORDER BY b.title
+LIMIT 20 OFFSET 0;
+
+-- 2. Просроченные выдачи с числом дней просрочки
+SELECT u.email, b.title, l.due_date, current_date - l.due_date AS days_overdue
+FROM loans l
+JOIN users u ON u.id = l.user_id
+JOIN books b ON b.id = l.book_id
+WHERE l.returned_at IS NULL AND l.due_date < current_date
+ORDER BY days_overdue DESC;
+
+-- 3. Топ-5 авторов по числу выдач (только те, у кого больше 3)
+SELECT a.name, count(*) AS loans_count
+FROM loans l
+JOIN books   b ON b.id = l.book_id
+JOIN authors a ON a.id = b.author_id
+GROUP BY a.name
+HAVING count(*) > 3
+ORDER BY loans_count DESC
+LIMIT 5;
+    Транзакция и подтверждение эффекта индекса
+-- Выдача книги: либо оба действия, либо ни одного
+BEGIN;
+  INSERT INTO loans (book_id, user_id, due_date)
+  VALUES (42, 7, current_date + 14);
+
+  UPDATE books SET total_copies = total_copies - 1
+  WHERE id = 42 AND total_copies > 0;
+
+  -- если UPDATE не затронул строк, приложение вызывает ROLLBACK
+COMMIT;
+
+-- Индекс обосновывается конкретным запросом и проверяется планом
+EXPLAIN ANALYZE
+SELECT * FROM loans WHERE user_id = 7 AND returned_at IS NULL;
+-- ДО:     Seq Scan on loans  (rows=500000)  actual time=142.331 ms
+CREATE INDEX loans_user_active_idx ON loans (user_id) WHERE returned_at IS NULL;
+-- ПОСЛЕ:  Index Scan using loans_user_active_idx  actual time=0.094 ms
+  
+  Демонстрация на занятии
+«Плохая таблица и три аномалии». Создать в psql одну таблицу с полями reader_name, reader_email, book_title, author_name, issued_at, заполнить 8 строками и предложить студентам выполнить три операции: исправить опечатку в названии книги (обновление в N строках — аномалия обновления), зарегистрировать читателя без выдачи (некуда — аномалия вставки), удалить единственную выдачу читателя (исчезает и читатель — аномалия удаления). Затем на глазах группы разделить таблицу и повторить те же три операции на нормализованной схеме. Вторая часть: сгенерировать 500 000 строк через generate_series, замерить запрос, создать индекс, замерить снова, показать смену Seq Scan на Index Scan.
+  Типичные ошибки студентов
+    
+Хранение списка значений в одном поле через запятую вместо связи M:N.
+    
+Отсутствие внешних ключей: «связь» существует только в коде приложения.
+    
+Тип varchar(255) для всего; float для денег вместо numeric; timestamp без часового пояса.
+    
+Отсутствие NOT NULL там, где значение обязательно; поля с тремя возможными смыслами NULL.
+    
+Хранение вычислимых величин (число доступных экземпляров) без механизма поддержания согласованности.
+    
+ON DELETE CASCADE везде — потеря данных при удалении справочной записи.
+    
+Индексы «на всякий случай» на каждом столбце без единого запроса-обоснования.
+    
+Пароли в открытом виде в таблице пользователей (устраняется на неделе 12).
+    
+Пагинация без ORDER BY — при повторном запросе порядок строк меняется.
+  
+  Контрольные вопросы
+    
+Приведите пример аномалии обновления и покажите, как нормализация её устраняет.
+    
+Как реализуется связь M:N и почему нельзя обойтись одним внешним ключом?
+    
+Чем отличаются ON DELETE CASCADE, RESTRICT и SET NULL? Приведите уместный сценарий для каждого.
+    
+Чем INNER JOIN отличается от LEFT JOIN? Приведите запрос, где разница критична.
+    
+Что означают свойства ACID? Проиллюстрируйте атомарность на операции выдачи книги.
+    
+Зачем нужен индекс и какова цена его создания?
+    
+Как убедиться, что индекс действительно используется?
+    
+Почему numeric предпочтительнее float для денежных величин?
+    
+Что даст ограничение CHECK (due_date > issued_at), если такая же проверка уже есть в Pydantic?
+    
+Как корректно реализовать пагинацию и почему обязателен ORDER BY?
+  
+  Домашнее задание
+Спроектировать схему базы данных собственного итогового проекта: ER-диаграмма (dbdiagram.io или аналог), DDL-скрипт с не менее 6 таблицами, всеми тремя типами связей и не менее 8 ограничениями целостности, скрипт наполнения тестовыми данными (не менее 30 строк в основной таблице), 10 SQL-запросов с описанием прикладного смысла каждого, 2 индекса с обоснованием и приложенными планами запроса до и после. Сдать в каталоге db/ с файлом db/README.md. Схема защищается устно на практике недели 11 и является допуском к лабораторной 8.
+  Материалы
+    
+postgresql.org/docs — Tutorial (гл. 2–3), Data Types, Constraints, Indexes, Using EXPLAIN.
+    
+PostgreSQL Tutorial (постгрес-туториалы) — соединения, группировка, оконные функции — как справочник по синтаксису.
+    
+use-the-index-luke.com — вводные главы об индексах и планах запроса.
+    
+Инструменты: psql, DBeaver или pgAdmin, dbdiagram.io для ER-диаграмм.
