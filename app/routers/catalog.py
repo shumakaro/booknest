@@ -1,10 +1,10 @@
 """Маршруты каталога: преобразуют HTTP-запросы в вызовы репозитория."""
 
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, Response
 from app.core.pagination import Pagination
 from app.repositories.memory import MemoryStore, get_store
-from app.schemas import AuthorCreate, AuthorRead, AuthorUpdate, BookCreate, BookRead, BookUpdate, Page
+from app.schemas import AuthorCreate, AuthorRead, AuthorUpdate, BookCreate, BookRead, BookUpdate, Genre, Page, Sort
 
 router = APIRouter()
 Store = Annotated[MemoryStore, Depends(get_store)]
@@ -22,14 +22,12 @@ def list_books(
     store: Store,
     pagination: Paging,
     q: str = "",
-    genre: str | None = None,
+    genre: Genre | None = None,
     available_only: bool = False,
-    sort: str = Query("title"),
+    sort: Sort = "title",
 ) -> dict:
     """Получить каталог с фильтрами и сортировкой по нескольким полям."""
     fields = sort.split(",")
-    if any(field.lstrip("-") not in ["title", "year", "id"] for field in fields):
-        raise HTTPException(422, "Сортировка разрешена по title, year, id; минус означает убывание")
     items = []
     for book in store.books.values():
         if q.casefold() not in book["title"].casefold():

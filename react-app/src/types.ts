@@ -1,7 +1,9 @@
+import type { BookRead } from "./api/generated";
+
 // Основная модель книги в приложении.
 export interface Book {
   id: string;
-  title: string;
+  title: BookRead["title"];
   authors: string[];
   year?: number;
   coverId?: number;
@@ -47,7 +49,7 @@ export interface Author {
 // Данные детальной страницы книги.
 export interface BookDetails {
   id: string;
-  title: string;
+  title: BookRead["title"];
   description: string;
   authors: Author[];
 }

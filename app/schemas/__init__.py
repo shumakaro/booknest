@@ -1,11 +1,12 @@
 """Контракты запросов и ответов BookNest."""
 
 
-from typing import Generic, Literal, TypeVar
+from typing import Annotated, Generic, Literal, TypeVar
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 T = TypeVar("T")
 Genre = Literal["scifi", "history", "poetry", "cs", "fiction"]
+Sort = Annotated[str, Field(pattern=r"^-?(title|year|id)(,-?(title|year|id))*$")]
 
 
 class Page(BaseModel, Generic[T]):
