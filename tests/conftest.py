@@ -35,7 +35,10 @@ def test_engine():
         )
     required = set(ScriptDirectory.from_config(cfg).get_heads())
     previous = os.environ.get("DATABASE_URL")
+    previous_direct = os.environ.get("DATABASE_URL_UNPOOLED")
     os.environ["DATABASE_URL"] = settings.test_database_url
+    # Миграции тестов не должны взять прямой production URL из локального .env.
+    os.environ["DATABASE_URL_UNPOOLED"] = settings.test_database_url
     try:
         # Уже применённые миграции при повторном тестировании не запускаются.
         if current != required:
@@ -45,6 +48,10 @@ def test_engine():
             os.environ.pop("DATABASE_URL", None)
         else:
             os.environ["DATABASE_URL"] = previous
+        if previous_direct is None:
+            os.environ.pop("DATABASE_URL_UNPOOLED", None)
+        else:
+            os.environ["DATABASE_URL_UNPOOLED"] = previous_direct
     yield engine
     engine.dispose()
 

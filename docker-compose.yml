@@ -8,6 +8,8 @@ x-api-env: &api-env
   SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
   CORS_ORIGINS: ${CORS_ORIGINS:-[]}
   COOKIE_SECURE: ${COOKIE_SECURE:-false}
+  # Доверяем ровно одному прокси, а не всем отправителям сети.
+  FORWARDED_ALLOW_IPS: ${WEB_INTERNAL_IP:-172.29.241.10}
   ACCESS_TTL_MIN: ${ACCESS_TTL_MIN:-15}
   REFRESH_TTL_DAYS: ${REFRESH_TTL_DAYS:-7}
 services:
@@ -61,6 +63,9 @@ services:
     restart: "no"
     logging: *logs
   web:
+    networks:
+      default:
+        ipv4_address: ${WEB_INTERNAL_IP:-172.29.241.10}
     image: booknest-web:local
     build:
       context: ./react-app
@@ -109,3 +114,9 @@ services:
 volumes:
   pgdata:
   demo-accounts:
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${DOCKER_SUBNET:-172.29.241.0/24}

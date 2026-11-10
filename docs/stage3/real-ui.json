@@ -1,0 +1,14 @@
+{
+  "api": "real FastAPI/PostgreSQL",
+  "checks": [
+    "real search, genre, availability, sort and reset",
+    "registration validation, real registration/login, refresh on reload, member restrictions 403",
+    "real wishlist add and removal, success notifications",
+    "logout, protected route redirect and anonymous 401",
+    "skip link moves focus to main"
+  ],
+  "pageErrors": [],
+  "createdUser": "stage3-1794319836591@example.com",
+  "createdRole": "member",
+  "passwordSaved": false
+}

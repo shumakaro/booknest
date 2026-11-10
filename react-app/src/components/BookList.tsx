@@ -4,6 +4,7 @@ import { EmptyState } from "./EmptyState";
 
 interface BookListProps {
   books: Book[];
+  wishlistPending?: boolean;
   wishlistIds: Set<string>;
   onWishlistToggle: (book: Book) => void;
   onDetails: (book: Book, trigger: HTMLButtonElement) => void;
@@ -11,6 +12,7 @@ interface BookListProps {
 
 export function BookList({
   books,
+  wishlistPending = false,
   wishlistIds,
   onWishlistToggle,
   onDetails,
@@ -31,6 +33,7 @@ export function BookList({
           key={book.id}
           book={book}
           inWishlist={wishlistIds.has(book.id)}
+          wishlistPending={wishlistPending}
           onWishlistToggle={onWishlistToggle}
           onDetails={onDetails}
         />

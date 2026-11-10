@@ -12,3 +12,7 @@ artifacts/
 .tools/
 react-app/test-results/
 react-app/playwright-report/
+.env.production
+backups/
+.env.local
+.neon

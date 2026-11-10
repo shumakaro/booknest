@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 from app.core.pagination import Pagination
+from app.schemas import ErrorRead
 from app.core.auth import Librarian
 from app.db import get_db
 from app.schemas import (
@@ -33,6 +34,11 @@ ERRORS = {
     409: {"description": "Конфликт данных"},
     422: {"description": "Ошибка проверки"},
 }
+
+
+# Уточнения маршрута сохраняют общую схему тела ошибки.
+for description in ERRORS.values():
+    description["model"] = ErrorRead
 
 
 @router.get("/books", response_model=Page[BookRead], status_code=200, tags=["books"], responses=ERRORS)

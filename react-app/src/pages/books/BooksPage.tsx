@@ -6,7 +6,8 @@ import { getWishlist, setWishlistSaved } from "../../api/wishlist";
 import { useAuth } from "../../app/useAuth";
 import { BookList } from "../../components/BookList";
 import { ErrorBox } from "../../components/ErrorBox";
-import { Spinner } from "../../components/Spinner";
+import { CatalogSkeleton } from "../../components/CatalogSkeleton";
+import { notify } from "../../lib/notifications";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import type { Book, RequestStatus } from "../../types";
 
@@ -69,15 +70,15 @@ export function BooksPage() {
     const saved = !wishlistIds.has(book.id);
     setWishlist(saved ? [...wishlist, book] : wishlist.filter(item => item.id !== book.id));
     setSaving(true); setWishError("");
-    try { await setWishlistSaved(book.id, saved); }
+    try { await setWishlistSaved(book.id, saved); notify(saved ? "Книга добавлена в желаемое" : "Книга удалена из желаемого"); }
     catch (reason) { setWishlist(previous); setWishError(toUserMessage(reason) + " Изменение отменено."); }
     finally { setSaving(false); }
   }
 
-  return <section><h2>Каталог книг</h2>
-    <form onSubmit={event => { event.preventDefault(); setRevision(value => value + 1); }}>
+  return <section className="catalog-page"><div className="catalog-intro"><p className="eyebrow">КНИЖНЫЙ КЛУБ BOOKNEST</p><h2>Найдите свою<br />следующую историю</h2><p>Знакомые авторы, новые миры и книги, к которым хочется возвращаться.</p></div>
+    <form className="catalog-filters" onSubmit={event => { event.preventDefault(); setRevision(value => value + 1); }}>
       <label htmlFor="catalog-query">Поиск по названию</label>
-      <input id="catalog-query" value={query} onChange={event => change("q", event.target.value)} />
+      <input placeholder="Какую книгу вы ищете?" id="catalog-query" value={query} onChange={event => change("q", event.target.value)} />
       <button>Найти</button>
       <label htmlFor="catalog-sort">Сортировка</label>
       <select id="catalog-sort" value={sort} onChange={event => change("sort", event.target.value)}>
@@ -90,14 +91,15 @@ export function BooksPage() {
         <option value="poetry">Поэзия</option><option value="cs">Информатика</option><option value="fiction">Проза</option>
       </select>
       <label><input type="checkbox" checked={available} onChange={event => change("available", event.target.checked ? "1" : "")} /> Только доступные</label>
+      {(query || genre || available || sort !== "title") && <button type="button" className="filter-reset" onClick={() => setParams({})}>Сбросить фильтры</button>}
     </form>
     {wishError && <p role="alert">{wishError}</p>}
-    {status === "loading" && <Spinner label="Загружаем каталог..." />}
+    {status === "loading" && <CatalogSkeleton />}
     {status === "error" && <ErrorBox message={error} onRetry={() => setRevision(value => value + 1)} />}
     {(status === "success" || status === "empty") && <><p>Найдено: {total}</p>
-      <BookList books={books} wishlistIds={wishlistIds} onWishlistToggle={book => { void toggleWishlist(book); }}
+      <BookList books={books} wishlistIds={wishlistIds} wishlistPending={saving} onWishlistToggle={book => { void toggleWishlist(book); }}
         onDetails={book => navigate(`/books/${encodeURIComponent(book.id)}`)} />
-      <nav aria-label="Страницы каталога">
+      <nav className="pagination" aria-label="Страницы каталога">
         <button disabled={page <= 1} onClick={() => change("page", String(page - 1))}>Предыдущая</button>
         <span>Страница {page}</span>
         <button disabled={page * 20 >= total} onClick={() => change("page", String(page + 1))}>Следующая</button>

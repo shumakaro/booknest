@@ -1,0 +1,9 @@
+[Unit]
+Description=BookNest database backup
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/booknest
+Environment=COMPOSE_ENV_FILE=/srv/booknest/.env.production
+Environment=BACKUP_DIR=/var/backups/booknest
+ExecStart=/bin/sh /srv/booknest/deployment/backup.sh
+UMask=0077

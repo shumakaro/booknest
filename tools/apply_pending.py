@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text, inspect
 from app.config import Settings
 
 settings=Settings()
-engine=create_engine(settings.database_url)
+engine=create_engine(settings.migration_url)
 cfg=Config('alembic.ini')
 heads=set(ScriptDirectory.from_config(cfg).get_heads())
 with engine.connect() as db:

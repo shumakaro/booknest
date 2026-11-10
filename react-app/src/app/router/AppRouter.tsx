@@ -12,13 +12,23 @@ import {
 import { Spinner } from "../../components/Spinner";
 import { BookDetailsPage } from "../../pages/books/BookDetailsPage";
 import { BooksPage } from "../../pages/books/BooksPage";
-import { LoansPage } from "../../pages/loans/LoansPage";
+
 import { LoginPage } from "../../pages/login/LoginPage";
 import { NotFoundPage } from "../../pages/not-found/NotFoundPage";
-import { WishlistPage } from "../../pages/wishlist/WishlistPage";
+
 import { AppLayout } from "../../shared/layout/AppLayout";
 
 import { RequireAuth } from "./RequireAuth";
+
+// Нечастые личные разделы не увеличивают первую загрузку каталога.
+const LoansPage = lazy(async () => {
+  const module = await import("../../pages/loans/LoansPage");
+  return { default: module.LoansPage };
+});
+const WishlistPage = lazy(async () => {
+  const module = await import("../../pages/wishlist/WishlistPage");
+  return { default: module.WishlistPage };
+});
 
 const BookFormPage = lazy(
   async () => {
@@ -93,12 +103,10 @@ export function AppRouter() {
         <Route
           element={<RequireAuth />}
         >
-          <Route path="loans" element={<LoansPage />} />
+          <Route path="loans" element={<Suspense fallback={<Spinner label="Загрузка выдач..." />}><LoansPage /></Suspense>} />
           <Route
             path="wishlist"
-            element={
-              <WishlistPage />
-            }
+            element={<Suspense fallback={<Spinner label="Загрузка желаемого..." />}><WishlistPage /></Suspense>}
           />
         </Route>
 

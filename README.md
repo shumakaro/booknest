@@ -53,7 +53,7 @@ npm --prefix react-app run test:e2e
 Для e2e API и клиент должны быть запущены; нужны локальные демонстрационные роли и подходящий браузер. Без Edge Chromium устанавливается командой `npx playwright install chromium` из react-app. Сквозная проверка создаёт новую книгу, выполняет операции только с ней и затем мягко скрывает её; исходный каталог не удаляется.
 
 ## Документация и защита
-[PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Markdown и DOCX различаются только форматом; визуальная проверка DOCX требует рендерера и пока не подтверждена. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
+[PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Markdown и DOCX различаются только форматом; визуальная проверка всех 52 страниц DOCX завершена; протокол в docs/report-qa.md. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
 
 Публичный адрес пока отсутствует: VPS и домен не предоставлены. Итоговый BookNest нельзя объявлять развёрнутым до фактической проверки HTTPS.
 
@@ -65,3 +65,11 @@ npm --prefix react-app run test:e2e
 Обычный `docker compose down` сохраняет именованные тома. `down -v` и `docker system prune` для существующих данных не применять. Профиль тестов: `docker compose --profile test up --build --abort-on-container-exit --exit-code-from test test`. Для разработки явно подключается `-f docker-compose.yml -f docker-compose.dev.yml`. Диагностика: [docs/docker-debug.md](docs/docker-debug.md).
 
 В этой Windows-среде Docker Engine/WSL отсутствуют; локально подтверждена только проверка config автономным Compose. Runtime-проверки выполняются в CI, их фактический статус отмечается в PROGRESS.md.
+
+## Подготовка VPS и результаты ЛР 12
+
+Порядок SSH, HTTPS, обновления, backup и безопасного восстановления описан в [runbook](docs/deployment.md). Production override подключается явно; секреты задаются на сервере отдельно от разработки. Публичный адрес и внешний мониторинг остаются открытыми.
+
+Реальный CI ЛР12: https://github.com/shumakaro/booknest/actions/runs/42236984907. Прошли checks, containers, восстановление 30 книг и 20 выдач в новую БД, запрет повторного восстановления и защита лимита входа от подмены адресов. PR https://github.com/shumakaro/booknest/pull/13 открыт без объединения.
+
+[Материалы защиты](docs/lab12/defense.md), [редактируемая схема](docs/lab12/architecture.pptx), [самостоятельное ревью](docs/lab12/self-review.md). Самостоятельный разбор не является взаимным ревью однокурсника. Lighthouse измерял локальный preview: Performance 93, Accessibility 100. Полный SQL-экран на 500 тыс. книг проверен отдельно; планы в docs/lab12/catalog-benchmark.json.

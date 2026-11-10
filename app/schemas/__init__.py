@@ -50,7 +50,24 @@ class AuthorRead(AuthorCreate):
 
 
 class BookCreate(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "title": "Учебная книга",
+                    "author_id": 1,
+                    "year": 2020,
+                    "isbn": "9780306406157",
+                    "genre": "fiction",
+                    "edition_year": 2021,
+                    "publisher": "Учебное издательство",
+                    "language": "Русский",
+                    "pages": 200,
+                }
+            ]
+        },
+    )
     title: str = Field(min_length=1, max_length=200)
     author_id: int = Field(gt=0)
     year: int = Field(ge=1450, le=2100)

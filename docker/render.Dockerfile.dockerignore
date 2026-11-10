@@ -1,0 +1,22 @@
+# Специальный контекст Render включает React, но исключает локальные секреты и данные.
+**/.git
+**/.env
+**/.env.*
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+.venv
+.tools
+.agents
+.codex
+.neon
+docs
+docs.zip
+artifacts
+backups
+react-app/dist
+react-app/test-results
+react-app/playwright-report
+.coverage
+htmlcov

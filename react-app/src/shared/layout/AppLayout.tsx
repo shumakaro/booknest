@@ -1,3 +1,5 @@
+// Общий макет сохраняет навигацию и уведомления при смене страниц.
+import { NoticeHost } from "../../components/NoticeHost";
 import {
   NavLink,
   Outlet,
@@ -34,7 +36,7 @@ export function AppLayout() {
         <div>
           <h1>BookNest</h1>
           <p>
-            Книжный клуб и выдача книг
+            Место для хороших историй
           </p>
         </div>
 
@@ -70,6 +72,7 @@ export function AppLayout() {
         <div className="site-header__actions">
           <button
             type="button"
+            aria-pressed={theme === "dark"}
             onClick={toggleTheme}
           >
             {theme === "light"
@@ -95,12 +98,14 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="page">
+      <a className="skip-link" href="#main-content">Перейти к содержимому</a>
+      <NoticeHost />
+      <main className="page" id="main-content" tabIndex={-1}>
         <Outlet />
       </main>
 
       <footer>
-        <p>BookNest</p>
+        <p>BookNest · Ваша следующая история начинается здесь</p>
       </footer>
     </div>
   );

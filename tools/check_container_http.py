@@ -1,9 +1,11 @@
 """Smoke контейнеров: настоящий API, начальный каталог и прямая SPA-ссылка."""
 import json
+import os
 import urllib.error
 import urllib.request
 
-base='http://127.0.0.1:8080'
+# Тот же контракт проверяет Compose и отдельный единый образ Render в CI.
+base=os.environ.get('BOOKNEST_CHECK_BASE_URL', 'http://127.0.0.1:8080')
 with urllib.request.urlopen(base+'/health') as response:
     assert json.load(response)['status']=='ok'
 with urllib.request.urlopen(base+'/api/v1/books') as response:

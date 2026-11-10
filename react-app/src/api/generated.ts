@@ -73,8 +73,11 @@ export interface ConfirmationRequest {
   token: string;
 }
 
-export interface HTTPValidationError {
-  detail?: (ValidationError)[];
+export interface ErrorRead {
+  code: string;
+  message: string;
+  details?: unknown | null;
+  request_id: string;
 }
 
 export interface HealthRead {
@@ -141,10 +144,4 @@ export interface UserRead {
   role: "member" | "librarian";
   is_active: boolean;
   email_verified: boolean;
-}
-
-export interface ValidationError {
-  loc: (string | number)[];
-  msg: string;
-  type: string;
 }
