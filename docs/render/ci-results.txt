@@ -1,0 +1,22 @@
+https://github.com/shumakaro/booknest/actions/runs/42842553114
+Commit: d7a85e6d4d4f2689189742167dc6062f8d4278bc
+checks: success; containers: success
+
+containers/7_Build and smoke the unified Render image.txt
+2026-11-10T15:18:18.6518994Z #24 naming to docker.io/library/booknest-render:ci done
+2026-11-10T15:18:24.9892078Z Container health, 30 active books, direct SPA route and API 404: OK
+
+containers/8_Smoke and persistence without deleting volumes.txt
+2026-11-10T15:18:25.2319972Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T15:18:47.7203791Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T15:18:48.0408319Z booknest-web:local inspect: 26.22 MB; image ls: 93.3MB
+2026-11-10T15:18:48.0408682Z booknest-api:local inspect: 38.42 MB; image ls: 165MB
+
+containers/10_Browser scenario inside clean container environment.txt
+2026-11-10T15:19:33.3019797Z   1 passed (7.1s)
+
+containers/12_Test profile with independent database.txt
+2026-11-10T15:20:11.7554054Z test-1  | 62 passed, 2 warnings in 6.26s
+
+checks/8_Run python -m pytest -q --cov=app --cov-report=term-missing.txt
+2026-11-10T15:16:48.9482451Z 62 passed, 2 warnings in 11.34s
