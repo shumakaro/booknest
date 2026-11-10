@@ -1,0 +1,38 @@
+{
+  "booknest": {
+    "counts": [
+      33,
+      14,
+      23
+    ],
+    "revision": [
+      [
+        "005_wishlist"
+      ]
+    ],
+    "original_ids_1_to_31_present": 31,
+    "original_catalog_1_to_30_active": 30,
+    "own_test_books": [
+      [
+        32,
+        true
+      ],
+      [
+        33,
+        true
+      ]
+    ]
+  },
+  "booknest_test": {
+    "counts": [
+      0,
+      0,
+      0
+    ],
+    "revision": [
+      [
+        "005_wishlist"
+      ]
+    ]
+  }
+}

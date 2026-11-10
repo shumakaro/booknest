@@ -1,0 +1,9 @@
+{
+  "only_book_id": 32,
+  "matched_exact_test_title": true,
+  "returned_loans": [
+    22
+  ],
+  "soft_delete_status": 204,
+  "original_books_changed": false
+}

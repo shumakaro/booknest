@@ -1,0 +1,10 @@
+{
+  "booknest": {
+    "connection": "OperationalError"
+  },
+  "booknest_test": {
+    "connection": "OperationalError"
+  },
+  "8000": "ConnectError",
+  "5173": "ConnectError"
+}

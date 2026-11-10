@@ -43,8 +43,8 @@ test('вход создание редактирование выдача воз
   await page.getByRole('button', { name: 'Сохранить изменения', exact: true }).click();
   await expect(page.getByRole('heading', { name: title + ' изменена', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Взять книгу', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Книга выдана');
-  await page.screenshot({ path: '../docs/lab10/fullstack-success.png', fullPage: true });
+  await expect(page.getByRole('complementary', { name: 'Уведомления' }).getByRole('status')).toContainText('Книга выдана');
+  await page.screenshot({ path: '../.tools/stage3/fullstack-success.png', fullPage: true });
   function isLoansResponse(response: import('@playwright/test').Response, pageNumber: number) {
     const url = new URL(response.url());
     return response.status() === 200 && url.pathname.endsWith('/loans') && url.searchParams.get('page') === String(pageNumber);

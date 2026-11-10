@@ -1,0 +1,26 @@
+{
+  "booknest": {
+    "counts": [
+      31,
+      13,
+      21
+    ],
+    "revision": [
+      [
+        "005_wishlist"
+      ]
+    ]
+  },
+  "booknest_test": {
+    "counts": [
+      0,
+      0,
+      0
+    ],
+    "revision": [
+      [
+        "005_wishlist"
+      ]
+    ]
+  }
+}
