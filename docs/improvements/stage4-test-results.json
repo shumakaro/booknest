@@ -1,0 +1,21 @@
+{
+  "backend": {
+    "tests": "91",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "20.297"
+  },
+  "backend_environment": "Existing local PostgreSQL _test with rollback; no production",
+  "backend_warnings": "1 pre-existing anyio/Starlette DeprecationWarning",
+  "frontend": {
+    "tests": 34,
+    "files": 9,
+    "repeat": "passed",
+    "last_duration_seconds": 31.63
+  },
+  "build": "TypeScript/Vite passed",
+  "lint": "ESLint passed",
+  "browser": "fixtures; see stage4-ui-results.json",
+  "docker": "not run in this stage"
+}

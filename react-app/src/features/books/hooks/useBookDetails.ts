@@ -61,13 +61,15 @@ export function useBookDetails(
             controller.signal,
           );
 
+        // Даже если транспорт вернул результат после отмены, другая книга его не получит.
+        if (controller.signal.aborted) return;
         setDetails(result);
         setStatus("success");
       } catch (error) {
-        if (
+        if (controller.signal.aborted || (
           error instanceof DOMException &&
           error.name === "AbortError"
-        ) {
+        )) {
           return;
         }
 
