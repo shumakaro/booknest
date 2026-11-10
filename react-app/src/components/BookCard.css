@@ -1,0 +1,89 @@
+/* Первый этап ЛР10: эффекты общей карточки локальной библиотеки и Open Library.
+   Два класса повышают приоритет над прежним оформлением App.css независимо от порядка импорта. */
+.book-card.book-card {
+  /* После появления transform снова принадлежит hover, а не завершенной анимации. */
+  animation-fill-mode: backwards;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+/* Обложка остается целиком видимой. Область обрезает только декоративное увеличение,
+   а фиксированная высота не дает сетке прыгать во время загрузки изображения. */
+.book-card .book-card__cover {
+  overflow: hidden;
+  background-image: radial-gradient(ellipse at 50% 30%, var(--surface), transparent 80%);
+}
+
+.book-card .book-card__cover img,
+.book-card .book-card__placeholder {
+  max-width: 100%;
+  flex-shrink: 1;
+  transform-origin: center 70%;
+  transition: transform 260ms ease, box-shadow 260ms ease;
+}
+
+/* Фокус на кнопке выделяет всю карточку, но сама карточка не добавляет лишний Tab.
+   Кнопки всегда остаются видимыми, в том числе на сенсорном экране. */
+.book-card.book-card:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary), var(--shadow);
+}
+
+.book-card .book-card__actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  white-space: normal;
+}
+
+.book-card__bookmark {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Текст объясняет состояние без зависимости от цвета или формы значка. */
+.book-card__availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: .86rem;
+  font-weight: 600;
+}
+
+.book-card__availability--ready { color: #355337; background: #e9efdf; }
+.book-card__availability--lent { color: #785029; background: #f4e8d6; }
+.app[data-theme="dark"] .book-card__availability--ready { color: #d6e8c7; background: #344132; }
+.app[data-theme="dark"] .book-card__availability--lent { color: #f1d7ac; background: #493c2b; }
+.book-card__availability-dot { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: currentColor; }
+
+/* Эффект наведения предназначен для мыши. На телефоне он не нужен для доступа к действиям. */
+@media (hover: hover) and (pointer: fine) {
+  .book-card.book-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 18px 38px rgb(76 51 29 / 16%);
+  }
+
+  .book-card:hover .book-card__cover img,
+  .book-card:hover .book-card__placeholder {
+    transform: scale(1.035) rotate(-1deg);
+    box-shadow: 8px 12px 18px rgb(45 29 14 / 22%);
+  }
+}
+
+/* Уменьшение движения отключает и переходы, и конечное смещение при наведении.
+   Цвет границы и доступность кнопок при этом сохраняются. */
+@media (prefers-reduced-motion: reduce) {
+  .book-card.book-card,
+  .book-card.book-card:hover,
+  .book-card.book-card .book-card__cover img,
+  .book-card.book-card .book-card__placeholder {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}
