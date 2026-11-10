@@ -1,0 +1,30 @@
+{
+  "backend": {
+    "environment": "Existing local PostgreSQL _test; rollback; no production",
+    "runs": [
+      {
+        "tests": "91",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "time": "43.474"
+      },
+      {
+        "tests": "91",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "time": "56.426"
+      }
+    ],
+    "warnings": "1 pre-existing anyio/Starlette DeprecationWarning"
+  },
+  "frontend": {
+    "tests": 22,
+    "files": 7,
+    "repeat": "passed"
+  },
+  "build": "TypeScript/Vite passed",
+  "lint": "ESLint/Ruff passed",
+  "docker": "not run in this stage"
+}
