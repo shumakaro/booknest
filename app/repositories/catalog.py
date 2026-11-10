@@ -1,7 +1,7 @@
 """SQL находится в репозитории; пагинация выполняется самой PostgreSQL."""
 
 from datetime import datetime, timezone
-from sqlalchemy import func, select, text
+from sqlalchemy import func, or_, select, text
 from sqlalchemy.orm import Session, selectinload
 from app.models import Author, Book, Genre, Loan, User
 
@@ -25,6 +25,15 @@ class CatalogRepository:
             .where(Book.deleted_at.is_(None))
             .options(selectinload(Book.author), selectinload(Book.genres))
         )
+
+    @staticmethod
+    def contains_text(column, query: str):
+        # В локальной PostgreSQL с C-locale ILIKE не меняет регистр кириллицы.
+        # Явно приводятся русские буквы (включая Ё), Latin обрабатывается ILIKE.
+        # Схема и настройки рабочей БД не меняются; значение остается параметром SQL.
+        capitals = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+        folded = func.translate(column, capitals, capitals.lower())
+        return folded.icontains(query.casefold(), autoescape=True)
 
     def book_dict(self, book: Book, available: int) -> dict:
         codes = sorted(genre.code for genre in book.genres)
@@ -60,6 +69,8 @@ class CatalogRepository:
         search_mode: str = "contains",
     ) -> dict:
         stmt = self.book_query()
+        # Пробелы по краям и между словами не должны скрывать совпадение.
+        q = " ".join(q.split())
         if q:
             if search_mode == "fulltext":
                 stmt = stmt.where(
@@ -67,7 +78,13 @@ class CatalogRepository:
                 )
             else:
                 # autoescape сохраняет буквальный смысл % и _ в пользовательском поиске.
-                stmt = stmt.where(Book.title.icontains(q, autoescape=True))
+                # EXISTS по автору не размножает книги и сохраняет правильный total.
+                stmt = stmt.where(
+                    or_(
+                        self.contains_text(Book.title, q),
+                        Book.author.has(self.contains_text(Author.name, q)),
+                    )
+                )
         if genre:
             stmt = stmt.where(Book.genres.any(Genre.code == genre))
         if available_only:
