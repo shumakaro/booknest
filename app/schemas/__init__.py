@@ -155,6 +155,9 @@ class BookRead(BookCreate):
     id: int
     available: int
     author: str
+    # Эти поля только читаются: происхождение устанавливает отдельная операция импорта.
+    external_work_id: str | None = None
+    cover_id: int | None = None
 
 
 class HealthRead(BaseModel):

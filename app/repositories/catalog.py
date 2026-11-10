@@ -35,6 +35,8 @@ class CatalogRepository:
             "author": book.author.name,
             "year": book.year,
             "isbn": book.isbn,
+            "external_work_id": book.external_work_id,
+            "cover_id": book.cover_id,
             "total_copies": book.total_copies,
             "genre": codes[0] if codes else "fiction",
             "description": book.description,
