@@ -1,0 +1,60 @@
+{
+  "base": "https://booknest-rzxk.onrender.com",
+  "new_api_schema": true,
+  "checks": [
+    {
+      "path": "/health",
+      "status": 200,
+      "total": null,
+      "id": null,
+      "title": null
+    },
+    {
+      "path": "/discover",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/books?size=1",
+      "status": 200,
+      "total": 30,
+      "id": null,
+      "title": null,
+      "items": [
+        {
+          "id": 19,
+          "title": "Dostoyevsky. Notes From Underground / White Nights / The Dream of a Ridiculous Man / Selections from The House of the Dead",
+          "cover_id": 6908257,
+          "external_work_id": "OL166934W"
+        }
+      ]
+    },
+    {
+      "path": "/api/v1/discover/books?title=Harry%20Potter&author=Rowling&page=1&size=2",
+      "status": 200,
+      "total": 266,
+      "id": null,
+      "title": null,
+      "items": [
+        {
+          "id": "OL82563W",
+          "title": "Harry Potter and the Philosopher's Stone",
+          "cover_id": 15155833,
+          "external_work_id": null
+        },
+        {
+          "id": "OL82537W",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "cover_id": 15158664,
+          "external_work_id": null
+        }
+      ]
+    },
+    {
+      "path": "/api/v1/discover/books/OL82563W",
+      "status": 200,
+      "total": null,
+      "id": "OL82563W",
+      "title": "Harry Potter and the Philosopher's Stone"
+    }
+  ]
+}
