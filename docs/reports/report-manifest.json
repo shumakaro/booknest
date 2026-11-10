@@ -1,0 +1,68 @@
+[
+  {
+    "lab": 7,
+    "file": "docs/reports/BookNest_LR07_podrobny_otchet.docx",
+    "sha256": "d2498e081f1d14ea040ec172a4de95259a4e390ab8db929e4ca46f222940d86a",
+    "lecture_questions": 10,
+    "screenshots_to_add": 5,
+    "paragraphs": 187,
+    "pages": 14,
+    "visual_review": "Все страницы просмотрены; измененные страницы просмотрены повторно.",
+    "layout_check": "Times New Roman 14, черный текст, выходов за безопасные границы не обнаружено."
+  },
+  {
+    "lab": 8,
+    "file": "docs/reports/BookNest_LR08_podrobny_otchet.docx",
+    "sha256": "55a93365982044c3cd7fa40da09a20077554f4f522ca1ee54e9811727d4ac47c",
+    "lecture_questions": 20,
+    "screenshots_to_add": 6,
+    "paragraphs": 249,
+    "pages": 20,
+    "visual_review": "Все страницы просмотрены; измененные страницы просмотрены повторно.",
+    "layout_check": "Times New Roman 14, черный текст, выходов за безопасные границы не обнаружено."
+  },
+  {
+    "lab": 9,
+    "file": "docs/reports/BookNest_LR09_podrobny_otchet.docx",
+    "sha256": "90c8588c17a1e878b43677c1a15a137b6b0c5409bed1dda3719ef79eed444d91",
+    "lecture_questions": 12,
+    "screenshots_to_add": 5,
+    "paragraphs": 200,
+    "pages": 16,
+    "visual_review": "Все страницы просмотрены; измененные страницы просмотрены повторно.",
+    "layout_check": "Times New Roman 14, черный текст, выходов за безопасные границы не обнаружено."
+  },
+  {
+    "lab": 10,
+    "file": "docs/reports/BookNest_LR10_podrobny_otchet.docx",
+    "sha256": "5ab8c77fd53c746f131b3916276f65d8e5af20e8f25921b9ca124b5fb425064e",
+    "lecture_questions": 10,
+    "screenshots_to_add": 7,
+    "paragraphs": 199,
+    "pages": 16,
+    "visual_review": "Все страницы просмотрены; измененные страницы просмотрены повторно.",
+    "layout_check": "Times New Roman 14, черный текст, выходов за безопасные границы не обнаружено."
+  },
+  {
+    "lab": 11,
+    "file": "docs/reports/BookNest_LR11_podrobny_otchet.docx",
+    "sha256": "540687c5d26012e5637b2b9cb0fc4da2666aa99b49413c36ab8e867a4a9f5d3b",
+    "lecture_questions": 11,
+    "screenshots_to_add": 5,
+    "paragraphs": 201,
+    "pages": 15,
+    "visual_review": "Все страницы просмотрены; измененные страницы просмотрены повторно.",
+    "layout_check": "Times New Roman 14, черный текст, выходов за безопасные границы не обнаружено."
+  },
+  {
+    "lab": 12,
+    "file": "docs/reports/BookNest_LR12_podrobny_otchet.docx",
+    "sha256": "b6c5b6d604ee53ef6f0541f558afe88b71d3f8d7994ae1931545891de852f381",
+    "lecture_questions": 20,
+    "screenshots_to_add": 7,
+    "paragraphs": 266,
+    "pages": 21,
+    "visual_review": "Все страницы просмотрены; измененные страницы просмотрены повторно.",
+    "layout_check": "Times New Roman 14, черный текст, выходов за безопасные границы не обнаружено."
+  }
+]
