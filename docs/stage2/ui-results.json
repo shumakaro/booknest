@@ -1,0 +1,16 @@
+{
+  "api": "fixtures; no DB accessed",
+  "widths": [
+    320,
+    375,
+    768,
+    1440
+  ],
+  "overflow": false,
+  "skeleton": true,
+  "wishlistNotice": true,
+  "empty": true,
+  "error": true,
+  "reducedMotion": true,
+  "pageErrors": []
+}
