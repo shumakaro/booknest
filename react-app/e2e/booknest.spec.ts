@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 
 // Только локальные учебные роли; пароли из игнорируемого файла не публикуются.
-const accounts = JSON.parse(readFileSync(new URL('../../.tools/demo-accounts.json', import.meta.url), 'utf8')) as Record<string, { email: string; password: string }>;
+const accounts = JSON.parse(readFileSync(process.env.BOOKNEST_DEMO_ACCOUNTS_FILE || new URL('../../.tools/demo-accounts.json', import.meta.url), 'utf8')) as Record<string, { email: string; password: string }>;
 
 function newIsbn(): string {
   const prefix = '978' + String(Date.now()).slice(-9);
@@ -40,11 +40,14 @@ test('вход создание редактирование выдача воз
   await expect(page.getByLabel('Издательство', { exact: true })).toHaveValue('Проверенное издательство');
   await expect(page.getByLabel('Количество страниц', { exact: true })).toHaveValue('137');
   await page.getByLabel('Название', { exact: true }).fill(title + ' изменена');
+  // Облачная БД отвечает медленнее localhost: ожидается именно завершение записи.
+  const updated = page.waitForResponse(response => response.request().method() === 'PATCH' && new URL(response.url()).pathname.endsWith(`/books/${id}`) && response.status() === 200);
   await page.getByRole('button', { name: 'Сохранить изменения', exact: true }).click();
+  await updated;
   await expect(page.getByRole('heading', { name: title + ' изменена', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Взять книгу', exact: true }).click();
   await expect(page.getByRole('complementary', { name: 'Уведомления' }).getByRole('status')).toContainText('Книга выдана');
-  await page.screenshot({ path: '../.tools/stage3/fullstack-success.png', fullPage: true });
+  await page.screenshot({ path: process.env.BOOKNEST_E2E_SCREENSHOT || '../.tools/stage3/fullstack-success.png', fullPage: true });
   function isLoansResponse(response: import('@playwright/test').Response, pageNumber: number) {
     const url = new URL(response.url());
     return response.status() === 200 && url.pathname.endsWith('/loans') && url.searchParams.get('page') === String(pageNumber);
@@ -62,7 +65,9 @@ test('вход создание редактирование выдача воз
   }
   const returnButton = page.getByRole('button', { name: `Вернуть книгу №${id}`, exact: true });
   await expect(returnButton).toBeVisible();
+  const returned = page.waitForResponse(response => response.request().method() === 'PATCH' && new URL(response.url()).pathname.includes('/loans/') && response.status() === 200);
   await returnButton.click();
+  await returned;
   await expect(returnButton).toHaveCount(0);
   await page.goto(`/books/${id}`);
   await expect(page.getByRole('heading', { name: title + ' изменена', exact: true })).toBeVisible();

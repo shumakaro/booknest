@@ -1,0 +1,29 @@
+{
+  "service": "Postgres",
+  "connections": {
+    "pooled": {
+      "driver": "psycopg",
+      "client_tls": true,
+      "revision": "005_wishlist",
+      "books": 32,
+      "active_books": 30,
+      "users": 12,
+      "loans": 21
+    },
+    "direct": {
+      "driver": "psycopg",
+      "client_tls": true,
+      "revision": "005_wishlist",
+      "books": 32,
+      "active_books": 30,
+      "users": 12,
+      "loans": 21
+    }
+  },
+  "http": {
+    "catalog_status": 200,
+    "total": 30,
+    "direct_spa_status": 200,
+    "health_status": 200
+  }
+}
