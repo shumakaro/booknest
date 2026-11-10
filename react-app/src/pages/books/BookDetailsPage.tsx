@@ -6,6 +6,7 @@ import { useAuth } from "../../app/useAuth";
 import { ErrorBox } from "../../components/ErrorBox";
 import { Spinner } from "../../components/Spinner";
 import { useBookDetails } from "../../features/books/hooks/useBookDetails";
+import { BookCover, BookDescription, BookFacts } from "../../features/books/components/BookPresentation";
 
 export function BookDetailsPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -38,18 +39,28 @@ export function BookDetailsPage() {
   if (status === "loading") return <Spinner label="Загружаем информацию о книге..." />;
   if (status === "error") return <section><h2>{notFound ? "Книга не найдена" : "Не удалось загрузить книгу"}</h2><ErrorBox message={errorMessage} onRetry={retry} /><Link to={back} state={backState}>Вернуться в каталог</Link></section>;
   if (!details) return <p>Данные книги отсутствуют.</p>;
-  return <article><Link to={back} state={backState}>Вернуться в каталог</Link><h2>{details.title}</h2>
-    <p>Автор: {details.authors.map(author => author.name).join(", ") || "Не указан"}</p>
-    <p>{details.description || "Описание отсутствует."}</p>
-    <dl><dt>ISBN</dt><dd>{details.record?.isbn ?? "Не указан"}</dd><dt>Издательство</dt><dd>{details.record?.publisher}</dd>
-      <dt>Язык</dt><dd>{details.record?.language}</dd><dt>Год первой публикации</dt><dd>{details.record?.year}</dd>
-      <dt>Год издания</dt><dd>{details.record?.edition_year}</dd><dt>Страниц</dt><dd>{details.record?.pages}</dd>
-      <dt>Доступно экземпляров</dt><dd>{details.record?.available}</dd></dl>
+  const record = details.record;
+  return <article className="book-detail-page"><Link className="book-detail__back" to={back} state={backState}>Вернуться в каталог</Link>
+    <div className="book-detail__layout"><aside className="book-detail__aside">
+      <BookCover title={details.title} coverId={record?.cover_id} />
+      <p className="book-detail__source">Книга из моей библиотеки</p>
+      {record?.external_work_id && <a href={`https://openlibrary.org/works/${encodeURIComponent(record.external_work_id)}`} target="_blank" rel="noopener noreferrer">Источник в Open Library</a>}
+    </aside><div className="book-detail__main"><p className="eyebrow">МОЯ БИБЛИОТЕКА</p><h2>{details.title}</h2>
+      <p className="book-detail__authors">{details.authors.map(author => author.name).join(", ") || "Автор не указан"}</p>
+      <section className="book-detail__availability" aria-label="Наличие в библиотеке">
+        <strong>{record?.available === undefined ? "Наличие пока неизвестно" : record.total_copies === 0 ? "Экземпляры пока не добавлены" : record.available > 0 ? `Доступно экземпляров: ${record.available}` : "Все экземпляры выданы"}</strong>
+        <p>Выдачи и возвраты учитываются в моей библиотеке.</p>
+      </section>
     {/* Успех уже объявляется глобальным уведомлением; здесь остается постоянный текст. */}
     {message && <p role={actionError ? "alert" : undefined}>{message}</p>}
-    <button disabled={pending || !details.record?.available} onClick={() => { void issue(); }}>{pending ? "Выполняется…" : "Взять книгу"}</button>
-    <p><Link to="/loans">Перейти к выдачам</Link></p>
-    {user?.role === "librarian" && <><p><Link to={`/books/${bookId}/edit`}>Редактировать книгу</Link></p>
-      <button disabled={pending} onClick={() => { void remove(); }}>Удалить книгу</button></>}
-  </article>;
+      <div className="book-detail__actions"><button className="btn btn--primary" disabled={pending || !record?.available} onClick={() => { void issue(); }}>{pending ? "Выполняется…" : user ? "Взять книгу" : "Войти, чтобы взять книгу"}</button>
+        <Link to="/loans">Перейти к выдачам</Link></div>
+      <BookFacts facts={[["ISBN", record?.isbn], ["Издательство", record?.publisher], ["Язык", record?.language],
+        ["Год первой публикации", record?.year], ["Год издания", record?.edition_year], ["Страниц", record?.pages], ["Всего экземпляров", record?.total_copies]]} />
+      {record?.external_work_id && <p className="book-detail__source">Сведения о конкретном издании импортированной книги могут требовать уточнения: издательство, язык, год издания и число страниц проверяются отдельно.</p>}
+      <BookDescription key={details.id} text={details.description} />
+      {user?.role === "librarian" && <section className="book-detail__management" aria-label="Управление книгой"><h3>Управление книгой</h3>
+        <div className="book-detail__actions"><Link to={`/books/${bookId}/edit`}>Редактировать книгу</Link>
+          <button className="btn btn--ghost" disabled={pending} onClick={() => { void remove(); }}>Удалить книгу</button></div></section>}
+    </div></div></article>;
 }

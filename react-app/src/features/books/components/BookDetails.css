@@ -1,0 +1,43 @@
+/* Детали интегрированного клиента ЛР10: обложка и основной текст образуют две колонки.
+   На телефоне они идут последовательно, действия всегда видимы. */
+.page > .book-detail-page { padding: clamp(18px, 3vw, 36px); }
+.book-detail__back { display: inline-block; margin-bottom: 28px; line-height: 1.6; }
+.book-detail__layout { display: grid; grid-template-columns: minmax(180px, 260px) minmax(0, 1fr); gap: clamp(24px, 4vw, 48px); align-items: start; }
+.book-detail__main { min-width: 0; }
+.book-detail__main h2 { margin: 12px 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.2; overflow-wrap: anywhere; }
+.book-detail__authors { color: var(--muted); line-height: 1.7; overflow-wrap: anywhere; }
+.book-detail__source { line-height: 1.7; color: var(--muted); overflow-wrap: anywhere; }
+.book-detail__cover { width: 100%; aspect-ratio: 2 / 3; display: flex; justify-content: center; align-items: center; border-radius: 14px; background: var(--surface-soft); overflow: hidden; }
+.book-detail__cover img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.book-detail__fallback { width: 88%; height: 90%; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 18px; text-align: center; background: #526451; color: #fff6e5; border-left: 8px solid rgb(0 0 0 / 15%); border-radius: 3px 10px 10px 3px; }
+.book-detail__fallback > span { font-family: Georgia, serif; border: 1px solid currentColor; padding: 8px; border-radius: 50%; }
+.book-detail__fallback strong { font-family: Georgia, serif; overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; }
+.book-detail__fallback small { font-size: .8rem; }
+.book-detail__availability { padding: 16px 18px; margin: 24px 0 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-soft); line-height: 1.7; }
+.book-detail__availability p { margin: 4px 0 0; }
+.book-detail__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 18px 0 28px; }
+.book-detail__actions .btn { min-height: 44px; }
+.book-detail__actions a { display: inline-flex; align-items: center; min-height: 44px; }
+.book-detail-page .book-detail__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 24px 0; }
+.book-detail__facts > div { padding: 12px 0; border-bottom: 1px solid var(--border); min-width: 0; }
+.book-detail__facts dt { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
+.book-detail__facts dd { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
+.book-detail__description { margin-top: 28px; }
+.book-detail__description p { white-space: pre-line; line-height: 1.8; overflow-wrap: anywhere; }
+.book-detail__management { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+.book-import { margin-top: 32px; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-soft); }
+.book-import p { line-height: 1.7; overflow-wrap: anywhere; }
+.book-import fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+.book-import .book-import__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.book-import__fields label { display: grid; gap: 8px; min-width: 0; }
+.book-import__fields input { width: 100%; min-width: 0; }
+.book-import .book-import__submit { margin-top: 18px; min-height: 44px; white-space: normal; }
+@media (max-width: 760px) {
+  .book-detail__layout { grid-template-columns: 1fr; }
+  .book-detail__aside { width: min(100%, 260px); justify-self: center; }
+}
+@media (max-width: 480px) {
+  .book-detail-page .book-detail__facts, .book-import .book-import__fields { grid-template-columns: 1fr; }
+  .book-detail__actions { align-items: stretch; flex-direction: column; }
+  .book-import { padding: 16px; }
+}
