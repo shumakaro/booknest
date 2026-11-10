@@ -1,0 +1,32 @@
+/* ЛР10: геометрия списка остается общей, а движение принадлежит только новой обертке. */
+.book-results__item { display: flex; min-width: 0; }
+.book-results__item > .book-card { width: 100%; animation: none; }
+.book-results__item--enter {
+  animation: result-enter 260ms ease-out backwards;
+  animation-delay: var(--result-delay, 0ms);
+}
+@keyframes result-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.catalog-result-panel { animation: result-enter 220ms ease-out backwards; }
+.catalog-result-panel .book-card { animation: none; }
+
+/* Панель остается на месте во время запроса; текст объясняет, что сейчас происходит. */
+.load-more-panel { min-height: 88px; margin: 28px 0; text-align: center; }
+.load-more-panel > p { color: var(--muted); line-height: 1.6; }
+.load-more-button { min-height: 44px; min-width: 190px; }
+.load-more-button:disabled { cursor: wait; }
+
+/* Каркас повторяет область обложки и кнопок настоящей карточки, без фиктивного текста. */
+.catalog-skeleton .skeleton-card { padding: 0; overflow: hidden; }
+.catalog-skeleton .skeleton-cover { height: 265px; margin: 0; border-radius: 0; }
+.skeleton-card__body { padding: 18px; }
+.skeleton-card__actions { display: grid; gap: 8px; margin-top: 30px; }
+.skeleton-button { height: 44px; }
+@media (max-width: 480px) { .catalog-skeleton .skeleton-cover { height: 280px; } }
+
+/* Пользовательская настройка отключает и анимацию обертки, и мерцание skeleton. */
+@media (prefers-reduced-motion: reduce) {
+  .book-results__item--enter, .catalog-result-panel, .catalog-skeleton .skeleton { animation: none; transform: none; }
+}

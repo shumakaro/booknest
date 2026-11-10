@@ -16,7 +16,7 @@ export function clearGlobalSearchCache() { snapshots.clear(); }
 export function useGlobalBooks(title: string, author: string, page: number) {
   const key = JSON.stringify([title, author]);
   const [result, setResult] = useState({ key: "", items: [] as ExternalBook[], total: 0, page: 0, hasMore: false });
-  const [state, setState] = useState<{ key: string; page: number; status: RequestStatus; error: string }>({
+  const [state, setState] = useState<{ key: string; page: number; status: RequestStatus; error: string; restored?: boolean }>({
     key: "", page: 0, status: "idle", error: "",
   });
   const [revision, setRevision] = useState(0);
@@ -31,7 +31,7 @@ export function useGlobalBooks(title: string, author: string, page: number) {
         const snapshot = snapshots.get(cacheKey);
         if (revision === 0 && snapshot && snapshot.expires > Date.now()) {
           setResult(snapshot.result);
-          setState({ key, page, status: snapshot.result.total ? "success" : "empty", error: "" });
+          setState({ key, page, status: snapshot.result.total ? "success" : "empty", error: "", restored: true });
           return;
         }
         const data = await searchGlobalBooks(title, author, page, controller.signal);
@@ -65,6 +65,6 @@ export function useGlobalBooks(title: string, author: string, page: number) {
   const current = result.key === key;
   const status = !active ? "idle" : state.key === key && state.page === page ? state.status : "loading";
   return { books: current && active ? result.items : [], total: current ? result.total : 0,
-    hasMore: current && result.hasMore && page < 1000, status,
+    hasMore: current && result.hasMore && page < 1000, status, restored: state.restored === true,
     error: state.key === key ? state.error : "", retry: () => setRevision(value => value + 1) };
 }

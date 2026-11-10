@@ -96,13 +96,13 @@ export function BooksPage() {
     {wishError && <p role="alert">{wishError}</p>}
     {status === "loading" && <CatalogSkeleton />}
     {status === "error" && <ErrorBox message={error} onRetry={() => setRevision(value => value + 1)} />}
-    {(status === "success" || status === "empty") && <><p>Найдено: {total}</p>
+    {(status === "success" || status === "empty") && <div className="catalog-result-panel"><p role="status">Найдено: {total}</p>
       <BookList books={books} wishlistIds={wishlistIds} wishlistPending={saving} onWishlistToggle={book => { void toggleWishlist(book); }}
         onDetails={book => navigate(`/books/${encodeURIComponent(book.id)}`)} />
       <nav className="pagination" aria-label="Страницы каталога">
         <button disabled={page <= 1} onClick={() => change("page", String(page - 1))}>Предыдущая</button>
         <span>Страница {page}</span>
         <button disabled={page * 20 >= total} onClick={() => change("page", String(page + 1))}>Следующая</button>
-      </nav></>}
+      </nav></div>}
   </section>;
 }

@@ -36,7 +36,7 @@ export function ExternalBookPage() {
     return () => controller.abort();
   }, [workId, revision]);
 
-  return <article><Link to={back}>Вернуться к глобальному поиску</Link>
+  return <article><Link to={back} state={{ restoreScrollY: location.state?.fromScrollY }}>Вернуться к глобальному поиску</Link>
     {loading && <Spinner label="Загружаем сведения Open Library…" />}
     {error && <ErrorBox message={error} onRetry={() => setRevision(value => value + 1)} />}
     {details && <><p className="eyebrow">OPEN LIBRARY</p><h2>{details.title}</h2>
