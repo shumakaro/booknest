@@ -1,3 +1,13 @@
+# Render: подготовка публикации 10 ноября 2026
+
+Продолжена текущая lab-12/deployment от709d0b2, проект и данные не пересоздавались. docs.zip сохранен. Добавлены app/render.py, docker/render.Dockerfile, его отдельный dockerignore и render-entrypoint.sh, tests/test_render.py, docs/render/README.md. Изменены app/config.py (автоматический точный HTTPS origin Render при пустом CORS), tools/check_container_http.py и CI. Compose/Nginx сохранены. Render-образ собирает React и запускает один FastAPI на PORT; повторного наполнения БД нет, миграции только существующие и непримененные.
+
+Фактические проверки: 62 Python-теста passed10,61с, coverage93%, одно предупреждение Starlette/anyio; Ruff, ESLint, npm run build (Vite2,26с), 5 frontend-тестов passed. Первые sandbox-запуски столкнулись с доступом к PostgreSQL/temp; успешный повтор с разрешенным доступом использует отдельную тестовую БД и новую папку .tools/pytest-render-20261110b. Рабочий Neon не менялся в этом подэтапе.
+
+CI дополнен сборкой Render-образа и настоящим HTTP/e2e через него с временной БД runner. Пока CI не завершен, успешная сборка контейнера не заявляется. Следующий шаг — публикация коммитов текущей ветки и проверка CI, затем заполнение владелицей уже открытой формы Render по docs/render/README.md (ветка lab-12/deployment, Dockerfile docker/render.Dockerfile, Free, пять переменных). Публичного URL/статуса Live пока нет; HTTPS и подключение именно из Render еще не проверены. PR8–13 не объединяются; DOCX/финальные скриншоты будут позже. История сохранена ниже.
+
+---
+
 # Neon подключен 10 ноября 2026 — часть четвертого этапа
 
 По прямым инструкциям владелицы установлен Neon CLI9.3.2, выполнены neon init с org-steep-queen-40161311 / frosty-boat-51024121 / production и neon deploy. После завершенной владелицей браузерной авторизации переменные загружены в игнорируемый .env. Сохранены резервные копии прежних файлов и все прежние переменные вне Neon. .env.local и .neon исключены из Git. docs.zip не менялся.
