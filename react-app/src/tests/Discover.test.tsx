@@ -18,6 +18,8 @@ vi.mock("../api/discover", async importOriginal => ({
 vi.mock("../app/useAuth", () => ({ useAuth: () => ({ user: null }) }));
 
 beforeEach(() => {
+  // JSDOM не прокручивает страницу; проверяется намерение восстановить позицию.
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   clearGlobalSearchCache();
   vi.mocked(searchGlobalBooks).mockReset();
   vi.mocked(getGlobalBook).mockReset();
@@ -114,6 +116,7 @@ it("отображает ошибку отсутствующей внешней 
 });
 
 it("после деталей возвращает накопленные страницы и поисковый запрос", async () => {
+  vi.spyOn(window, "scrollY", "get").mockReturnValue(380);
   vi.mocked(searchGlobalBooks).mockResolvedValueOnce(page()).mockResolvedValueOnce(page([book(21)], false));
   vi.mocked(getGlobalBook).mockResolvedValue({ ...book(21), description: "Описание", notice: null });
   open();
@@ -126,4 +129,24 @@ it("после деталей возвращает накопленные стр
   await screen.findByRole("heading", { name: "Внешняя книга 1" });
   expect(screen.getByRole("heading", { name: "Внешняя книга 21" })).toBeInTheDocument();
   expect(searchGlobalBooks).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(window.scrollTo).toHaveBeenCalledWith({ top: 380, behavior: "instant" }));
+});
+
+it("при подгрузке сохраняет карточки и блокирует повторный запрос до ответа", async () => {
+  let finish: (value: ExternalPage) => void = () => {};
+  vi.mocked(searchGlobalBooks).mockResolvedValueOnce(page())
+    .mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  open();
+  const first = await screen.findByRole("article", { name: "Внешняя книга 1" });
+  await userEvent.click(screen.getByRole("button", { name: "Показать ещё" }));
+  expect(screen.getByRole("status", { name: "Загружаем следующую страницу" })).toBeInTheDocument();
+  const pending = screen.getByRole("button", { name: "Загружаем…" });
+  expect(pending).toBeDisabled();
+  await userEvent.click(pending);
+  expect(searchGlobalBooks).toHaveBeenCalledTimes(2);
+  expect(screen.getByRole("article", { name: "Внешняя книга 1" })).toBe(first);
+  await act(async () => { finish(page([book(21)], false)); });
+  await screen.findByRole("heading", { name: "Внешняя книга 21" });
+  expect(screen.getByRole("article", { name: "Внешняя книга 1" })).toBe(first);
+  expect(screen.queryByRole("status", { name: "Загружаем следующую страницу" })).not.toBeInTheDocument();
 });
