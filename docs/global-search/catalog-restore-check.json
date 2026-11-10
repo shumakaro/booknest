@@ -1,0 +1,21 @@
+{
+  "replaced": 30,
+  "before": {
+    "books": 32,
+    "users": 13,
+    "loans": 23,
+    "wishlist_entries": 1
+  },
+  "after": {
+    "books": 32,
+    "users": 13,
+    "loans": 23,
+    "wishlist_entries": 1
+  },
+  "protected_data_unchanged": true,
+  "applied": true,
+  "restore_database": "booknest_global_restore_test",
+  "restore_verified": true,
+  "branch": "br-weathered-rice-beyaagz5",
+  "production_changed": false
+}

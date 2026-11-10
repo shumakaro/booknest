@@ -1,0 +1,336 @@
+[
+  {
+    "local_id": 1,
+    "old_title": "Книга 01",
+    "id": "OL82563W",
+    "title": "Harry Potter and the Philosopher's Stone",
+    "authors": [
+      "J. K. Rowling"
+    ],
+    "year": 1997,
+    "cover_id": 15155833
+  },
+  {
+    "local_id": 2,
+    "old_title": "Книга 02",
+    "id": "OL82537W",
+    "title": "Harry Potter and the Chamber of Secrets",
+    "authors": [
+      "J. K. Rowling"
+    ],
+    "year": 1998,
+    "cover_id": 15158664
+  },
+  {
+    "local_id": 3,
+    "old_title": "Книга 03",
+    "id": "OL82536W",
+    "title": "Harry Potter and the Prisoner of Azkaban",
+    "authors": [
+      "J. K. Rowling"
+    ],
+    "year": 1999,
+    "cover_id": 10580435
+  },
+  {
+    "local_id": 4,
+    "old_title": "Книга 04",
+    "id": "OL82560W",
+    "title": "Harry Potter and the Goblet of Fire",
+    "authors": [
+      "J. K. Rowling"
+    ],
+    "year": 2000,
+    "cover_id": 12059372
+  },
+  {
+    "local_id": 5,
+    "old_title": "Книга 05",
+    "id": "OL82548W",
+    "title": "Harry Potter and the Order of the Phoenix",
+    "authors": [
+      "J. K. Rowling"
+    ],
+    "year": 2003,
+    "cover_id": 15158666
+  },
+  {
+    "local_id": 6,
+    "old_title": "Книга 06",
+    "id": "OL82586W",
+    "title": "Harry Potter and the Deathly Hallows",
+    "authors": [
+      "J. K. Rowling"
+    ],
+    "year": 2007,
+    "cover_id": 15158660
+  },
+  {
+    "local_id": 7,
+    "old_title": "Книга 07",
+    "id": "OL27482W",
+    "title": "The Hobbit",
+    "authors": [
+      "J.R.R. Tolkien"
+    ],
+    "year": 1937,
+    "cover_id": 14627509
+  },
+  {
+    "local_id": 8,
+    "old_title": "Книга 08",
+    "id": "OL27513W",
+    "title": "The Fellowship of the Ring",
+    "authors": [
+      "J.R.R. Tolkien"
+    ],
+    "year": 1954,
+    "cover_id": 14627060
+  },
+  {
+    "local_id": 9,
+    "old_title": "Книга 09",
+    "id": "OL27448W",
+    "title": "The Lord of the Rings",
+    "authors": [
+      "J.R.R. Tolkien"
+    ],
+    "year": 1954,
+    "cover_id": 14625765
+  },
+  {
+    "local_id": 10,
+    "old_title": "Книга 10",
+    "id": "OL27479W",
+    "title": "The Two Towers",
+    "authors": [
+      "J.R.R. Tolkien"
+    ],
+    "year": 1954,
+    "cover_id": 14627564
+  },
+  {
+    "local_id": 11,
+    "old_title": "Книга 11",
+    "id": "OL27455W",
+    "title": "The Return of the King",
+    "authors": [
+      "J.R.R. Tolkien"
+    ],
+    "year": 1950,
+    "cover_id": 14627062
+  },
+  {
+    "local_id": 12,
+    "old_title": "Книга 12",
+    "id": "OL27495W",
+    "title": "The Silmarillion",
+    "authors": [
+      "J.R.R. Tolkien",
+      "Christopher Tolkien"
+    ],
+    "year": 1977,
+    "cover_id": 14627042
+  },
+  {
+    "local_id": 13,
+    "old_title": "Книга 13",
+    "id": "OL25086286W",
+    "title": "Jane Austen",
+    "authors": [
+      "Jane Austen"
+    ],
+    "year": 1994,
+    "cover_id": 14592231
+  },
+  {
+    "local_id": 14,
+    "old_title": "Книга 14",
+    "id": "OL66554W",
+    "title": "Pride and Prejudice",
+    "authors": [
+      "Jane Austen"
+    ],
+    "year": 1813,
+    "cover_id": 14348537
+  },
+  {
+    "local_id": 15,
+    "old_title": "Книга 15",
+    "id": "OL66513W",
+    "title": "Emma",
+    "authors": [
+      "Jane Austen"
+    ],
+    "year": 1815,
+    "cover_id": 9278312
+  },
+  {
+    "local_id": 16,
+    "old_title": "Книга 16",
+    "id": "OL66562W",
+    "title": "Sense and Sensibility",
+    "authors": [
+      "Jane Austen"
+    ],
+    "year": 1811,
+    "cover_id": 9278292
+  },
+  {
+    "local_id": 17,
+    "old_title": "Книга 17",
+    "id": "OL66544W",
+    "title": "Persuasion",
+    "authors": [
+      "Jane Austen"
+    ],
+    "year": 1789,
+    "cover_id": 12824691
+  },
+  {
+    "local_id": 18,
+    "old_title": "Книга 18",
+    "id": "OL66534W",
+    "title": "Northanger Abbey",
+    "authors": [
+      "Jane Austen"
+    ],
+    "year": 1818,
+    "cover_id": 12567961
+  },
+  {
+    "local_id": 19,
+    "old_title": "Книга 19",
+    "id": "OL166934W",
+    "title": "Dostoyevsky. Notes From Underground / White Nights / The Dream of a Ridiculous Man / Selections from The House of the Dead",
+    "authors": [
+      "Fyodor Dostoyevsky"
+    ],
+    "year": 1961,
+    "cover_id": 6908257
+  },
+  {
+    "local_id": 20,
+    "old_title": "Книга 20",
+    "id": "OL166894W",
+    "title": "Преступление и наказание",
+    "authors": [
+      "Fiódor Dostoievski"
+    ],
+    "year": 1866,
+    "cover_id": 9411873
+  },
+  {
+    "local_id": 21,
+    "old_title": "Книга 21",
+    "id": "OL21025633W",
+    "title": "Записки изъ подполья",
+    "authors": [
+      "Fiódor Dostoievski"
+    ],
+    "year": 1864,
+    "cover_id": 10445973
+  },
+  {
+    "local_id": 22,
+    "old_title": "Книга 22",
+    "id": "OL166968W",
+    "title": "Униженные и оскорблённые",
+    "authors": [
+      "Fyodor Dostoyevsky"
+    ],
+    "year": 1884,
+    "cover_id": 8221235
+  },
+  {
+    "local_id": 23,
+    "old_title": "Книга 23",
+    "id": "OL10432709W",
+    "title": "Братья Карамазовы",
+    "authors": [
+      "Fiódor Dostoievski"
+    ],
+    "year": 1880,
+    "cover_id": 8272336
+  },
+  {
+    "local_id": 24,
+    "old_title": "Книга 24",
+    "id": "OL166925W",
+    "title": "Идиот",
+    "authors": [
+      "Fiódor Dostoievski"
+    ],
+    "year": 1874,
+    "cover_id": 11226648
+  },
+  {
+    "local_id": 25,
+    "old_title": "Книга 25",
+    "id": "OL267096W",
+    "title": "Анна Каренина",
+    "authors": [
+      "Leo Tolstoy"
+    ],
+    "year": 1876,
+    "cover_id": 2560652
+  },
+  {
+    "local_id": 26,
+    "old_title": "Книга 26",
+    "id": "OL267174W",
+    "title": "Смерть Ивана Ильича",
+    "authors": [
+      "Leo Tolstoy",
+      "Anthony Briggs",
+      "Anthony Horvath",
+      "Zinc Read"
+    ],
+    "year": 1887,
+    "cover_id": 419697
+  },
+  {
+    "local_id": 27,
+    "old_title": "Книга 27",
+    "id": "OL267171W",
+    "title": "War and Peace",
+    "authors": [
+      "Лев Толстой"
+    ],
+    "year": 1845,
+    "cover_id": 12621906
+  },
+  {
+    "local_id": 28,
+    "old_title": "Книга 28",
+    "id": "OL457431W",
+    "title": "Hadji-Mourad",
+    "authors": [
+      "Leo Tolstoy"
+    ],
+    "year": 1900,
+    "cover_id": 605982
+  },
+  {
+    "local_id": 29,
+    "old_title": "Книга 29",
+    "id": "OL457760W",
+    "title": "Voskresenīe",
+    "authors": [
+      "Лев Толстой"
+    ],
+    "year": 1899,
+    "cover_id": 6309101
+  },
+  {
+    "local_id": 30,
+    "old_title": "Книга 30",
+    "id": "OL15088382W",
+    "title": "The Kreutzer sonata and other stories",
+    "authors": [
+      "Лев Толстой"
+    ],
+    "year": 1887,
+    "cover_id": 11725468
+  }
+]
