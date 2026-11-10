@@ -4,7 +4,8 @@ import { apiFetch } from "./client";
 
 // Внутренние компоненты сохраняют прежний строковый id, а API использует числовой.
 export function fromApiBook(item: BookRead): Book {
-  return { id: String(item.id), title: item.title, authors: [item.author], year: item.year, record: item };
+  return { id: String(item.id), title: item.title, authors: [item.author], year: item.year,
+    coverId: item.cover_id ?? undefined, record: item };
 }
 
 export async function searchBooks(query: string, page: number, signal?: AbortSignal,

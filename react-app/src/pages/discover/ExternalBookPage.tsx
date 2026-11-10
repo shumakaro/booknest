@@ -6,6 +6,7 @@ import type { ExternalDetails } from "../../api/discover";
 import { toUserMessage } from "../../api/client";
 import { ErrorBox } from "../../components/ErrorBox";
 import { Spinner } from "../../components/Spinner";
+import { ImportBookForm } from "./ImportBookForm";
 
 export function ExternalBookPage() {
   const { workId = "" } = useParams();
@@ -48,7 +49,7 @@ export function ExternalBookPage() {
       <p className="external-description">{details.description || "Описание отсутствует."}</p>
       {details.notice && <p role="status">{details.notice}</p>}
       <a href={`https://openlibrary.org/works/${details.id}`} target="_blank" rel="noopener noreferrer">Открыть в Open Library</a>
-      <p>Для выдачи нужен экземпляр в «Моей библиотеке». Этот результат пока не добавлен в неё.</p>
+      <ImportBookForm key={details.id} book={details} />
     </>}
   </article>;
 }
