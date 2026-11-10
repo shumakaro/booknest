@@ -97,7 +97,7 @@ export function BooksPage() {
     {status === "loading" && <CatalogSkeleton />}
     {status === "error" && <ErrorBox message={error} onRetry={() => setRevision(value => value + 1)} />}
     {(status === "success" || status === "empty") && <><p>Найдено: {total}</p>
-      <BookList books={books} wishlistIds={wishlistIds} onWishlistToggle={book => { void toggleWishlist(book); }}
+      <BookList books={books} wishlistIds={wishlistIds} wishlistPending={saving} onWishlistToggle={book => { void toggleWishlist(book); }}
         onDetails={book => navigate(`/books/${encodeURIComponent(book.id)}`)} />
       <nav className="pagination" aria-label="Страницы каталога">
         <button disabled={page <= 1} onClick={() => change("page", String(page - 1))}>Предыдущая</button>

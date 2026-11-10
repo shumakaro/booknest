@@ -6,6 +6,7 @@ import { Button } from "./Button";
 
 interface BookCardProps {
   book: Book;
+  wishlistPending?: boolean;
   inWishlist: boolean;
   onWishlistToggle: (book: Book) => void;
   onDetails: (book: Book, trigger: HTMLButtonElement) => void;
@@ -13,6 +14,7 @@ interface BookCardProps {
 
 export function BookCard({
   book,
+  wishlistPending = false,
   inWishlist,
   onWishlistToggle,
   onDetails,
@@ -69,6 +71,7 @@ export function BookCard({
             type="button"
             variant="ghost"
             aria-pressed={inWishlist}
+            disabled={wishlistPending}
             onClick={() =>
               onWishlistToggle(book)
             }
