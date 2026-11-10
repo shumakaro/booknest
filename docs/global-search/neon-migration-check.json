@@ -1,0 +1,19 @@
+{
+  "branch": "br-weathered-rice-beyaagz5",
+  "expires_at": "2026-11-11T18:00:00Z",
+  "before_counts": [
+    32,
+    13,
+    23,
+    1
+  ],
+  "after_counts": [
+    32,
+    13,
+    23,
+    1
+  ],
+  "before_revision": "005_wishlist",
+  "after_revision": "006_external_books",
+  "production_changed": false
+}

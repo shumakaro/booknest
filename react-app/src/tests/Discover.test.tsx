@@ -14,6 +14,8 @@ vi.mock("../api/discover", async importOriginal => ({
   ...await importOriginal<typeof import("../api/discover")>(),
   searchGlobalBooks: vi.fn(), getGlobalBook: vi.fn(),
 }));
+// Публичный поиск проверяется без учетной записи; импорт проверяется отдельно.
+vi.mock("../app/useAuth", () => ({ useAuth: () => ({ user: null }) }));
 
 beforeEach(() => {
   clearGlobalSearchCache();
