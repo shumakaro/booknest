@@ -1,0 +1,50 @@
+{
+  "replaced": 30,
+  "before": {
+    "books": 32,
+    "users": 13,
+    "loans": 23,
+    "wishlist_entries": 1
+  },
+  "after": {
+    "books": 32,
+    "users": 13,
+    "loans": 23,
+    "wishlist_entries": 1
+  },
+  "protected_data_unchanged": true,
+  "applied": true,
+  "backup_sha256": "40bb06c3a4403aa7d6142f15c2fc36ad919eb305f0a42535f82ae42947c34a8c",
+  "backup_verified_by_restore": true,
+  "revision": "006_external_books",
+  "render_code_updated": false,
+  "public_checks": [
+    {
+      "path": "/health",
+      "status": 200,
+      "total": null,
+      "titles": []
+    },
+    {
+      "path": "/api/v1/books?size=1",
+      "status": 200,
+      "total": 30,
+      "titles": [
+        "Dostoyevsky. Notes From Underground / White Nights / The Dream of a Ridiculous Man / Selections from The House of the Dead"
+      ]
+    },
+    {
+      "path": "/api/v1/books?q=Harry&size=20",
+      "status": 200,
+      "total": 6,
+      "titles": [
+        "Harry Potter and the Chamber of Secrets",
+        "Harry Potter and the Deathly Hallows",
+        "Harry Potter and the Goblet of Fire",
+        "Harry Potter and the Order of the Phoenix",
+        "Harry Potter and the Philosopher's Stone",
+        "Harry Potter and the Prisoner of Azkaban"
+      ]
+    }
+  ]
+}

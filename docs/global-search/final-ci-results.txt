@@ -1,0 +1,33 @@
+https://github.com/shumakaro/booknest/actions/runs/42878600718
+Commit: 064a0a2a350462c896ce43715f17d97f2e523a0f
+checks: success; containers: success
+
+0_containers.txt
+2026-11-10T18:49:08.0293978Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T18:49:08.3228880Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T18:49:31.5396488Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T18:49:31.9153792Z booknest-web:local inspect: 26.22 MB; image ls: 93.3MB
+2026-11-10T18:49:31.9154229Z booknest-api:local inspect: 38.68 MB; image ls: 166MB
+2026-11-10T18:50:02.8007719Z   1 passed (6.2s)
+2026-11-10T18:50:46.4402898Z test-1  | 85 passed, 2 warnings in 10.71s
+
+containers/7_Build and smoke the unified Render image.txt
+2026-11-10T18:49:08.0293936Z Container health, 30 active books, direct SPA route and API 404: OK
+
+containers/8_Smoke and persistence without deleting volumes.txt
+2026-11-10T18:49:08.3228841Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T18:49:31.5396091Z Container health, 30 active books, direct SPA route and API 404: OK
+2026-11-10T18:49:31.9153756Z booknest-web:local inspect: 26.22 MB; image ls: 93.3MB
+2026-11-10T18:49:31.9154227Z booknest-api:local inspect: 38.68 MB; image ls: 166MB
+
+containers/10_Browser scenario inside clean container environment.txt
+2026-11-10T18:50:02.8007640Z   1 passed (6.2s)
+
+containers/12_Test profile with independent database.txt
+2026-11-10T18:50:46.4402893Z test-1  | 85 passed, 2 warnings in 10.71s
+
+1_checks.txt
+2026-11-10T18:47:26.9320719Z 85 passed, 2 warnings in 17.46s
+
+checks/8_Run python -m pytest -q --cov=app --cov-report=term-missing.txt
+2026-11-10T18:47:26.9320716Z 85 passed, 2 warnings in 17.46s

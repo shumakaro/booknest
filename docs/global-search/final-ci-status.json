@@ -1,0 +1,160 @@
+{
+  "id": 42878600718,
+  "name": "BookNest checks",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/shumakaro/booknest/actions/runs/42878600718",
+  "sha": "064a0a2a350462c896ce43715f17d97f2e523a0f",
+  "jobs": [
+    {
+      "name": "checks",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Initialize containers",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Prepare isolated test configuration",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run python -m ruff check app tests migrations examples",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run python -m pytest -q --cov=app --cov-report=term-missing",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm --prefix react-app ci",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm --prefix react-app run lint",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm --prefix react-app run test",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm --prefix react-app run build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Stop containers",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "containers",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Generate disposable container configuration",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run docker compose config --quiet",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run docker compose up -d --build --wait",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and smoke the unified Render image",
+          "conclusion": "success"
+        },
+        {
+          "name": "Smoke and persistence without deleting volumes",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify backup and restore into a new database",
+          "conclusion": "success"
+        },
+        {
+          "name": "Browser scenario inside clean container environment",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify trusted proxy rate limit",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test profile with independent database",
+          "conclusion": "success"
+        },
+        {
+          "name": "Diagnostics",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Stop only this disposable runner project",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

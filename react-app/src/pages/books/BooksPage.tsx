@@ -75,7 +75,7 @@ export function BooksPage() {
     finally { setSaving(false); }
   }
 
-  return <section className="catalog-page"><div className="catalog-intro"><p className="eyebrow">КНИЖНЫЙ КЛУБ BOOKNEST</p><h2>Найдите свою<br />следующую историю</h2><p>Знакомые авторы, новые миры и книги, к которым хочется возвращаться.</p></div>
+  return <section className="catalog-page"><div className="catalog-intro"><p className="eyebrow">МОЯ БИБЛИОТЕКА</p><h2>Найдите свою<br />следующую историю</h2><p>Книги нашей библиотеки. Другие произведения можно найти в разделе «Глобальный поиск».</p></div>
     <form className="catalog-filters" onSubmit={event => { event.preventDefault(); setRevision(value => value + 1); }}>
       <label htmlFor="catalog-query">Поиск по названию</label>
       <input placeholder="Какую книгу вы ищете?" id="catalog-query" value={query} onChange={event => change("q", event.target.value)} />

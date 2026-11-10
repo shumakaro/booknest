@@ -1,0 +1,15 @@
+{
+  "base": "https://booknest-rzxk.onrender.com",
+  "pages": [
+    20,
+    10
+  ],
+  "query": "Harry",
+  "found": 6,
+  "first_page_cover_elements": 20,
+  "mobile_width": 375,
+  "overflow": false,
+  "detail": "Harry Potter and the Chamber of Secrets",
+  "errors": [],
+  "writes": false
+}

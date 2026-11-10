@@ -53,6 +53,8 @@ export interface BookRead {
   id: number;
   available: number;
   author: string;
+  external_work_id?: string | null;
+  cover_id?: number | null;
 }
 
 export interface BookUpdate {
@@ -80,8 +82,41 @@ export interface ErrorRead {
   request_id: string;
 }
 
+export interface ExternalBook {
+  id: string;
+  title: string;
+  authors?: (string)[];
+  year?: number | null;
+  cover_id?: number | null;
+}
+
+export interface ExternalDetails {
+  id: string;
+  title: string;
+  authors?: (string)[];
+  year?: number | null;
+  cover_id?: number | null;
+  description: string;
+  notice?: string | null;
+}
+
+export interface ExternalPage {
+  items: (ExternalBook)[];
+  total: number;
+  page: number;
+  size: number;
+  has_more: boolean;
+}
+
 export interface HealthRead {
   status: string;
+}
+
+export interface ImportBook {
+  work_id: string;
+  year: number;
+  total_copies?: number;
+  genre?: "scifi" | "history" | "poetry" | "cs" | "fiction";
 }
 
 export interface LoanCreate {

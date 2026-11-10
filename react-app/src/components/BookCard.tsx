@@ -8,7 +8,8 @@ interface BookCardProps {
   book: Book;
   wishlistPending?: boolean;
   inWishlist: boolean;
-  onWishlistToggle: (book: Book) => void;
+  onWishlistToggle?: (book: Book) => void;
+  sourceLabel?: string;
   onDetails: (book: Book, trigger: HTMLButtonElement) => void;
 }
 
@@ -17,6 +18,7 @@ export function BookCard({
   wishlistPending = false,
   inWishlist,
   onWishlistToggle,
+  sourceLabel = "Каталог",
   onDetails,
 }: BookCardProps) {
   // Сбой внешней картинки переключает на декоративный переплет, а не ломает карточку.
@@ -58,7 +60,7 @@ export function BookCard({
           <Badge>
             {inWishlist
               ? "В желаемом"
-              : "Каталог"}
+              : sourceLabel}
           </Badge>
         </div>
 
@@ -67,7 +69,7 @@ export function BookCard({
   Подробнее
 </Button>
 
-          <Button
+          {onWishlistToggle && <Button
             type="button"
             variant="ghost"
             aria-pressed={inWishlist}
@@ -79,7 +81,7 @@ export function BookCard({
             {inWishlist
               ? "Удалить из желаемого"
               : "В желаемое"}
-          </Button>
+          </Button>}
         </div>
       </div>
     </article>

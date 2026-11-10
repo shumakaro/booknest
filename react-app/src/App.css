@@ -684,3 +684,11 @@
 .btn--primary { color: var(--button-text); }
 /* Скрытая ссылка не попадает даже в полноразмерный снимок страницы; Tab открывает ее. */
 .skip-link:not(:focus) { clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; white-space: nowrap; padding: 0; }
+/* Два поля внешнего поиска не смешиваются с фильтрами локального каталога. */
+.global-search-form { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; }
+.global-search-form label { display: grid; gap: 8px; min-width: 0; }
+.global-search-form input { width: 100%; min-width: 0; }
+.catalog-source-note { color: var(--muted); line-height: 1.6; }
+.external-cover { display: block; max-width: min(100%,260px); max-height: 400px; object-fit: contain; margin: 24px 0; border-radius: 10px; }
+.external-description { white-space: pre-line; line-height: 1.8; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .global-search-form { grid-template-columns: 1fr; padding: 18px; } }

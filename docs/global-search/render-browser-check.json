@@ -1,0 +1,23 @@
+{
+  "source": "real Open Library through https://booknest-rzxk.onrender.com",
+  "base": "https://booknest-rzxk.onrender.com",
+  "auth_refresh": "real API, anonymous session",
+  "first": 20,
+  "accumulated": 40,
+  "detail": "Harry Potter and the Philosopher's Stone",
+  "sizes": [
+    {
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "overflow": false
+    }
+  ],
+  "errors": []
+}

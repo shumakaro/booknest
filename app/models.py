@@ -62,6 +62,9 @@ class Book(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id", ondelete="RESTRICT"))
     year: Mapped[int]
     isbn: Mapped[str | None] = mapped_column(String(13), unique=True)
+    # Один внешний Work соответствует одной библиотечной записи, не всем его изданиям.
+    external_work_id: Mapped[str | None] = mapped_column(String(30), unique=True)
+    cover_id: Mapped[int | None]
     total_copies: Mapped[int] = mapped_column(server_default="1")
     description: Mapped[str] = mapped_column(Text, server_default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

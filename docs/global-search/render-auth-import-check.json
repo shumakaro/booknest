@@ -1,0 +1,43 @@
+[
+  {
+    "check": "anonymous import",
+    "status": 401
+  },
+  {
+    "check": "librarian login/refresh",
+    "login": 200,
+    "refresh": 200,
+    "cookie_secure_httponly_strict": true
+  },
+  {
+    "check": "librarian existing import",
+    "attempt": 1,
+    "status": 200
+  },
+  {
+    "check": "librarian existing import",
+    "attempt": 2,
+    "status": 200
+  },
+  {
+    "check": "librarian logout/revocation",
+    "logout": 204,
+    "old_access": 401
+  },
+  {
+    "check": "member login/refresh",
+    "login": 200,
+    "refresh": 200,
+    "cookie_secure_httponly_strict": true
+  },
+  {
+    "check": "member existing import",
+    "attempt": 1,
+    "status": 403
+  },
+  {
+    "check": "member logout/revocation",
+    "logout": 204,
+    "old_access": 401
+  }
+]
