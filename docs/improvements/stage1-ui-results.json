@@ -1,0 +1,19 @@
+{
+  "source": "Локальная production-сборка; API и обложки фикстурные; БД не используется",
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "hover": true,
+  "keyboardFocus": true,
+  "reducedMotion": true,
+  "brokenCoverFallback": true,
+  "wideCover": true,
+  "detailsNavigation": true,
+  "externalHasNoLocalAvailability": true,
+  "touchWishlist": true,
+  "pageErrors": []
+}
