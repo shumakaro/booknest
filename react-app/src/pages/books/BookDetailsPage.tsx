@@ -1,6 +1,6 @@
 import { notify } from "../../lib/notifications";
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { apiFetch, toUserMessage } from "../../api/client";
 import { useAuth } from "../../app/useAuth";
 import { ErrorBox } from "../../components/ErrorBox";
@@ -12,6 +12,11 @@ export function BookDetailsPage() {
   const { details, status, errorMessage, notFound, retry } = useBookDetails(bookId);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Возврат разрешен только во внутренний каталог; прямое открытие тоже работает.
+  const from: unknown = location.state?.from;
+  const back = typeof from === "string" && (from === "/books" || from.startsWith("/books?")) ? from : "/books";
+  const backState = { restoreScrollY: location.state?.fromScrollY };
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState(false);
   const [pending, setPending] = useState(false);
@@ -27,13 +32,13 @@ export function BookDetailsPage() {
   async function remove() {
     if (!confirm("Удалить книгу из каталога?")) return;
     setPending(true); setActionError(false);
-    try { await apiFetch(`/books/${bookId}`, { method: "DELETE" }); notify("Книга удалена из каталога"); navigate("/books"); }
+    try { await apiFetch(`/books/${bookId}`, { method: "DELETE" }); notify("Книга удалена из каталога"); navigate(back); }
     catch (reason) { setActionError(true); setMessage(toUserMessage(reason)); setPending(false); }
   }
   if (status === "loading") return <Spinner label="Загружаем информацию о книге..." />;
-  if (status === "error") return <section><h2>{notFound ? "Книга не найдена" : "Не удалось загрузить книгу"}</h2><ErrorBox message={errorMessage} onRetry={retry} /><Link to="/books">Вернуться в каталог</Link></section>;
+  if (status === "error") return <section><h2>{notFound ? "Книга не найдена" : "Не удалось загрузить книгу"}</h2><ErrorBox message={errorMessage} onRetry={retry} /><Link to={back} state={backState}>Вернуться в каталог</Link></section>;
   if (!details) return <p>Данные книги отсутствуют.</p>;
-  return <article><Link to="/books">Вернуться в каталог</Link><h2>{details.title}</h2>
+  return <article><Link to={back} state={backState}>Вернуться в каталог</Link><h2>{details.title}</h2>
     <p>Автор: {details.authors.map(author => author.name).join(", ") || "Не указан"}</p>
     <p>{details.description || "Описание отсутствует."}</p>
     <dl><dt>ISBN</dt><dd>{details.record?.isbn ?? "Не указан"}</dd><dt>Издательство</dt><dd>{details.record?.publisher}</dd>
