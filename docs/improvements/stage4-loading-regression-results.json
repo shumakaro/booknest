@@ -1,0 +1,27 @@
+{
+  "source": "Локальная production-сборка; API фикстурные; рабочая БД не используется",
+  "initialSkeleton": true,
+  "appendSkeleton": true,
+  "pendingButtonDisabled": true,
+  "existingDomRetained": true,
+  "failedPageRetried": true,
+  "requestsBeforeReload": [
+    1,
+    2,
+    2
+  ],
+  "uniqueBooks": 23,
+  "oldCardAnimationStarts": 1,
+  "newCardsAnimated": true,
+  "cachedReturnWithoutAnimationOrRequest": true,
+  "scrollRestored": true,
+  "reducedMotion": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "horizontalOverflow": false,
+  "pageErrors": []
+}
