@@ -30,6 +30,23 @@ def test_database_filters(db_client, db_book, db_author):
     assert db_client.get("/api/v1/books?q=%27%20OR%201%3D1%20--").json()["total"] == 0
 
 
+def test_search_covers_records_beyond_first_thirty(db_client, db, db_author):
+    from app.models import Book
+
+    # Записи находятся во внешней откатываемой транзакции отдельной тестовой БД.
+    books = [Book(title=f"Проверка пагинации {number:02}", author_id=db_author.id,
+                  year=2001, edition_year=2001, total_copies=1) for number in range(1, 36)]
+    db.add_all(books)
+    db.commit()
+    first = db_client.get("/api/v1/books?size=20").json()
+    second = db_client.get("/api/v1/books?size=20&page=2").json()
+    assert first["total"] == second["total"] == 35
+    assert len(first["items"]) == 20 and len(second["items"]) == 15
+    assert not ({book["id"] for book in first["items"]} & {book["id"] for book in second["items"]})
+    found = db_client.get("/api/v1/books?q=пагинации%2035").json()
+    assert found["total"] == 1 and found["items"][0]["id"] == books[-1].id
+
+
 def test_database_loan_conflict_and_return(db_client, db_book, db_reader):
     payload = {"user_id": db_reader.id, "due_date": str(date.today() + timedelta(days=14))}
     path = f"/api/v1/books/{db_book['id']}/loans"
