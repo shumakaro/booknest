@@ -5,12 +5,14 @@ from pydantic import Field, field_validator
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=(".env", ".env.local"), extra="ignore")
     title: str = "BookNest API"
     version: str = "1.0.0"
     write_limit: int = 60
     cors_origins: list[str] = []
     database_url: str
+    # Neon выдает отдельный прямой URL для Alembic и резервных копий.
+    database_url_unpooled: str | None = None
     sql_echo: bool = False
     test_database_url: str | None = None
     # Секрет обязателен: без настройки приложение не должно стартовать с известным ключом.
@@ -19,6 +21,20 @@ class Settings(BaseSettings):
     access_ttl_seconds: int | None = Field(default=None, ge=1, le=1800)
     refresh_ttl_days: int = Field(default=7, ge=1, le=7)
     cookie_secure: bool = False
+
+    @field_validator("database_url", "database_url_unpooled", "test_database_url", mode="before")
+    @classmethod
+    def psycopg_driver(cls, value: str | None) -> str | None:
+        # CLI выдает обычный Postgres URL; SQLAlchemy 2.0 иначе выбирает psycopg2.
+        # Меняется только схема драйвера, пароль и параметры TLS остаются прежними.
+        if value and value.startswith(("postgres://", "postgresql://")):
+            return "postgresql+psycopg://" + value.split("://", 1)[1]
+        return value
+
+    @property
+    def migration_url(self) -> str:
+        # Локальная конфигурация и Compose продолжают работать с одним DATABASE_URL.
+        return self.database_url_unpooled or self.database_url
 
     @field_validator("cors_origins")
     @classmethod
