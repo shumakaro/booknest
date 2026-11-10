@@ -1,7 +1,8 @@
 """Общие параметры приложения читаются из окружения."""
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
+from urllib.parse import urlsplit
 
 
 class Settings(BaseSettings):
@@ -10,6 +11,8 @@ class Settings(BaseSettings):
     version: str = "1.0.0"
     write_limit: int = 60
     cors_origins: list[str] = []
+    # Render сообщает реальный адрес сервиса, в том числе при занятом имени booknest.
+    render_external_url: str | None = None
     database_url: str
     # Neon выдает отдельный прямой URL для Alembic и резервных копий.
     database_url_unpooled: str | None = None
@@ -42,3 +45,14 @@ class Settings(BaseSettings):
         if "*" in value:
             raise ValueError("CORS требует явных origins")
         return value
+
+    @model_validator(mode="after")
+    def render_origin(self):
+        # Явная настройка сохраняет приоритет. Локальная разработка не меняется.
+        if not self.cors_origins and self.render_external_url:
+            url = urlsplit(self.render_external_url)
+            if (url.scheme != "https" or not url.hostname or url.username or url.password
+                    or url.path not in ("", "/") or url.query or url.fragment):
+                raise ValueError("RENDER_EXTERNAL_URL должен содержать только HTTPS origin")
+            self.cors_origins = [self.render_external_url.rstrip("/")]
+        return self
