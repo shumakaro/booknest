@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-10",
+  "base_commit": "1065a49",
+  "branch": "codex/global-book-search",
+  "backend": {
+    "passed": 80,
+    "coverage_percent": 93,
+    "seconds": 12.94,
+    "warnings": 1,
+    "database": "existing separate local _test database; rollback"
+  },
+  "frontend": {
+    "passed": 13,
+    "files": 5
+  },
+  "ruff": "passed",
+  "eslint": "passed",
+  "build": "npm run build passed; TypeScript and Vite, last build 197 ms",
+  "live_api": {
+    "source": "live Open Library via FastAPI TestClient",
+    "pages": [
+      {
+        "page": 1,
+        "http_status": 200,
+        "total": 266,
+        "count": 5,
+        "ids": [
+          "OL82563W",
+          "OL82537W",
+          "OL82586W",
+          "OL82536W",
+          "OL82560W"
+        ]
+      },
+      {
+        "page": 2,
+        "http_status": 200,
+        "total": 266,
+        "count": 5,
+        "ids": [
+          "OL82548W",
+          "OL82565W",
+          "OL17360811W",
+          "OL14981609W",
+          "OL21385222W"
+        ]
+      }
+    ],
+    "details_status": 200
+  },
+  "browser": {
+    "source": "real Open Library through local production preview",
+    "base": "http://127.0.0.1:5182",
+    "auth_refresh": "401 fixture, no login or database writes",
+    "first": 20,
+    "accumulated": 40,
+    "detail": "Harry Potter and the Philosopher's Stone",
+    "sizes": [
+      {
+        "width": 375,
+        "overflow": false
+      },
+      {
+        "width": 768,
+        "overflow": false
+      },
+      {
+        "width": 1280,
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  "docker": "not run locally: no Docker Engine; CI deferred to next part",
+  "render": "not changed; no deploy",
+  "import": "deferred to part 2"
+}
