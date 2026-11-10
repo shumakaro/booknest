@@ -25,6 +25,7 @@ def test_database_crud(db_client, db_book):
 
 def test_database_filters(db_client, db_book, db_author):
     assert db_client.get("/api/v1/books?q=БД&size=1&sort=-year,title").json()["total"] == 1
+    assert db_client.get("/api/v1/books", params={"q": "бд"}).json()["total"] == 1
     assert db_client.get("/api/v1/books?q=нет").json()["total"] == 0
     assert db_client.get(f"/api/v1/authors/{db_author.id}/books").json()["total"] == 1
     assert db_client.get("/api/v1/books?q=%27%20OR%201%3D1%20--").json()["total"] == 0
@@ -45,6 +46,26 @@ def test_search_covers_records_beyond_first_thirty(db_client, db, db_author):
     assert not ({book["id"] for book in first["items"]} & {book["id"] for book in second["items"]})
     found = db_client.get("/api/v1/books?q=пагинации%2035").json()
     assert found["total"] == 1 and found["items"][0]["id"] == books[-1].id
+
+
+@pytest.mark.parametrize("query", ["мария", "МАРИЯ", "ёлкин", "ЁЛКИН", "100%_Автор", "  Мария   100%_Автор  "])
+def test_catalog_search_matches_author_without_duplicates(db_client, db, query):
+    """Автор ищется по всей БД; спецсимволы не превращаются в SQL-шаблон."""
+    from app.models import Author, Book
+
+    author = Author(name="Мария 100%_Автор Ёлкин")
+    other = Author(name="Другой 100ABАвтор")
+    db.add_all([author, other])
+    db.flush()
+    books = [Book(title=f"Одинаковое название {number}", author_id=author.id,
+                  year=2000, edition_year=2000, total_copies=1) for number in range(2)]
+    db.add_all(books + [Book(title="Посторонняя книга", author_id=other.id,
+                            year=2000, edition_year=2000, total_copies=1)])
+    db.commit()
+    first = db_client.get("/api/v1/books", params={"q": query, "size": 1, "page": 1}).json()
+    second = db_client.get("/api/v1/books", params={"q": query, "size": 1, "page": 2}).json()
+    assert first["total"] == second["total"] == 2
+    assert {first["items"][0]["id"], second["items"][0]["id"]} == {book.id for book in books}
 
 
 def test_database_loan_conflict_and_return(db_client, db_book, db_reader):

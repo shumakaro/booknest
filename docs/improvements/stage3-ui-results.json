@@ -1,0 +1,21 @@
+{
+  "source": "Локальная production-сборка с 55 учебными книгами; API фикстурные, SQL проверяется отдельно",
+  "directFilters": true,
+  "rangeUsesTotal": true,
+  "returnPreservesUrlAndScroll": true,
+  "removeOneFilterKeepsOthers": true,
+  "resetAll": true,
+  "authorSearchBeyondFirstThirty": true,
+  "outOfRangeGoesToLastPage": true,
+  "invalidUrlNormalizedBeforeApi": true,
+  "emptyStateLinksToExternalSearch": true,
+  "darkTheme": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "horizontalOverflow": false,
+  "pageErrors": []
+}

@@ -1,0 +1,11 @@
+/* Метки относятся к собственному PostgreSQL-каталогу ЛР10 и не меняют старые страницы. */
+.catalog-active-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.catalog-page .catalog-active-filters button {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 44px; max-width: 100%; padding: 8px 12px;
+  color: var(--text); background: var(--surface-soft);
+  border: 1px solid var(--border); border-radius: 18px;
+  white-space: normal; overflow-wrap: anywhere; text-align: left;
+}
+.catalog-query-note { color: var(--muted); line-height: 1.6; margin: 12px 0; }
+.catalog-pagination-position { text-align: center; line-height: 1.5; }
