@@ -26,6 +26,7 @@ USER root
 COPY requirements-lock.txt ./
 RUN pip install --no-cache-dir -r requirements-lock.txt
 COPY tests ./tests
+COPY tools/refresh_demo_catalog.py ./tools/refresh_demo_catalog.py
 COPY examples ./examples
 COPY pyproject.toml ./
 RUN chown -R appuser /app
