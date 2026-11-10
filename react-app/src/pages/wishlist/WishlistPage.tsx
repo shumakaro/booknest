@@ -1,3 +1,4 @@
+import { notify } from "../../lib/notifications";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getWishlist, syncWishlist } from "../../api/wishlist";
@@ -28,7 +29,7 @@ export function WishlistPage() {
     const previous = books;
     // Показываем удаление сразу; при неудаче возвращаем точное предыдущее состояние.
     setBooks(books.filter(item => item.id !== book.id)); setPending(true); setError("");
-    try { await syncWishlist(book); }
+    try { await syncWishlist(book); notify("Книга удалена из желаемого"); }
     catch (reason) { setBooks(previous); setError(toUserMessage(reason) + " Изменение отменено."); }
     finally { setPending(false); }
   }

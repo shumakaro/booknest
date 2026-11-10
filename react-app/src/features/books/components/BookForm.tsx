@@ -1,3 +1,4 @@
+import { notify } from "../../../lib/notifications";
 import { useState } from "react";
 
 import {
@@ -81,6 +82,8 @@ export function BookForm({
         bookId,
       );
 
+      // Уведомление отправляется только после успешного ответа, до перехода на другую страницу.
+      notify(mode === "create" ? "Книга добавлена в каталог" : "Изменения книги сохранены");
       onSuccess();
     } catch (error) {
       if (

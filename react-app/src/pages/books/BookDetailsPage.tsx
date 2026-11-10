@@ -1,3 +1,4 @@
+import { notify } from "../../lib/notifications";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiFetch, toUserMessage } from "../../api/client";
@@ -18,14 +19,14 @@ export function BookDetailsPage() {
     setPending(true); setMessage("");
     const due = new Date(); due.setDate(due.getDate() + 14);
     const dueDate = [due.getFullYear(), String(due.getMonth() + 1).padStart(2, "0"), String(due.getDate()).padStart(2, "0")].join("-");
-    try { await apiFetch(`/books/${bookId}/loans`, { method: "POST", body: JSON.stringify({ due_date: dueDate }) }); setMessage("Книга выдана. Возврат доступен в разделе выдач."); retry(); }
+    try { await apiFetch(`/books/${bookId}/loans`, { method: "POST", body: JSON.stringify({ due_date: dueDate }) }); notify("Книга выдана. Приятного чтения!"); setMessage("Книга выдана. Возврат доступен в разделе выдач."); retry(); }
     catch (reason) { setMessage(toUserMessage(reason)); }
     finally { setPending(false); }
   }
   async function remove() {
     if (!confirm("Удалить книгу из каталога?")) return;
     setPending(true);
-    try { await apiFetch(`/books/${bookId}`, { method: "DELETE" }); navigate("/books"); }
+    try { await apiFetch(`/books/${bookId}`, { method: "DELETE" }); notify("Книга удалена из каталога"); navigate("/books"); }
     catch (reason) { setMessage(toUserMessage(reason)); setPending(false); }
   }
   if (status === "loading") return <Spinner label="Загружаем информацию о книге..." />;
@@ -39,7 +40,7 @@ export function BookDetailsPage() {
       <dt>Год издания</dt><dd>{details.record?.edition_year}</dd><dt>Страниц</dt><dd>{details.record?.pages}</dd>
       <dt>Доступно экземпляров</dt><dd>{details.record?.available}</dd></dl>
     {message && <p role="status">{message}</p>}
-    <button disabled={pending || !details.record?.available} onClick={() => { void issue(); }}>Взять книгу</button>
+    <button disabled={pending || !details.record?.available} onClick={() => { void issue(); }}>{pending ? "Выполняется…" : "Взять книгу"}</button>
     <p><Link to="/loans">Перейти к выдачам</Link></p>
     {user?.role === "librarian" && <><p><Link to={`/books/${bookId}/edit`}>Редактировать книгу</Link></p>
       <button disabled={pending} onClick={() => { void remove(); }}>Удалить книгу</button></>}
