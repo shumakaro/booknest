@@ -48,8 +48,10 @@ export function AppLayout() {
             to="/books"
             className={getNavClass}
           >
-            Каталог
+            Моя библиотека
           </NavLink>
+
+          <NavLink to="/discover" className={getNavClass}>Глобальный поиск</NavLink>
 
           <NavLink
             to="/wishlist"

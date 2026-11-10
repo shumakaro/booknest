@@ -12,6 +12,8 @@ import {
 import { Spinner } from "../../components/Spinner";
 import { BookDetailsPage } from "../../pages/books/BookDetailsPage";
 import { BooksPage } from "../../pages/books/BooksPage";
+import { DiscoverPage } from "../../pages/discover/DiscoverPage";
+import { ExternalBookPage } from "../../pages/discover/ExternalBookPage";
 
 import { LoginPage } from "../../pages/login/LoginPage";
 import { NotFoundPage } from "../../pages/not-found/NotFoundPage";
@@ -62,6 +64,8 @@ export function AppRouter() {
       <Route
         element={<AppLayout />}
       >
+        <Route path="discover" element={<DiscoverPage />} />
+        <Route path="discover/:workId" element={<ExternalBookPage />} />
         <Route
           index
           element={
