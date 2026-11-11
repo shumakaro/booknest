@@ -1,0 +1,14 @@
+/* Форма интегрированного каталога ЛР10; правила ограничены ее классом. */
+.book-form .book-form__body { border: 0; margin: 0; padding: 0; min-width: 0; }
+.book-form__intro, .book-form__draft { color: var(--muted); line-height: 1.7; }
+.book-form .book-form__group { border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 24px 0; min-width: 0; }
+.book-form__group > legend { font-family: Georgia, serif; font-size: 1.2rem; padding: 0 8px; }
+.book-form__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.book-form__field { min-width: 0; }
+.book-form__field label { display: block; font-weight: 600; margin-bottom: 8px; }
+.book-form__field input { width: 100%; min-width: 0; min-height: 44px; }
+.book-form__hint { font-size: .85rem; color: var(--muted); line-height: 1.6; margin: 8px 0 0; }
+.book-form__field [aria-invalid="true"] { border-color: var(--danger); }
+.book-form__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.book-form__actions button { min-height: 44px; }
+@media (max-width: 760px) { .book-form__grid { grid-template-columns: 1fr; } .book-form .book-form__group { padding: 14px; } }

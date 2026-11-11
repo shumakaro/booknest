@@ -31,7 +31,7 @@ export function BookDetailsPage() {
     finally { setPending(false); }
   }
   async function remove() {
-    if (!confirm("Удалить книгу из каталога?")) return;
+    if (!confirm(`Удалить «${details?.title ?? "книгу"}» из каталога?\nКнига будет скрыта; история выдач сохранится.`)) return;
     setPending(true); setActionError(false);
     try { await apiFetch(`/books/${bookId}`, { method: "DELETE" }); notify("Книга удалена из каталога"); navigate(back); }
     catch (reason) { setActionError(true); setMessage(toUserMessage(reason)); setPending(false); }
@@ -60,7 +60,7 @@ export function BookDetailsPage() {
       {record?.external_work_id && <p className="book-detail__source">Сведения о конкретном издании импортированной книги могут требовать уточнения: издательство, язык, год издания и число страниц проверяются отдельно.</p>}
       <BookDescription key={details.id} text={details.description} />
       {user?.role === "librarian" && <section className="book-detail__management" aria-label="Управление книгой"><h3>Управление книгой</h3>
-        <div className="book-detail__actions"><Link to={`/books/${bookId}/edit`}>Редактировать книгу</Link>
+        <div className="book-detail__actions"><Link to={`/books/${bookId}/edit`} state={location.state}>Редактировать книгу</Link>
           <button className="btn btn--ghost" disabled={pending} onClick={() => { void remove(); }}>Удалить книгу</button></div></section>}
     </div></div></article>;
 }

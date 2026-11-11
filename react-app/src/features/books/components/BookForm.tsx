@@ -1,438 +1,104 @@
-import { notify } from "../../../lib/notifications";
-import { useState } from "react";
-
-import {
-  useForm,
-  type SubmitHandler,
-} from "react-hook-form";
-
+// Форма ЛР10 использует контракт собственного API; проверенные данные вводятся явно.
+import { useEffect, useRef, useState } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import {
-  BookFormApiError,
-  saveBook,
-} from "../../../api/bookForm";
-
+import { BookFormApiError, saveBook } from "../../../api/bookForm";
+import { notify } from "../../../lib/notifications";
 import { useUnsavedChanges } from "../../../shared/hooks/useUnsavedChanges";
-
-import {
-  bookSchema,
-  type BookFormValues,
-} from "../bookSchema";
+import { bookSchema, type BookFormValues } from "../bookSchema";
+import "./BookForm.css";
 
 interface BookFormProps {
   mode: "create" | "edit";
   bookId?: string;
-  defaultValues?: BookFormValues;
-  onSuccess: () => void;
+  defaultValues?: Partial<BookFormValues>;
+  onSuccess: (id: string) => void;
+  onCancel?: () => void;
 }
 
-const CREATE_DEFAULTS: BookFormValues = {
-  title: "",
-  author: "",
-  isbn: "",
-  publisher: "",
-  language: "Русский",
-  publicationYear: 2020,
-  editionYear: 2020,
-  pages: 1,
-};
+type Field = { name: keyof BookFormValues; label: string; hint: string; numeric?: boolean; max?: number };
+const groups: { title: string; fields: Field[] }[] = [
+  { title: "Книга и автор", fields: [
+    { name: "title", label: "Название", max: 200, hint: "Полное название, до 200 символов." },
+    { name: "author", label: "Автор", max: 120, hint: "Имя автора, до 120 символов. Существующий автор будет найден автоматически." },
+    { name: "isbn", label: "ISBN", hint: "Необязательно. ISBN-10 или ISBN-13, можно с пробелами и дефисами." },
+  ] },
+  { title: "Конкретное издание", fields: [
+    { name: "publisher", label: "Издательство", max: 100, hint: "Укажите издательство или явно напишите «Не указано»." },
+    { name: "language", label: "Язык", max: 30, hint: "Язык этой книги; неизвестное значение можно обозначить «Не указано»." },
+    { name: "publicationYear", label: "Год первой публикации", numeric: true, hint: "Проверенный год произведения: 1450–2100." },
+    { name: "editionYear", label: "Год издания", numeric: true, hint: "Год конкретного издания, не раньше первой публикации." },
+    { name: "pages", label: "Количество страниц", numeric: true, hint: "Фактическое целое число от 1 до 10000." },
+    { name: "totalCopies", label: "Количество экземпляров", numeric: true, hint: "От 0 до 10000. Нельзя указать меньше количества действующих выдач." },
+  ] },
+];
+const fields = groups.flatMap(group => group.fields);
+// Годы, язык и страницы не подставляются вымышленными значениями при создании.
+const CREATE_DEFAULTS: Partial<BookFormValues> = { title: "", author: "", isbn: "", publisher: "", language: "", totalCopies: 1 };
 
-export function BookForm({
-  mode,
-  bookId,
-  defaultValues,
-  onSuccess,
-}: BookFormProps) {
-  const [
-    generalError,
-    setGeneralError,
-  ] = useState("");
-
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: {
-      errors,
-      isSubmitting,
-      isDirty,
-    },
-  } = useForm<BookFormValues>({
-    resolver:
-      zodResolver(bookSchema),
-
-    defaultValues:
-      defaultValues ??
-      CREATE_DEFAULTS,
+export function BookForm({ mode, bookId, defaultValues, onSuccess, onCancel }: BookFormProps) {
+  const [generalError, setGeneralError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const lock = useRef(false);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const focusField = useRef<keyof BookFormValues | null>(null);
+  const { register, handleSubmit, setError, setFocus, reset, formState: { errors, isSubmitting, isDirty, dirtyFields } } = useForm<BookFormValues>({
+    resolver: zodResolver(bookSchema), defaultValues: { ...CREATE_DEFAULTS, ...defaultValues },
   });
+  const busy = saving || isSubmitting;
+  useUnsavedChanges(isDirty);
+  // Поля во время запроса выключены; фокус ошибки переносится после их включения.
+  useEffect(() => {
+    if (busy) return;
+    if (focusField.current) { setFocus(focusField.current); focusField.current = null; }
+    else if (generalError) errorRef.current?.focus();
+  }, [busy, generalError, setFocus]);
 
-  useUnsavedChanges(
-    isDirty && !isSubmitting,
-  );
-
-  const onSubmit: SubmitHandler<
-    BookFormValues
-  > = async (data) => {
-    setGeneralError("");
-
+  const onSubmit: SubmitHandler<BookFormValues> = async data => {
+    if (lock.current) return;
+    lock.current = true; setSaving(true); setGeneralError("");
     try {
-      await saveBook(
-        data,
-        bookId,
-      );
-
-      // Уведомление отправляется только после успешного ответа, до перехода на другую страницу.
+      const saved = await saveBook(data, bookId, mode === "edit" ? Object.keys(dirtyFields) as (keyof BookFormValues)[] : undefined);
+      reset(data);
       notify(mode === "create" ? "Книга добавлена в каталог" : "Изменения книги сохранены");
-      onSuccess();
+      onSuccess(saved.id);
     } catch (error) {
-      if (
-        error instanceof
-        BookFormApiError
-      ) {
-        if (
-          error.status === 422 &&
-          error.fieldErrors
-        ) {
-          Object.entries(
-            error.fieldErrors,
-          ).forEach(
-            ([field, message]) => {
-              setError(
-                field as keyof BookFormValues,
-                {
-                  type: "server",
-                  message,
-                },
-              );
-            },
-          );
-
-          return;
-        }
-
-        if (
-          error.status === 409 &&
-          error.fieldErrors?.isbn
-        ) {
-          setError("isbn", {
-            type: "server",
-            message:
-              error.fieldErrors
-                .isbn,
-          });
-
-          return;
-        }
-
-        setGeneralError(
-          error.message,
-        );
-
-        return;
-      }
-
-      setGeneralError(
-        "Не удалось сохранить книгу.",
-      );
-    }
+      if (error instanceof BookFormApiError) {
+        const known = fields.filter(field => error.fieldErrors?.[field.name]);
+        if (known.length) {
+          for (const field of known) setError(field.name, { type: "server", message: error.fieldErrors?.[field.name] });
+          focusField.current = known[0]?.name ?? null;
+        } else setGeneralError(error.message);
+      } else setGeneralError("Не удалось сохранить книгу. Проверьте соединение и повторите попытку.");
+    } finally { lock.current = false; setSaving(false); }
   };
 
-  return (
-    <form
-      onSubmit={
-        handleSubmit(onSubmit)
-      }
-      noValidate
-    >
-      <div>
-        <label htmlFor="title">
-          Название
-        </label>
-
-        <input
-          id="title"
-          {...register("title")}
-          aria-invalid={
-            Boolean(errors.title)
-          }
-          aria-describedby={
-            errors.title
-              ? "title-error"
-              : undefined
-          }
-        />
-
-        {errors.title && (
-          <p
-            id="title-error"
-            role="alert"
-          >
-            {errors.title.message}
-          </p>
-        )}
+  return <form className="book-form" aria-label={mode === "create" ? "Новая книга" : "Редактирование книги"} aria-busy={busy} noValidate
+    onSubmit={handleSubmit(onSubmit, invalid => {
+      const first = fields.find(field => invalid[field.name]);
+      if (first) requestAnimationFrame(() => setFocus(first.name));
+    })}>
+    <p className="book-form__intro">ISBN можно оставить пустым. Остальные характеристики заполняются проверенными данными; сохранение проверяется и на сервере.</p>
+    <fieldset disabled={busy} className="book-form__body"><legend className="visually-hidden">Данные книги</legend>
+      {groups.map(group => <fieldset className="book-form__group" key={group.title}><legend>{group.title}</legend>
+        <div className="book-form__grid">{group.fields.map(field => <div className="book-form__field" key={field.name}>
+          <label htmlFor={`book-${field.name}`}>{field.label}</label>
+          <input id={`book-${field.name}`} type={field.numeric ? "number" : "text"} step={field.numeric ? 1 : undefined} maxLength={field.max}
+            {...register(field.name, field.numeric ? { valueAsNumber: true } : {})}
+            aria-invalid={Boolean(errors[field.name])}
+            aria-describedby={`book-${field.name}-hint${errors[field.name] ? ` book-${field.name}-error` : ""}`} />
+          <p id={`book-${field.name}-hint`} className="book-form__hint">{field.hint}</p>
+          {errors[field.name] && <p id={`book-${field.name}-error`} role="alert">{errors[field.name]?.message}</p>}
+        </div>)}</div>
+      </fieldset>)}
+      <div className="book-form__actions"><button className="btn btn--primary" type="submit" disabled={mode === "edit" && !isDirty}>
+        {busy ? "Сохранение..." : mode === "create" ? "Создать книгу" : "Сохранить изменения"}</button>
+        {onCancel && <button type="button" className="btn btn--ghost" onClick={() => {
+          if (!isDirty || confirm("Есть несохранённые изменения. Отменить редактирование?")) onCancel();
+        }}>Отмена</button>}
       </div>
-
-      <div>
-        <label htmlFor="author">
-          Автор
-        </label>
-
-        <input
-          id="author"
-          {...register("author")}
-          aria-invalid={
-            Boolean(errors.author)
-          }
-          aria-describedby={
-            errors.author
-              ? "author-error"
-              : undefined
-          }
-        />
-
-        {errors.author && (
-          <p
-            id="author-error"
-            role="alert"
-          >
-            {errors.author.message}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="isbn">
-          ISBN
-        </label>
-
-        <input
-          id="isbn"
-          {...register("isbn")}
-          aria-invalid={
-            Boolean(errors.isbn)
-          }
-          aria-describedby={
-            errors.isbn
-              ? "isbn-error"
-              : undefined
-          }
-        />
-
-        {errors.isbn && (
-          <p
-            id="isbn-error"
-            role="alert"
-          >
-            {errors.isbn.message}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="publisher">
-          Издательство
-        </label>
-
-        <input
-          id="publisher"
-          {...register("publisher")}
-          aria-invalid={
-            Boolean(
-              errors.publisher,
-            )
-          }
-          aria-describedby={
-            errors.publisher
-              ? "publisher-error"
-              : undefined
-          }
-        />
-
-        {errors.publisher && (
-          <p
-            id="publisher-error"
-            role="alert"
-          >
-            {
-              errors.publisher
-                .message
-            }
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="language">
-          Язык
-        </label>
-
-        <input
-          id="language"
-          {...register("language")}
-          aria-invalid={
-            Boolean(
-              errors.language,
-            )
-          }
-          aria-describedby={
-            errors.language
-              ? "language-error"
-              : undefined
-          }
-        />
-
-        {errors.language && (
-          <p
-            id="language-error"
-            role="alert"
-          >
-            {
-              errors.language
-                .message
-            }
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="publicationYear">
-          Год первой публикации
-        </label>
-
-        <input
-          id="publicationYear"
-          type="number"
-          {...register(
-            "publicationYear",
-            {
-              valueAsNumber:
-                true,
-            },
-          )}
-          aria-invalid={
-            Boolean(
-              errors.publicationYear,
-            )
-          }
-          aria-describedby={
-            errors.publicationYear
-              ? "publicationYear-error"
-              : undefined
-          }
-        />
-
-        {errors.publicationYear && (
-          <p
-            id="publicationYear-error"
-            role="alert"
-          >
-            {
-              errors
-                .publicationYear
-                .message
-            }
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="editionYear">
-          Год издания
-        </label>
-
-        <input
-          id="editionYear"
-          type="number"
-          {...register(
-            "editionYear",
-            {
-              valueAsNumber:
-                true,
-            },
-          )}
-          aria-invalid={
-            Boolean(
-              errors.editionYear,
-            )
-          }
-          aria-describedby={
-            errors.editionYear
-              ? "editionYear-error"
-              : undefined
-          }
-        />
-
-        {errors.editionYear && (
-          <p
-            id="editionYear-error"
-            role="alert"
-          >
-            {
-              errors.editionYear
-                .message
-            }
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="pages">
-          Количество страниц
-        </label>
-
-        <input
-          id="pages"
-          type="number"
-          {...register(
-            "pages",
-            {
-              valueAsNumber:
-                true,
-            },
-          )}
-          aria-invalid={
-            Boolean(errors.pages)
-          }
-          aria-describedby={
-            errors.pages
-              ? "pages-error"
-              : undefined
-          }
-        />
-
-        {errors.pages && (
-          <p
-            id="pages-error"
-            role="alert"
-          >
-            {errors.pages.message}
-          </p>
-        )}
-      </div>
-
-      {generalError && (
-        <p role="alert">
-          {generalError}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-      >
-        {isSubmitting
-          ? "Сохранение..."
-          : mode === "create"
-            ? "Создать книгу"
-            : "Сохранить изменения"}
-      </button>
-
-      {isDirty && (
-        <p>
-          Есть несохранённые изменения.
-        </p>
-      )}
-    </form>
-  );
+    </fieldset>
+    {generalError && <p ref={errorRef} tabIndex={-1} role="alert">{generalError}</p>}
+    {isDirty && <p className="book-form__draft">Есть несохранённые изменения.</p>}
+  </form>;
 }
