@@ -53,8 +53,13 @@ class CatalogService:
             # Изменения одной операции фиксируются один раз, после всех проверок.
             self.db.commit()
             return self.read(resource, item.id)
-        except IntegrityError:
+        except IntegrityError as error:
+            # Название известного ограничения определяет поле конфликта без выдачи SQL.
+            # Остальные ошибки целостности не должны ошибочно помечаться как ISBN.
+            constraint = getattr(getattr(error.orig, "diag", None), "constraint_name", None)
             self.db.rollback()
+            if resource == "books" and constraint == "books_isbn_key":
+                raise HTTPException(409, "ISBN уже используется другой записью") from None
             raise HTTPException(409, "Данные конфликтуют с существующей записью") from None
 
     def delete(self, resource: str, item_id: int) -> None:

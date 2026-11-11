@@ -2,6 +2,7 @@ import {
   Link,
   useNavigate,
   useParams,
+  useLocation,
 } from "react-router-dom";
 
 import { Spinner } from "../../components/Spinner";
@@ -13,6 +14,7 @@ import type { BookFormValues } from "../../features/books/bookSchema";
 export function BookFormPage() {
   const navigate =
     useNavigate();
+  const location = useLocation();
 
   const { bookId } =
     useParams<{
@@ -72,7 +74,7 @@ export function BookFormPage() {
   }
 
   let defaultValues:
-    | BookFormValues
+    | Partial<BookFormValues>
     | undefined;
 
   if (
@@ -86,9 +88,10 @@ export function BookFormPage() {
       isbn: record?.isbn ?? "",
       publisher: record?.publisher ?? "",
       language: record?.language ?? "",
-      publicationYear: record?.year ?? 2020,
-      editionYear: record?.edition_year ?? record?.year ?? 2020,
-      pages: record?.pages ?? 1,
+      publicationYear: record?.year,
+      editionYear: record?.edition_year ?? undefined,
+      pages: record?.pages,
+      totalCopies: record?.total_copies,
     };
   }
 
@@ -100,7 +103,7 @@ export function BookFormPage() {
       navigate(
         `/books/${encodeURIComponent(
           bookId,
-        )}`,
+        )}`, { state: location.state },
       );
 
       return;
@@ -118,6 +121,7 @@ export function BookFormPage() {
       </h2>
 
       <BookForm
+        key={bookId ?? "create"}
         mode={mode}
         bookId={bookId}
         defaultValues={
@@ -126,13 +130,9 @@ export function BookFormPage() {
         onSuccess={
           handleSuccess
         }
+        onCancel={() => navigate(bookId ? `/books/${encodeURIComponent(bookId)}` : "/books", { state: location.state })}
       />
 
-      <p>
-        <Link to="/books">
-          Отмена
-        </Link>
-      </p>
     </section>
   );
 }

@@ -1,0 +1,22 @@
+{
+  "backend": {
+    "tests": "93",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "10.708"
+  },
+  "backend_environment": "Existing local PostgreSQL _test on loopback 55432; rollback; no production",
+  "backend_warning": "1 pre-existing anyio/Starlette DeprecationWarning",
+  "initial_backend_attempt": "failed to connect to stopped local cluster; restarted existing cluster; no initdb/seed/restore",
+  "frontend": {
+    "tests": 48,
+    "files": 10,
+    "repeat": "passed",
+    "last_duration_seconds": 6.49
+  },
+  "build": "TypeScript/Vite passed",
+  "lint": "ESLint/Ruff passed",
+  "docker": "not run",
+  "production": "not accessed"
+}
