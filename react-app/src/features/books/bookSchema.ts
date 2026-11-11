@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeIsbn } from "./isbn";
 
 export const bookSchema = z
   .object({
@@ -6,21 +7,19 @@ export const bookSchema = z
       .string()
       .trim()
       .min(2, "Название должно содержать минимум 2 символа.")
-      .max(120, "Название слишком длинное."),
+      .max(200, "Название слишком длинное (до 200 символов)."),
 
     author: z
       .string()
       .trim()
       .min(2, "Укажите автора.")
-      .max(100, "Имя автора слишком длинное."),
+      .max(120, "Имя автора слишком длинное (до 120 символов)."),
 
     isbn: z
       .string()
       .trim()
-      .regex(
-        /^(?:\d{10}|\d{13})$/,
-        "ISBN должен содержать 10 или 13 цифр.",
-      ),
+      .refine(value => { try { normalizeIsbn(value); return true; } catch { return false; } },
+        "Проверьте ISBN-10 или ISBN-13 и контрольную цифру; неизвестный ISBN можно оставить пустым."),
 
     publisher: z
       .string()
@@ -31,7 +30,11 @@ export const bookSchema = z
     language: z
       .string()
       .trim()
-      .min(2, "Укажите язык."),
+      .min(2, "Укажите язык.")
+      .max(30, "Название языка слишком длинное."),
+
+    totalCopies: z.number({ error: "Укажите количество экземпляров." }).int("Нужно целое число.")
+      .min(0, "Количество не может быть отрицательным.").max(10000, "Допустимо до 10000 экземпляров.").optional(),
 
     publicationYear: z
       .number({

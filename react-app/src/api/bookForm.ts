@@ -1,6 +1,7 @@
 import type { BookFormValues } from "../features/books/bookSchema";
-import type { AuthorRead, BookCreate, BookRead, Page_AuthorRead_ } from "./generated";
+import type { AuthorRead, BookUpdate, BookRead, Page_AuthorRead_ } from "./generated";
 import { apiFetch, ApiError, toUserMessage } from "./client";
+import { normalizeIsbn } from "../features/books/isbn";
 
 export class BookFormApiError extends ApiError {
   fieldErrors?: Record<string, string>;
@@ -9,31 +10,21 @@ export class BookFormApiError extends ApiError {
   }
 }
 
-function isbn13(value: string): string {
-  // Старые формы разрешали ISBN-10. Преобразуем корректный ISBN-10 в ISBN-13.
-  if (value.length === 13) return value;
-  let checksum = 0;
-  for (let index = 0; index < 10; index++) checksum += Number(value[index]) * (10 - index);
-  if (value.length !== 10 || checksum % 11 !== 0) {
-    throw new BookFormApiError("Проверьте ISBN", 422, { isbn: "Неверная контрольная цифра ISBN-10." });
-  }
-  const prefix = "978" + value.slice(0, 9);
-  let sum = 0;
-  for (let index = 0; index < 12; index++) sum += Number(prefix[index]) * (index % 2 === 0 ? 1 : 3);
-  return prefix + String((10 - sum % 10) % 10);
-}
-
 async function findAuthor(name: string): Promise<AuthorRead | undefined> {
   const params = new URLSearchParams({ q: name, size: "100" });
   const result = await apiFetch<Page_AuthorRead_>(`/authors?${params}`);
   return result.items.find(author => author.name.toLocaleLowerCase() === name.toLocaleLowerCase());
 }
 
-export async function saveBook(data: BookFormValues, bookId?: string): Promise<{ id: string }> {
+export async function saveBook(data: BookFormValues, bookId?: string, changed?: (keyof BookFormValues)[]): Promise<{ id: string }> {
   try {
-    const isbn = isbn13(data.isbn);
-    let author = await findAuthor(data.author.trim());
-    if (!author) {
+    let isbn: string | null;
+    try { isbn = normalizeIsbn(data.isbn); }
+    catch (error) { throw new BookFormApiError("Проверьте ISBN", 422, { isbn: (error as Error).message }); }
+    // PATCH отправляет только измененные поля и не создает автора при правке страниц.
+    const needsAuthor = !bookId || !changed || changed.includes("author");
+    let author = needsAuthor ? await findAuthor(data.author.trim()) : undefined;
+    if (needsAuthor && !author) {
       try { author = await apiFetch<AuthorRead>("/authors", { method: "POST", body: JSON.stringify({ name: data.author.trim() }) }); }
       catch (reason) {
         if (!(reason instanceof ApiError) || reason.status !== 409) throw reason;
@@ -41,8 +32,16 @@ export async function saveBook(data: BookFormValues, bookId?: string): Promise<{
         if (!author) throw reason;
       }
     }
-    const payload: BookCreate = { title: data.title, author_id: author.id, isbn, year: data.publicationYear,
+    let payload: BookUpdate = { title: data.title, isbn, year: data.publicationYear,
       edition_year: data.editionYear, publisher: data.publisher, language: data.language, pages: data.pages };
+    if (author) payload.author_id = author.id;
+    if (data.totalCopies !== undefined) payload.total_copies = data.totalCopies;
+    if (bookId && changed) {
+      const aliases: Record<string, string> = { author: "author_id", publicationYear: "year", editionYear: "edition_year", totalCopies: "total_copies" };
+      const keys = new Set(changed.map(field => aliases[field] ?? field));
+      payload = Object.fromEntries(Object.entries(payload).filter(([field]) => keys.has(field)));
+      if (!Object.keys(payload).length) return { id: bookId };
+    }
     const saved = await apiFetch<BookRead>(bookId ? `/books/${encodeURIComponent(bookId)}` : "/books",
       { method: bookId ? "PATCH" : "POST", body: JSON.stringify(payload) });
     return { id: String(saved.id) };
@@ -50,12 +49,12 @@ export async function saveBook(data: BookFormValues, bookId?: string): Promise<{
     if (reason instanceof BookFormApiError) throw reason;
     if (reason instanceof ApiError) {
       const fields: Record<string, string> = {};
-      const aliases: Record<string, string> = { year: "publicationYear", edition_year: "editionYear", author_id: "author" };
+      const aliases: Record<string, string> = { year: "publicationYear", edition_year: "editionYear", author_id: "author", total_copies: "totalCopies" };
       for (const detail of reason.details ?? []) {
         const key = String(detail.loc?.at(-1) ?? "");
         if (key && detail.msg) fields[aliases[key] ?? key] = detail.msg;
       }
-      if (reason.status === 409) fields.isbn = reason.message;
+      if (reason.status === 409 && /isbn/i.test(reason.message)) fields.isbn = reason.message;
       throw new BookFormApiError(toUserMessage(reason), reason.status, fields);
     }
     throw reason;
