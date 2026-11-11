@@ -1,0 +1,16 @@
+/* ЛР10: карточки выдач используют существующие темы и не прячут действия на телефоне. */
+.loans-intro { color: var(--muted); line-height: 1.7; }
+.loans-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0; }
+.page .loans-filters button:not(.btn) { min-height: 44px; background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.page .loans-filters button[aria-pressed="true"] { background: var(--primary); color: var(--button-text); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.loan-list { list-style: none; padding: 0; display: grid; gap: 18px; }
+.loan-card { min-width: 0; padding: 22px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+.loan-card__heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; }
+.loan-card h3 { margin: 0; overflow-wrap: anywhere; }
+.loan-card dl { display: flex; flex-wrap: wrap; gap: 16px 36px; margin: 20px 0; }
+.loan-card dt { color: var(--muted); font-size: .9rem; }
+.loan-card dd { margin: 4px 0 0; }
+.page .loan-card button:not(.btn) { min-height: 44px; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.loans-page .loan-state--overdue { color: var(--danger); border: 1px solid currentColor; background: var(--surface); }
+.loan-state--today { border: 1px solid currentColor; }
+@media (max-width: 540px) { .loan-card { padding: 18px; } .loan-card dl { display: grid; gap: 14px; } .loan-card button { width: 100%; } }
