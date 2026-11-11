@@ -198,3 +198,5 @@ class LoanRead(BaseModel):
     issued_at: date
     due_date: date
     returned_at: date | None
+    # Дополнительное поле списка; прежние ответы выдачи/возврата остаются совместимыми.
+    book_title: str | None = None

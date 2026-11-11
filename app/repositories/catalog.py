@@ -196,7 +196,9 @@ class LoanRepository:
     def get(self, item_id: int, lock: bool = False) -> Loan | None:
         stmt = select(Loan).where(Loan.id == item_id)
         if lock:
-            stmt = stmt.with_for_update()
+            # get_own_loan уже мог прочитать объект до ожидания блокировки.
+            # После ожидания нужны свежие returned_at, а не прежнее состояние identity map.
+            stmt = stmt.with_for_update().execution_options(populate_existing=True)
         return self.db.scalar(stmt)
 
     def user(self, user_id: int) -> User | None:
@@ -218,10 +220,23 @@ class LoanRepository:
         self.db.flush()
         return loan
 
-    def list(self, user_id: int | None, page: int, size: int) -> dict:
-        stmt = select(Loan)
+    def list(self, user_id: int | None, page: int, size: int, state: str = "all") -> dict:
+        # Название загружается сразу, включая мягко удаленные исторические книги.
+        stmt = select(Loan, Book.title).join(Book, Book.id == Loan.book_id)
         if user_id is not None:
             stmt = stmt.where(Loan.user_id == user_id)
+        if state in ("active", "overdue"):
+            stmt = stmt.where(Loan.returned_at.is_(None))
+        if state == "overdue":
+            # В день срока книга еще не просрочена; returned исключен выше.
+            stmt = stmt.where(Loan.due_date < func.current_date())
+        if state == "returned":
+            stmt = stmt.where(Loan.returned_at.is_not(None))
         total = self.db.scalar(select(func.count()).select_from(stmt.subquery()))
-        items = list(self.db.scalars(stmt.order_by(Loan.id).offset((page - 1) * size).limit(size)))
+        order = (Loan.due_date, Loan.id) if state in ("active", "overdue") else (Loan.id,)
+        rows = self.db.execute(stmt.order_by(*order).offset((page - 1) * size).limit(size))
+        items = [{"id": loan.id, "book_id": loan.book_id, "book_title": title,
+                  "user_id": loan.user_id, "issued_at": loan.issued_at,
+                  "due_date": loan.due_date, "returned_at": loan.returned_at}
+                 for loan, title in rows]
         return {"items": items, "total": total, "page": page, "size": size}

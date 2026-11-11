@@ -1,6 +1,6 @@
 """Выдачи защищены личностью и проверкой владения, отчёт — ролью."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, HTTPException
 from app.core.auth import CurrentUser, Database, Librarian, get_own_loan
 from app.core.pagination import Pagination
@@ -23,9 +23,13 @@ def issue_book(item_id: int, payload: LoanCreate, db: Database, user: CurrentUse
 
 
 @router.get("/loans", response_model=Page[LoanRead], status_code=200)
-def list_loans(db: Database, pagination: Paging, user: CurrentUser) -> dict:
+def list_loans(
+    db: Database, pagination: Paging, user: CurrentUser,
+    state: Literal["all", "active", "overdue", "returned"] = "all",
+) -> dict:
+    """Фильтр применяется к личным записям до подсчета и пагинации."""
     user_id = None if user.role == "librarian" else user.id
-    return LoanService(db).repo.list(user_id, pagination.page, pagination.size)
+    return LoanService(db).repo.list(user_id, pagination.page, pagination.size, state)
 
 
 @router.get("/loans/{loan_id}", response_model=LoanRead, status_code=200)

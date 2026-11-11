@@ -131,6 +131,7 @@ export interface LoanRead {
   issued_at: string;
   due_date: string;
   returned_at: string | null;
+  book_title?: string | null;
 }
 
 export interface LoanReturn {

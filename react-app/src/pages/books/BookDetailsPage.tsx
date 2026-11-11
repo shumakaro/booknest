@@ -1,5 +1,5 @@
 import { notify } from "../../lib/notifications";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { apiFetch, toUserMessage } from "../../api/client";
 import { useAuth } from "../../app/useAuth";
@@ -15,29 +15,37 @@ export function BookDetailsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  // Возврат разрешен только во внутренний каталог; прямое открытие тоже работает.
+  // Возврат разрешен только в известные внутренние списки.
   const from: unknown = location.state?.from;
   const back = typeof from === "string" && (from === "/books" || from.startsWith("/books?")
-    || from === "/wishlist" || from.startsWith("/wishlist?")) ? from : "/books";
-  const backLabel = back.startsWith("/wishlist") ? "Вернуться в желаемое" : "Вернуться в каталог";
+    || from === "/wishlist" || from.startsWith("/wishlist?")
+    || from === "/loans" || from.startsWith("/loans?")) ? from : "/books";
+  const backLabel = back.startsWith("/wishlist") ? "Вернуться в желаемое" : back.startsWith("/loans") ? "Вернуться к выдачам" : "Вернуться в каталог";
   const backState = { restoreScrollY: location.state?.fromScrollY };
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState(false);
   const [pending, setPending] = useState(false);
+  // Ref закрывает промежуток между кликом и перерисовкой disabled-кнопки.
+  const actionLock = useRef(false);
   async function issue() {
     if (!user) { navigate("/login", { state: { from: { pathname: `/books/${bookId}` } } }); return; }
+    if (actionLock.current) return;
+    actionLock.current = true;
     setPending(true); setMessage(""); setActionError(false);
     const due = new Date(); due.setDate(due.getDate() + 14);
     const dueDate = [due.getFullYear(), String(due.getMonth() + 1).padStart(2, "0"), String(due.getDate()).padStart(2, "0")].join("-");
     try { await apiFetch(`/books/${bookId}/loans`, { method: "POST", body: JSON.stringify({ due_date: dueDate }) }); notify("Книга выдана. Приятного чтения!"); setMessage("Книга выдана. Возврат доступен в разделе выдач."); retry(); }
     catch (reason) { setActionError(true); setMessage(toUserMessage(reason)); }
-    finally { setPending(false); }
+    finally { actionLock.current = false; setPending(false); }
   }
   async function remove() {
+    if (actionLock.current) return;
     if (!confirm(`Удалить «${details?.title ?? "книгу"}» из каталога?\nКнига будет скрыта; история выдач сохранится.`)) return;
+    actionLock.current = true;
     setPending(true); setActionError(false);
     try { await apiFetch(`/books/${bookId}`, { method: "DELETE" }); notify("Книга удалена из каталога"); navigate(back); }
-    catch (reason) { setActionError(true); setMessage(toUserMessage(reason)); setPending(false); }
+    catch (reason) { setActionError(true); setMessage(toUserMessage(reason)); }
+    finally { actionLock.current = false; setPending(false); }
   }
   if (status === "loading") return <Spinner label="Загружаем информацию о книге..." />;
   if (status === "error") return <section><h2>{notFound ? "Книга не найдена" : "Не удалось загрузить книгу"}</h2><ErrorBox message={errorMessage} onRetry={retry} /><Link to={back} state={backState}>{backLabel}</Link></section>;

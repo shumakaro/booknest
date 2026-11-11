@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-11",
+  "backend": {
+    "runner": "pytest",
+    "database": "existing local dedicated PostgreSQL _test; transactional fixtures; no Neon",
+    "tests": 102,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 13.484,
+    "warnings": 1,
+    "warningNote": "Existing Starlette/AnyIO deprecation warning"
+  },
+  "frontend": {
+    "runner": "Vitest",
+    "tests": 69,
+    "files": 13,
+    "passed": true,
+    "repeated": true,
+    "seconds": 8.18
+  },
+  "build": "tsc -b && vite build: passed after fixing TypeScript errors",
+  "lint": "ESLint and Ruff passed",
+  "browser": "Edge: local production build, fixture API; repeated after CSS specificity fix",
+  "concurrency": "cached ORM state refreshed under row lock; SQL stale-state regression and sequential conflicts tested; no multi-connection stress test",
+  "docker": "not run in stage 7",
+  "production": "not used; no deploy or merge"
+}
