@@ -1,0 +1,29 @@
+{
+  "source": "Локальная production-сборка; API/обложки учебные; рабочая БД не используется",
+  "localCover": true,
+  "missingFactsExplicit": true,
+  "unavailableLoanDisabled": true,
+  "guestGoesToLogin": true,
+  "readerHasNoManagementOrImport": true,
+  "externalHasNoLocalLoan": true,
+  "brokenCoverFallback": true,
+  "descriptionExpandCollapse": true,
+  "externalHtmlIsText": true,
+  "unknownYearNotInvented": true,
+  "missingAuthorBlocksImport": true,
+  "pendingBlocksFieldsAndDuplicateSubmit": true,
+  "failedImportRetainsValues": true,
+  "serverResultCopiesPreserved": true,
+  "successFocusesLocalLink": true,
+  "librarianManagementVisible": true,
+  "externalResponsive": true,
+  "darkTheme": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "horizontalOverflow": false,
+  "pageErrors": []
+}
