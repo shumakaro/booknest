@@ -8,6 +8,8 @@ import { apiFetch } from '../api/client';
 // Ошибка бизнес-правила приходит с сервера: проверяется сообщение для пользователя,
 // а не внутренняя реализация компонента или CSS-классы.
 vi.mock('../app/useAuth', () => ({ useAuth: () => ({ user: { role: 'member' } }) }));
+// Этот тест проверяет выдачу; серверное желаемое имеет отдельные сценарии.
+vi.mock('../features/books/components/WishlistAction', () => ({ WishlistAction: () => null }));
 vi.mock('../features/books/hooks/useBookDetails', () => ({ useBookDetails: () => ({
   details: { title: 'Тестовая книга', authors: [], record: { available: 1 } },
   status: 'success', retry: vi.fn(),

@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-11",
+  "backend": {
+    "runner": "pytest",
+    "database": "existing local PostgreSQL dedicated _test; rollback fixtures; no Neon",
+    "tests": 95,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 34.075,
+    "warnings": 1,
+    "warningNote": "Existing Starlette/AnyIO deprecation warning"
+  },
+  "frontend": {
+    "runner": "Vitest",
+    "tests": 60,
+    "files": 12,
+    "passed": true,
+    "seconds": 17.29,
+    "repeated": true
+  },
+  "build": "tsc -b && vite build: passed",
+  "lint": "ESLint passed; Ruff tests/test_integration.py passed; node --check browser scripts passed",
+  "docker": "not run in stage 6",
+  "production": "not used; no deploy or merge"
+}

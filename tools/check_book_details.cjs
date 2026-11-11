@@ -37,6 +37,8 @@ const { chromium } = createRequire(path.resolve('react-app/package.json'))('@pla
     }
     if (url.pathname.endsWith('/books/7')) return reply(localBook);
     if (url.pathname.endsWith('/books/2')) return reply({ ...localBook, id: 2, available: 0 });
+    // ЛР10: детали читают личное желаемое; ответ остается учебным и изолированным.
+    if (url.pathname.endsWith('/wishlist')) return reply({ items: [], total: 0, page: 1, size: 100 });
     return reply({ message: 'Учебная запись не найдена' }, 404);
   });
   try {
