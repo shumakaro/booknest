@@ -7,6 +7,7 @@ import { ErrorBox } from "../../components/ErrorBox";
 import { Spinner } from "../../components/Spinner";
 import { useBookDetails } from "../../features/books/hooks/useBookDetails";
 import { BookCover, BookDescription, BookFacts } from "../../features/books/components/BookPresentation";
+import { WishlistAction } from "../../features/books/components/WishlistAction";
 
 export function BookDetailsPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -16,7 +17,9 @@ export function BookDetailsPage() {
   const location = useLocation();
   // Возврат разрешен только во внутренний каталог; прямое открытие тоже работает.
   const from: unknown = location.state?.from;
-  const back = typeof from === "string" && (from === "/books" || from.startsWith("/books?")) ? from : "/books";
+  const back = typeof from === "string" && (from === "/books" || from.startsWith("/books?")
+    || from === "/wishlist" || from.startsWith("/wishlist?")) ? from : "/books";
+  const backLabel = back.startsWith("/wishlist") ? "Вернуться в желаемое" : "Вернуться в каталог";
   const backState = { restoreScrollY: location.state?.fromScrollY };
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState(false);
@@ -37,10 +40,10 @@ export function BookDetailsPage() {
     catch (reason) { setActionError(true); setMessage(toUserMessage(reason)); setPending(false); }
   }
   if (status === "loading") return <Spinner label="Загружаем информацию о книге..." />;
-  if (status === "error") return <section><h2>{notFound ? "Книга не найдена" : "Не удалось загрузить книгу"}</h2><ErrorBox message={errorMessage} onRetry={retry} /><Link to={back} state={backState}>Вернуться в каталог</Link></section>;
+  if (status === "error") return <section><h2>{notFound ? "Книга не найдена" : "Не удалось загрузить книгу"}</h2><ErrorBox message={errorMessage} onRetry={retry} /><Link to={back} state={backState}>{backLabel}</Link></section>;
   if (!details) return <p>Данные книги отсутствуют.</p>;
   const record = details.record;
-  return <article className="book-detail-page"><Link className="book-detail__back" to={back} state={backState}>Вернуться в каталог</Link>
+  return <article className="book-detail-page"><Link className="book-detail__back" to={back} state={backState}>{backLabel}</Link>
     <div className="book-detail__layout"><aside className="book-detail__aside">
       <BookCover title={details.title} coverId={record?.cover_id} />
       <p className="book-detail__source">Книга из моей библиотеки</p>
@@ -55,6 +58,7 @@ export function BookDetailsPage() {
     {message && <p role={actionError ? "alert" : undefined}>{message}</p>}
       <div className="book-detail__actions"><button className="btn btn--primary" disabled={pending || !record?.available} onClick={() => { void issue(); }}>{pending ? "Выполняется…" : user ? "Взять книгу" : "Войти, чтобы взять книгу"}</button>
         <Link to="/loans">Перейти к выдачам</Link></div>
+      <WishlistAction key={`${user?.id ?? "guest"}:${bookId}`} bookId={bookId ?? details.id} />
       <BookFacts facts={[["ISBN", record?.isbn], ["Издательство", record?.publisher], ["Язык", record?.language],
         ["Год первой публикации", record?.year], ["Год издания", record?.edition_year], ["Страниц", record?.pages], ["Всего экземпляров", record?.total_copies]]} />
       {record?.external_work_id && <p className="book-detail__source">Сведения о конкретном издании импортированной книги могут требовать уточнения: издательство, язык, год издания и число страниц проверяются отдельно.</p>}
