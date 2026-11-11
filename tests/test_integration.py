@@ -94,3 +94,46 @@ def test_form_copies_and_delete_keep_loan_history(db_client, db_author, db_reade
     assert db_client.delete(path).status_code == 204
     assert db_client.get(path).status_code == 404
     assert db.get(Loan, loan_id).returned_at is not None
+
+
+def test_wishlist_pagination_beyond_one_hundred(db_client, db, db_author, db_reader, member_token):
+    """Личный список разбивается на страницы без ограничения первыми ста книгами."""
+    from app.models import Book, WishlistEntry
+
+    books = [Book(title=f"Желаемое {index:03}", author_id=db_author.id, year=2000,
+                  edition_year=2000, total_copies=1) for index in range(102)]
+    db.add_all(books)
+    db.flush()
+    db.add_all([WishlistEntry(user_id=db_reader.id, book_id=book.id) for book in books])
+    db.commit()
+    db_client.headers["Authorization"] = "Bearer " + member_token
+    first = db_client.get("/api/v1/wishlist?size=100&page=1").json()
+    second = db_client.get("/api/v1/wishlist?size=100&page=2").json()
+    assert first["total"] == second["total"] == 102
+    assert len(first["items"]) == 100 and len(second["items"]) == 2
+    assert len({book["id"] for book in first["items"] + second["items"]}) == 102
+
+
+def test_wishlist_cannot_read_or_remove_another_users_entry(db_client, db, db_author, db_reader, member_token):
+    """ID книги не позволяет изменить персональную связь другого пользователя."""
+    from app.models import Book, User, WishlistEntry
+
+    other = User(email="other-wishlist@example.test", password_hash="disabled-test-account", role="member")
+    book = Book(title="Книга другого читателя", author_id=db_author.id, year=2000,
+                edition_year=2000, total_copies=1)
+    db.add_all([other, book])
+    db.flush()
+    db.add(WishlistEntry(user_id=other.id, book_id=book.id))
+    db.commit()
+    db_client.headers["Authorization"] = "Bearer " + member_token
+    assert db_client.get("/api/v1/wishlist", params={"user_id": other.id}).json()["total"] == 0
+    assert db_client.delete(f"/api/v1/wishlist/{book.id}").status_code == 204
+    assert db.get(WishlistEntry, (other.id, book.id)) is not None
+    assert db_client.post(f"/api/v1/wishlist/{book.id}").status_code == 204
+    assert db_client.post(f"/api/v1/wishlist/{book.id}").status_code == 204
+    assert db_client.get("/api/v1/wishlist").json()["total"] == 1
+    assert db_client.delete(f"/api/v1/wishlist/{book.id}").status_code == 204
+    assert db.get(WishlistEntry, (other.id, book.id)) is not None
+    assert db_client.get(f"/api/v1/books/{book.id}").status_code == 200
+    db_client.headers.pop("Authorization")
+    assert db_client.get("/api/v1/wishlist").status_code == 401
