@@ -114,11 +114,11 @@ export function AppRouter() {
           />
         </Route>
 
-        <Route path="register" element={<LoginPage register />} />
+        <Route path="register" element={<LoginPage key="register" register />} />
 
         <Route
           path="login"
-          element={<LoginPage />}
+          element={<LoginPage key="login" />}
         />
 
         <Route

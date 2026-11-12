@@ -1,0 +1,25 @@
+{
+  "source": "Local production build; fixture auth/API; no real accounts or production data",
+  "registrationByteLimitBeforeRequest": true,
+  "passwordVisibility": true,
+  "duplicateRegisterAndLoginBlocked": true,
+  "errorsKeepInput": true,
+  "registrationClearsPassword": true,
+  "registrationKeepsDestinationAndEmail": true,
+  "returnQueryAndHash": true,
+  "accountAndRoleVisible": true,
+  "accessExpiryRefresh": true,
+  "failedLogoutVisibleAndRetryable": true,
+  "confirmedLogoutClearsAccount": true,
+  "expiredSessionMessageAndReturn": true,
+  "noCredentialStorageKeys": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "darkTheme": true,
+  "pageErrors": []
+}

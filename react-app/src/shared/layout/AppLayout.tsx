@@ -1,5 +1,7 @@
 // Общий макет сохраняет навигацию и уведомления при смене страниц.
 import { NoticeHost } from "../../components/NoticeHost";
+import { useRef, useState } from "react";
+import { toUserMessage } from "../../api/client";
 import {
   NavLink,
   Outlet,
@@ -21,6 +23,16 @@ function getNavClass({
 export function AppLayout() {
   const { user, logout } =
     useAuth();
+  const [leaving, setLeaving] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
+  const logoutLock = useRef(false);
+  async function leave() {
+    if (logoutLock.current) return;
+    logoutLock.current = true; setLeaving(true); setLogoutError("");
+    try { await logout(); }
+    catch (reason) { setLogoutError(toUserMessage(reason) + " Выход не подтвержден сервером. Повторите попытку."); }
+    finally { logoutLock.current = false; setLeaving(false); }
+  }
 
   const {
     theme,
@@ -85,9 +97,10 @@ export function AppLayout() {
           {user ? (
             <button
               type="button"
-              onClick={logout}
+              disabled={leaving}
+              onClick={() => { void leave(); }}
             >
-              Выйти
+              {leaving ? "Выходим…" : "Выйти"}
             </button>
           ) : (
             <NavLink
@@ -103,6 +116,8 @@ export function AppLayout() {
       <a className="skip-link" href="#main-content">Перейти к содержимому</a>
       <NoticeHost />
       <main className="page" id="main-content" tabIndex={-1}>
+        {user && <p className="session-account">{user.email} · {user.role === "librarian" ? "Библиотекарь" : "Читатель"}</p>}
+        {logoutError && <p role="alert">{logoutError}</p>}
         <Outlet />
       </main>
 
