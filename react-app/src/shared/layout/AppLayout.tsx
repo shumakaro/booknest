@@ -2,6 +2,7 @@
 import { NoticeHost } from "../../components/NoticeHost";
 import { useRef, useState } from "react";
 import { toUserMessage } from "../../api/client";
+import { RouteAccessibility } from "../../features/accessibility/RouteAccessibility";
 import {
   NavLink,
   Outlet,
@@ -26,6 +27,7 @@ export function AppLayout() {
   const [leaving, setLeaving] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const logoutLock = useRef(false);
+  const main = useRef<HTMLElement>(null);
   async function leave() {
     if (logoutLock.current) return;
     logoutLock.current = true; setLeaving(true); setLogoutError("");
@@ -44,6 +46,7 @@ export function AppLayout() {
       className="app"
       data-theme={theme}
     >
+      <RouteAccessibility target={main} />
       <header className="site-header">
         <div>
           <h1>BookNest</h1>
@@ -118,7 +121,7 @@ export function AppLayout() {
 
       <a className="skip-link" href="#main-content">Перейти к содержимому</a>
       <NoticeHost />
-      <main className="page" id="main-content" tabIndex={-1}>
+      <main ref={main} className="page" id="main-content" tabIndex={-1}>
         {user && <p className="session-account">{user.email} · {user.role === "librarian" ? "Библиотекарь" : "Читатель"}</p>}
         {logoutError && <p role="alert">{logoutError}</p>}
         <Outlet />

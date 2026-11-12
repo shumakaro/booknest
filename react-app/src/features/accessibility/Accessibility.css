@@ -1,0 +1,5 @@
+/* Правила только интегрированного приложения: статические упражнения ЛР1–6 не меняются. */
+.app .main-nav .nav-link { display: inline-flex; align-items: center; min-height: 44px; }
+.app .notice p { min-width: 0; overflow-wrap: anywhere; }
+.app .notice button { flex: 0 0 44px; }
+.app .notice { align-items: flex-start; max-height: 50dvh; overflow-y: auto; }
