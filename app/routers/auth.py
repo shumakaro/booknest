@@ -65,8 +65,10 @@ def register(payload: RegisterRequest, db: Database):
 
 
 @router.post("/token", response_model=TokenRead, status_code=200, dependencies=[Depends(limit_login)])
-def token(form: Annotated[OAuth2PasswordRequestForm, Depends()], db: Database, response: Response):
+def token(form: Annotated[OAuth2PasswordRequestForm, Depends()], db: Database, response: Response, request: Request):
     """Пароль передаётся как OAuth2 form; при любой неудаче сообщение одинаковое."""
+    # Вход тоже устанавливает cookie: запрещенный Origin не должен менять сеанс браузера.
+    check_cookie_origin(request)
     service = AuthService(db)
     user = service.authenticate(form.username, form.password)
     access, refresh = service.tokens(user)
