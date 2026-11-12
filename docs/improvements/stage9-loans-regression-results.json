@@ -1,0 +1,26 @@
+{
+  "source": "Local production build; fixture API; no production data",
+  "stateFiltersBeforePagination": true,
+  "selectedFilterVisible": true,
+  "controls44px": true,
+  "lastCopyUnavailable": true,
+  "failedReturnKeepsList": true,
+  "returnPendingDisabled": true,
+  "shrinkPageAfterReturn": true,
+  "dueTodayAndOverdue": true,
+  "historyReadOnly": true,
+  "availableAfterReturn": true,
+  "duplicateIssueBlocked": true,
+  "detailsReturnUrlAndActualScroll": true,
+  "loadRetry": true,
+  "librarianReaderVisible": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "darkTheme": true,
+  "pageErrors": []
+}

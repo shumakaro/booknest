@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-12",
+  "backend": {
+    "tests": 107,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 70.317,
+    "warnings": 1,
+    "database": "existing local PostgreSQL _test; rollback fixtures; no Neon"
+  },
+  "frontend": {
+    "tests": 90,
+    "files": 17,
+    "passed": true,
+    "seconds": 67.18,
+    "command": "npm test -- --run --maxWorkers=2"
+  },
+  "build": "TypeScript/Vite passed",
+  "lint": "ESLint, Ruff modified backend/tests and node --check passed",
+  "initialFailures": {
+    "backend": "48 passed, 59 setup errors before existing local PostgreSQL restart; no production changes",
+    "frontend": "89 passed, 1 existing Login test timed out at 5000ms; full rerun with 2 workers passed"
+  },
+  "browser": "Edge local production build with fixture API; repeated; auth/loans/forms regressions passed",
+  "docker": "not run",
+  "production": "no deploy or merge; no real accounts or Neon data"
+}

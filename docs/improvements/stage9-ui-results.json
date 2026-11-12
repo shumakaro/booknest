@@ -1,0 +1,23 @@
+{
+  "source": "Local production build; fixture API; SQL permissions tested separately on local PostgreSQL",
+  "sixExistingActionLinks": true,
+  "journalPagination": true,
+  "methodFilterResetsPage": true,
+  "nullUserHandled": true,
+  "historicalPathIsText": true,
+  "emptyFilter": true,
+  "retryAfterReadFailure": true,
+  "outOfRangeCorrected": true,
+  "server403HidesRows": true,
+  "memberDeniedWithoutRead": true,
+  "guestLoginWithoutRead": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "darkTheme": true,
+  "pageErrors": []
+}
