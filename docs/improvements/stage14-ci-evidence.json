@@ -1,0 +1,40 @@
+{
+  "run_url": "https://github.com/shumakaro/booknest/actions/runs/43262560871",
+  "sha": "4c8bf1e8f13e16156acf1cade96a7c556d6b276e",
+  "conclusion": "success",
+  "selected_evidence": {
+    "containers/7_Build and smoke the unified Render image.txt": [
+      "Container health, 30 active books, 8 SPA routes, assets/cache and API 404: OK"
+    ],
+    "containers/8_Smoke and persistence without deleting volumes.txt": [
+      "Container health, 30 active books, 8 SPA routes, assets/cache and API 404: OK",
+      "Container health, 30 active books, 8 SPA routes, assets/cache and API 404: OK",
+      "booknest-web:local inspect: 26.23 MB; image ls: 93.4MB",
+      "booknest-api:local inspect: 38.69 MB; image ls: 166MB",
+      "Runtime API: non-root, no tests or documentation",
+      "Runtime API: non-root, no tests or documentation"
+    ],
+    "containers/9_Verify backup and restore into a new database.txt": [
+      "Восстановление в новую тестовую БД проверено: 30|20",
+      "Целевая БД уже существует; восстановление остановлено без изменений"
+    ],
+    "containers/10_Browser scenario inside clean container environment.txt": [
+      "1 passed (6.6s)"
+    ],
+    "containers/11_Verify trusted proxy rate limit.txt": [
+      "Forged forwarded headers cannot bypass login limit: [401, 401, 401, 401, 401, 429]"
+    ],
+    "containers/12_Test profile with independent database.txt": [
+      "140 passed, 2 warnings in 22.70s"
+    ],
+    "checks/9_Verify current API types without rewriting files.txt": [
+      "Типы API соответствуют схеме."
+    ],
+    "checks/10_Run python -m pytest -q --cov=app --cov-report=term-missing --junitxml=artifacts_backend-tests.xml.txt": [
+      "140 passed, 2 warnings in 20.28s"
+    ],
+    "checks/13_Run npm --prefix react-app run test -- --maxWorkers=2.txt": [
+      "Tests  95 passed (95)"
+    ]
+  }
+}
