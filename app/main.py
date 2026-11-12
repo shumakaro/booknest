@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import Settings
 from app.core.http import ERROR_RESPONSES, configure_http
 from app.routers.loans import router as loans_router
+from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
 from app.routers.wishlist import router as wishlist_router
 from app.routers.catalog_db import router
@@ -33,6 +34,7 @@ def create_app() -> FastAPI:
     )
     application.include_router(router, prefix="/api/v1")
     application.include_router(loans_router, prefix="/api/v1")
+    application.include_router(audit_router, prefix="/api/v1")
     application.include_router(auth_router, prefix="/api/v1")
     application.include_router(wishlist_router, prefix="/api/v1")
     application.include_router(discover_router, prefix="/api/v1")
