@@ -1,0 +1,13 @@
+/* Рабочее место ЛР10: небольшие переходы к готовым функциям и адаптивный журнал. */
+.librarian-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; margin: 26px 0 36px; }
+.librarian-links a { display: grid; gap: 10px; padding: 22px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-decoration: none; min-width: 0; }
+.librarian-links span, .librarian-help { color: var(--muted); line-height: 1.6; }
+.librarian-links a:hover { background: var(--surface-soft); }
+.audit-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 16px; margin: 24px 0; }
+.audit-controls label { display: grid; gap: 8px; }
+.page .audit-controls :is(button,select):not(.btn) { min-height: 44px; }
+.audit-list { display: grid; gap: 16px; list-style: none; padding: 0; }
+.audit-list li { min-width: 0; padding: 22px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.audit-event__heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+.audit-list code { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 540px) { .audit-controls { display: grid; } .audit-list li { padding: 18px; } }
