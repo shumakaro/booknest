@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     access_ttl_seconds: int | None = Field(default=None, ge=1, le=1800)
     refresh_ttl_days: int = Field(default=7, ge=1, le=7)
     cookie_secure: bool = False
+    # Учебный код разрешается печатать только при явном локальном запуске, не по умолчанию.
+    log_email_confirmation: bool = False
 
     @field_validator("database_url", "database_url_unpooled", "test_database_url", mode="before")
     @classmethod

@@ -149,11 +149,13 @@ def test_cors_and_cookie_origin(db_client):
     assert db_client.post("/auth/refresh", headers={"Origin": "https://untrusted.example"}).status_code == 403
 
 
-def test_confirmation_and_audit(db_client, db, db_author, caplog):
+def test_confirmation_and_audit(db_client, db, db_author, caplog, monkeypatch):
     import logging
     from sqlalchemy import func, select
     from app.models import AuditEvent
 
+    # Только этот изолированный учебный тест разрешает код в локальном захваченном журнале.
+    monkeypatch.setenv("LOG_EMAIL_CONFIRMATION", "true")
     caplog.set_level(logging.INFO, logger="booknest.auth")
     response = db_client.post(
         "/auth/register", json={"email": "confirm@example.com", "password": "Confirm123"}

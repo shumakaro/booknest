@@ -30,9 +30,11 @@ class AuthService:
         try:
             user = self.repo.add_user(email, hash_password(password))
             self.db.commit()
-            # Дополнительное учебное подтверждение без отправки почты.
-            confirmation = create_token(user.id, user.role, "email", 900)
-            log.info("Учебный код подтверждения user_id=%s token=%s", user.id, confirmation)
+            # В обычных журналах не должно быть действующего токена. Учебная демонстрация
+            # сохранена за отдельным флагом для изолированной локальной консоли.
+            if Settings().log_email_confirmation:
+                confirmation = create_token(user.id, user.role, "email", 900)
+                log.info("Учебный код подтверждения user_id=%s token=%s", user.id, confirmation)
             return user
         except IntegrityError:
             self.db.rollback()

@@ -1,7 +1,7 @@
 """HTTP списка желаемого: доступ только к данным текущего пользователя."""
 
 from typing import Annotated
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.exc import IntegrityError
 from app.core.auth import CurrentUser, Database
 from app.core.pagination import Pagination
@@ -23,8 +23,12 @@ def add_wishlist(book_id: int, db: Database, user: CurrentUser) -> Response:
     try:
         WishlistRepository(db).add(user.id, book_id)
         db.commit()
-    except IntegrityError:
+    except IntegrityError as error:
         db.rollback()
+        # Только гонка повторной вставки той же пары означает идемпотентный успех.
+        constraint = getattr(getattr(error.orig, "diag", None), "constraint_name", None)
+        if constraint != "wishlist_entries_pkey":
+            raise HTTPException(409, "Не удалось сохранить желаемое из-за конфликта данных. Обновите страницу.") from None
     return Response(status_code=204)
 
 
