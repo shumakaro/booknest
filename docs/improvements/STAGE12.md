@@ -51,3 +51,5 @@ Ruff измененных Python и генератор API `--check` прошл�
 Из корня, с уже настроенной локальной TEST_DATABASE_URL: `.venv/Scripts/python.exe -X utf8 -m tools.measure_orm`, затем `.venv/Scripts/python.exe -X utf8 -m tools.check_orm_metadata`. Рабочие .env не переписываются. Инструменты намеренно не создают БД/схему и не применяют миграции автоматически.
 
 Рабочие Neon/Render, секреты, миграции, Docker, исходные ЛР1–6, прежние SQL-отчеты/benchmark, docs.zip и шесть DOCX сохранены. Deploy/merge не выполнялись. Следующий этап — 13, безопасность и регрессии; затем 14 Docker/CI и только после этого 15 Neon с отдельным уведомлением. Render 16, скриншоты/приемка 17, отдельные подробные отчеты 18 остаются по согласованному порядку.
+
+Опубликован PR27 https://github.com/shumakaro/booknest/pull/27 в codex/api-contracts, open, merged=false. Коммиты: f9440f8, c43442f, 969fbc8, 47db00b, 4df8c6e. Объединение и развертывание не выполнялись.
