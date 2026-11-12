@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-12",
+  "backend": {
+    "tests": 129,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 70.02,
+    "warnings": 1,
+    "database": "existing local dedicated _test; rollback fixtures; no Neon"
+  },
+  "measurement": {
+    "fixture_books": 24,
+    "select_counts": {
+      "demonstration_lazy": 41,
+      "demonstration_selectin": 3,
+      "actual_catalog_1": 4,
+      "actual_wishlist_1": 4,
+      "actual_catalog_20": 4,
+      "actual_wishlist_20": 4
+    },
+    "rollback_verified": true,
+    "repeated": true,
+    "plan_execution_ms": 0.566
+  },
+  "metadata": "alembic check: No new upgrade operations detected; no DDL applied",
+  "lint": "Ruff passed; generated API types --check passed; diff check passed",
+  "frontend": "not rerun; client unchanged",
+  "browser": "not rerun",
+  "docker": "not run",
+  "production": "no Neon/Render connection or changes; no deploy/merge"
+}

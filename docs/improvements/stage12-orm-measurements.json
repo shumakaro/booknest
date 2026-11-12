@@ -1,0 +1,478 @@
+{
+  "database": "local dedicated _test; no production connection",
+  "fixture_books": 24,
+  "sql_parameters_saved": false,
+  "phases": {
+    "demonstration_lazy": {
+      "select_count": 41,
+      "elapsed_ms": 49.033,
+      "sql": [
+        "SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.external_work_id, books.cover_id, books.total_copies, books.description, books.created_at, books.language, books.publisher, books.edition_year, books.pages, books.deleted_at \nFROM books \nWHERE (books.title LIKE %(title_1)s::VARCHAR || '%%') ORDER BY books.id \n LIMIT %(param_1)s::INTEGER",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id = %(pk_1)s::INTEGER",
+        "SELECT genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM genres, book_genres \nWHERE %(param_1)s::INTEGER = book_genres.book_id AND genres.id = book_genres.genre_id"
+      ]
+    },
+    "demonstration_selectin": {
+      "select_count": 3,
+      "elapsed_ms": 12.982,
+      "sql": [
+        "SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.external_work_id, books.cover_id, books.total_copies, books.description, books.created_at, books.language, books.publisher, books.edition_year, books.pages, books.deleted_at \nFROM books \nWHERE (books.title LIKE %(title_1)s::VARCHAR || '%%') ORDER BY books.id \n LIMIT %(param_1)s::INTEGER",
+        "SELECT books_1.id AS books_1_id, genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM books AS books_1 JOIN book_genres AS book_genres_1 ON books_1.id = book_genres_1.book_id JOIN genres ON genres.id = book_genres_1.genre_id \nWHERE books_1.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)"
+      ]
+    },
+    "actual_catalog_1": {
+      "select_count": 4,
+      "elapsed_ms": 17.194,
+      "sql": [
+        "SELECT count(*) AS count_1 \nFROM (SELECT books.id AS id, books.title AS title, books.author_id AS author_id, books.year AS year, books.isbn AS isbn, books.external_work_id AS external_work_id, books.cover_id AS cover_id, books.total_copies AS total_copies, books.description AS description, books.created_at AS created_at, books.language AS language, books.publisher AS publisher, books.edition_year AS edition_year, books.pages AS pages, books.deleted_at AS deleted_at, books.total_copies - (SELECT count(loans.id) AS count_2 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books \nWHERE books.deleted_at IS NULL AND ((translate(books.title, %(translate_1)s::VARCHAR, %(translate_2)s::VARCHAR) ILIKE '%%' || %(translate_3)s::VARCHAR || '%%' ESCAPE '/') OR (EXISTS (SELECT 1 \nFROM authors \nWHERE authors.id = books.author_id AND (translate(authors.name, %(translate_4)s::VARCHAR, %(translate_5)s::VARCHAR) ILIKE '%%' || %(translate_6)s::VARCHAR || '%%' ESCAPE '/'))))) AS anon_1",
+        "SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.external_work_id, books.cover_id, books.total_copies, books.description, books.created_at, books.language, books.publisher, books.edition_year, books.pages, books.deleted_at, books.total_copies - (SELECT count(loans.id) AS count_1 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books \nWHERE books.deleted_at IS NULL AND ((translate(books.title, %(translate_1)s::VARCHAR, %(translate_2)s::VARCHAR) ILIKE '%%' || %(translate_3)s::VARCHAR || '%%' ESCAPE '/') OR (EXISTS (SELECT 1 \nFROM authors \nWHERE authors.id = books.author_id AND (translate(authors.name, %(translate_4)s::VARCHAR, %(translate_5)s::VARCHAR) ILIKE '%%' || %(translate_6)s::VARCHAR || '%%' ESCAPE '/')))) ORDER BY books.title ASC, books.id \n LIMIT %(param_1)s::INTEGER OFFSET %(param_2)s::INTEGER",
+        "SELECT books_1.id AS books_1_id, genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM books AS books_1 JOIN book_genres AS book_genres_1 ON books_1.id = book_genres_1.book_id JOIN genres ON genres.id = book_genres_1.genre_id \nWHERE books_1.id IN (%(primary_keys_1)s::INTEGER)",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id IN (%(primary_keys_1)s::INTEGER)"
+      ]
+    },
+    "actual_wishlist_1": {
+      "select_count": 4,
+      "elapsed_ms": 9.455,
+      "sql": [
+        "SELECT count(*) AS count_1 \nFROM (SELECT books.id AS id, books.title AS title, books.author_id AS author_id, books.year AS year, books.isbn AS isbn, books.external_work_id AS external_work_id, books.cover_id AS cover_id, books.total_copies AS total_copies, books.description AS description, books.created_at AS created_at, books.language AS language, books.publisher AS publisher, books.edition_year AS edition_year, books.pages AS pages, books.deleted_at AS deleted_at, books.total_copies - (SELECT count(loans.id) AS count_2 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books JOIN wishlist_entries ON wishlist_entries.book_id = books.id \nWHERE books.deleted_at IS NULL AND wishlist_entries.user_id = %(user_id_1)s::INTEGER) AS anon_1",
+        "SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.external_work_id, books.cover_id, books.total_copies, books.description, books.created_at, books.language, books.publisher, books.edition_year, books.pages, books.deleted_at, books.total_copies - (SELECT count(loans.id) AS count_1 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books JOIN wishlist_entries ON wishlist_entries.book_id = books.id \nWHERE books.deleted_at IS NULL AND wishlist_entries.user_id = %(user_id_1)s::INTEGER ORDER BY books.id \n LIMIT %(param_1)s::INTEGER OFFSET %(param_2)s::INTEGER",
+        "SELECT books_1.id AS books_1_id, genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM books AS books_1 JOIN book_genres AS book_genres_1 ON books_1.id = book_genres_1.book_id JOIN genres ON genres.id = book_genres_1.genre_id \nWHERE books_1.id IN (%(primary_keys_1)s::INTEGER)",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id IN (%(primary_keys_1)s::INTEGER)"
+      ]
+    },
+    "actual_catalog_20": {
+      "select_count": 4,
+      "elapsed_ms": 13.829,
+      "sql": [
+        "SELECT count(*) AS count_1 \nFROM (SELECT books.id AS id, books.title AS title, books.author_id AS author_id, books.year AS year, books.isbn AS isbn, books.external_work_id AS external_work_id, books.cover_id AS cover_id, books.total_copies AS total_copies, books.description AS description, books.created_at AS created_at, books.language AS language, books.publisher AS publisher, books.edition_year AS edition_year, books.pages AS pages, books.deleted_at AS deleted_at, books.total_copies - (SELECT count(loans.id) AS count_2 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books \nWHERE books.deleted_at IS NULL AND ((translate(books.title, %(translate_1)s::VARCHAR, %(translate_2)s::VARCHAR) ILIKE '%%' || %(translate_3)s::VARCHAR || '%%' ESCAPE '/') OR (EXISTS (SELECT 1 \nFROM authors \nWHERE authors.id = books.author_id AND (translate(authors.name, %(translate_4)s::VARCHAR, %(translate_5)s::VARCHAR) ILIKE '%%' || %(translate_6)s::VARCHAR || '%%' ESCAPE '/'))))) AS anon_1",
+        "SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.external_work_id, books.cover_id, books.total_copies, books.description, books.created_at, books.language, books.publisher, books.edition_year, books.pages, books.deleted_at, books.total_copies - (SELECT count(loans.id) AS count_1 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books \nWHERE books.deleted_at IS NULL AND ((translate(books.title, %(translate_1)s::VARCHAR, %(translate_2)s::VARCHAR) ILIKE '%%' || %(translate_3)s::VARCHAR || '%%' ESCAPE '/') OR (EXISTS (SELECT 1 \nFROM authors \nWHERE authors.id = books.author_id AND (translate(authors.name, %(translate_4)s::VARCHAR, %(translate_5)s::VARCHAR) ILIKE '%%' || %(translate_6)s::VARCHAR || '%%' ESCAPE '/')))) ORDER BY books.title ASC, books.id \n LIMIT %(param_1)s::INTEGER OFFSET %(param_2)s::INTEGER",
+        "SELECT books_1.id AS books_1_id, genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM books AS books_1 JOIN book_genres AS book_genres_1 ON books_1.id = book_genres_1.book_id JOIN genres ON genres.id = book_genres_1.genre_id \nWHERE books_1.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)"
+      ]
+    },
+    "actual_wishlist_20": {
+      "select_count": 4,
+      "elapsed_ms": 12.694,
+      "sql": [
+        "SELECT count(*) AS count_1 \nFROM (SELECT books.id AS id, books.title AS title, books.author_id AS author_id, books.year AS year, books.isbn AS isbn, books.external_work_id AS external_work_id, books.cover_id AS cover_id, books.total_copies AS total_copies, books.description AS description, books.created_at AS created_at, books.language AS language, books.publisher AS publisher, books.edition_year AS edition_year, books.pages AS pages, books.deleted_at AS deleted_at, books.total_copies - (SELECT count(loans.id) AS count_2 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books JOIN wishlist_entries ON wishlist_entries.book_id = books.id \nWHERE books.deleted_at IS NULL AND wishlist_entries.user_id = %(user_id_1)s::INTEGER) AS anon_1",
+        "SELECT books.id, books.title, books.author_id, books.year, books.isbn, books.external_work_id, books.cover_id, books.total_copies, books.description, books.created_at, books.language, books.publisher, books.edition_year, books.pages, books.deleted_at, books.total_copies - (SELECT count(loans.id) AS count_1 \nFROM loans \nWHERE loans.book_id = books.id AND loans.returned_at IS NULL) AS available \nFROM books JOIN wishlist_entries ON wishlist_entries.book_id = books.id \nWHERE books.deleted_at IS NULL AND wishlist_entries.user_id = %(user_id_1)s::INTEGER ORDER BY books.id \n LIMIT %(param_1)s::INTEGER OFFSET %(param_2)s::INTEGER",
+        "SELECT books_1.id AS books_1_id, genres.id AS genres_id, genres.code AS genres_code, genres.name AS genres_name \nFROM books AS books_1 JOIN book_genres AS book_genres_1 ON books_1.id = book_genres_1.book_id JOIN genres ON genres.id = book_genres_1.genre_id \nWHERE books_1.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)",
+        "SELECT authors.id AS authors_id, authors.name AS authors_name, authors.birth_year AS authors_birth_year \nFROM authors \nWHERE authors.id IN (%(primary_keys_1)s::INTEGER, %(primary_keys_2)s::INTEGER, %(primary_keys_3)s::INTEGER, %(primary_keys_4)s::INTEGER, %(primary_keys_5)s::INTEGER, %(primary_keys_6)s::INTEGER, %(primary_keys_7)s::INTEGER, %(primary_keys_8)s::INTEGER, %(primary_keys_9)s::INTEGER, %(primary_keys_10)s::INTEGER, %(primary_keys_11)s::INTEGER, %(primary_keys_12)s::INTEGER, %(primary_keys_13)s::INTEGER, %(primary_keys_14)s::INTEGER, %(primary_keys_15)s::INTEGER, %(primary_keys_16)s::INTEGER, %(primary_keys_17)s::INTEGER, %(primary_keys_18)s::INTEGER, %(primary_keys_19)s::INTEGER, %(primary_keys_20)s::INTEGER)"
+      ]
+    }
+  },
+  "alembic_heads": [
+    "006_external_books"
+  ],
+  "catalog_plan": [
+    {
+      "Plan": {
+        "Node Type": "Limit",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 25.81,
+        "Total Cost": 28.8,
+        "Plan Rows": 1,
+        "Plan Width": 920,
+        "Actual Startup Time": 0.339,
+        "Actual Total Time": 0.472,
+        "Actual Rows": 20,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 22,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 25.81,
+            "Total Cost": 28.8,
+            "Plan Rows": 1,
+            "Plan Width": 920,
+            "Actual Startup Time": 0.337,
+            "Actual Total Time": 0.467,
+            "Actual Rows": 20,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 25.81,
+                "Total Cost": 25.82,
+                "Plan Rows": 1,
+                "Plan Width": 912,
+                "Actual Startup Time": 0.309,
+                "Actual Total Time": 0.311,
+                "Actual Rows": 20,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "books.title",
+                  "books.id"
+                ],
+                "Sort Method": "quicksort",
+                "Sort Space Used": 28,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 2,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Relation Name": "books",
+                    "Alias": "books",
+                    "Startup Cost": 0.0,
+                    "Total Cost": 25.8,
+                    "Plan Rows": 1,
+                    "Plan Width": 912,
+                    "Actual Startup Time": 0.045,
+                    "Actual Total Time": 0.267,
+                    "Actual Rows": 24,
+                    "Actual Loops": 1,
+                    "Filter": "((deleted_at IS NULL) AND ((translate((title)::text, 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'::text, 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'::text) ~~* '%orm-5df7cd8ecff4%'::text) OR (ANY (author_id = (hashed SubPlan 3).col1))))",
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 2,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Seq Scan",
+                        "Parent Relationship": "SubPlan",
+                        "Subplan Name": "SubPlan 3",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Relation Name": "authors",
+                        "Alias": "authors",
+                        "Startup Cost": 0.0,
+                        "Total Cost": 1.41,
+                        "Plan Rows": 1,
+                        "Plan Width": 4,
+                        "Actual Startup Time": 0.0,
+                        "Actual Total Time": 0.0,
+                        "Actual Rows": 0,
+                        "Actual Loops": 0,
+                        "Filter": "(translate((name)::text, 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'::text, 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'::text) ~~* '%orm-5df7cd8ecff4%'::text)",
+                        "Rows Removed by Filter": 0,
+                        "Shared Hit Blocks": 0,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Node Type": "Aggregate",
+                "Strategy": "Plain",
+                "Partial Mode": "Simple",
+                "Parent Relationship": "SubPlan",
+                "Subplan Name": "SubPlan 1",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 2.97,
+                "Total Cost": 2.98,
+                "Plan Rows": 1,
+                "Plan Width": 8,
+                "Actual Startup Time": 0.007,
+                "Actual Total Time": 0.007,
+                "Actual Rows": 1,
+                "Actual Loops": 20,
+                "Shared Hit Blocks": 20,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Relation Name": "loans",
+                    "Alias": "loans",
+                    "Startup Cost": 0.0,
+                    "Total Cost": 2.96,
+                    "Plan Rows": 1,
+                    "Plan Width": 4,
+                    "Actual Startup Time": 0.003,
+                    "Actual Total Time": 0.003,
+                    "Actual Rows": 0,
+                    "Actual Loops": 20,
+                    "Filter": "((returned_at IS NULL) AND (book_id = books.id))",
+                    "Rows Removed by Filter": 12,
+                    "Shared Hit Blocks": 20,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Planning": {
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "Planning Time": 0.491,
+      "Triggers": [],
+      "Execution Time": 0.566
+    }
+  ],
+  "checks": {
+    "books": [
+      "books_copies_ck",
+      "books_cover_id_ck",
+      "books_edition_ck",
+      "books_external_work_id_ck",
+      "books_isbn_ck",
+      "books_pages_ck",
+      "books_title_ck",
+      "books_year_ck"
+    ],
+    "authors": [
+      "authors_birth_year_check",
+      "authors_name_ck"
+    ],
+    "genres": [
+      "genres_code_ck"
+    ],
+    "users": [
+      "users_email_ck",
+      "users_role_ck"
+    ],
+    "loans": [
+      "loans_dates_ck",
+      "loans_return_ck"
+    ]
+  },
+  "indexes": {
+    "books": [
+      "books_author_year_idx",
+      "books_external_work_id_key",
+      "books_isbn_key",
+      "books_search_idx"
+    ],
+    "loans": [
+      "loans_active_uniq",
+      "loans_due_idx"
+    ],
+    "wishlist_entries": []
+  },
+  "primary_keys": {
+    "books": {
+      "constrained_columns": [
+        "id"
+      ],
+      "name": "books_pkey",
+      "comment": null
+    },
+    "loans": {
+      "constrained_columns": [
+        "id"
+      ],
+      "name": "loans_pkey",
+      "comment": null
+    },
+    "book_genres": {
+      "constrained_columns": [
+        "book_id",
+        "genre_id"
+      ],
+      "name": "book_genres_pkey",
+      "comment": null
+    },
+    "wishlist_entries": {
+      "constrained_columns": [
+        "user_id",
+        "book_id"
+      ],
+      "name": "wishlist_entries_pkey",
+      "comment": null
+    }
+  },
+  "foreign_keys": {
+    "books": [
+      {
+        "columns": [
+          "author_id"
+        ],
+        "target": "authors",
+        "ondelete": "RESTRICT"
+      }
+    ],
+    "book_genres": [
+      {
+        "columns": [
+          "book_id"
+        ],
+        "target": "books",
+        "ondelete": "CASCADE"
+      },
+      {
+        "columns": [
+          "genre_id"
+        ],
+        "target": "genres",
+        "ondelete": "CASCADE"
+      }
+    ],
+    "loans": [
+      {
+        "columns": [
+          "book_id"
+        ],
+        "target": "books",
+        "ondelete": "RESTRICT"
+      },
+      {
+        "columns": [
+          "user_id"
+        ],
+        "target": "users",
+        "ondelete": "RESTRICT"
+      }
+    ],
+    "wishlist_entries": [
+      {
+        "columns": [
+          "book_id"
+        ],
+        "target": "books",
+        "ondelete": "CASCADE"
+      },
+      {
+        "columns": [
+          "user_id"
+        ],
+        "target": "users",
+        "ondelete": "CASCADE"
+      }
+    ]
+  },
+  "counts_before": {
+    "authors": 0,
+    "books": 0,
+    "genres": 0,
+    "users": 0,
+    "loans": 0,
+    "wishlist_entries": 0,
+    "book_genres": 0
+  },
+  "counts_after": {
+    "authors": 0,
+    "books": 0,
+    "genres": 0,
+    "users": 0,
+    "loans": 0,
+    "wishlist_entries": 0,
+    "book_genres": 0
+  },
+  "rollback_verified": true,
+  "same_control_rows": true,
+  "production_changed": false,
+  "limitations": "Small warm-cache fixture; demonstration is not an old application version. Sequences may advance despite rollback. No index/DDL changes."
+}
