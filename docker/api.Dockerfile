@@ -27,8 +27,11 @@ COPY requirements-lock.txt ./
 RUN pip install --no-cache-dir -r requirements-lock.txt
 COPY tests ./tests
 COPY tools/refresh_demo_catalog.py ./tools/refresh_demo_catalog.py
+COPY tools/generate_api_types.py tools/measure_orm.py tools/check_orm_metadata.py ./tools/
+COPY docs/api/openapi.json ./docs/api/openapi.json
+COPY react-app/src/api/generated.ts ./react-app/src/api/generated.ts
 COPY examples ./examples
 COPY pyproject.toml ./
 RUN chown -R appuser /app
 USER appuser
-CMD ["python", "-m", "pytest", "-q"]
+CMD ["python", "-m", "pytest", "-q", "--junitxml=/app/.tools/container-tests.xml"]
