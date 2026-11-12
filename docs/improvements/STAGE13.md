@@ -46,3 +46,5 @@ Frontend, браузер и Docker заново не запускались: к�
 - stage13-test-results.json, STAGE13/PLAN/PROGRESS/AI_USAGE: объяснения и протокол.
 
 Рабочие данные/секреты/Neon/Render, реальные строки подключения, миграции, Docker, ЛР1–6, docs.zip и шесть DOCX сохранены. Deploy/merge не выполнялись. При будущем обновлении проверяются точный CORS Origin, HTTPS/COOKIE_SECURE и выключенный LOG_EMAIL_CONFIRMATION; сейчас новые значения в Render не записывались. Следующий этап 14 — Docker/CI, затем объявление начала Neon 15. Render 16, скриншоты 17 и отдельные подробные отчеты 18 остаются последними по согласованному порядку.
+
+Опубликован PR28 https://github.com/shumakaro/booknest/pull/28 в codex/orm-measurements, open, merged=false. Коммиты: 4779749, 56058e1, 69c0415, 8bdac16, a246f6b. Финальный XML backend: 74,490 с. Объединение и развертывание не выполнялись.
