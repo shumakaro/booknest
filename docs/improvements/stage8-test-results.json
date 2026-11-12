@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-11",
+  "backend": {
+    "tests": 102,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 18.008,
+    "warnings": 1,
+    "database": "existing local PostgreSQL _test; rollback fixtures; no Neon"
+  },
+  "frontend": {
+    "tests": 84,
+    "files": 16,
+    "passed": true,
+    "repeated": true,
+    "seconds": 10.27
+  },
+  "build": "TypeScript/Vite passed",
+  "lint": "ESLint passed; node --check passed",
+  "browser": "Local production build, fixture API; repeated after mobile layout adjustment and waiting for final animation geometry",
+  "production": "No real accounts, no deploy or merge",
+  "docker": "not run"
+}

@@ -1,0 +1,27 @@
+{
+  "source": "Local production build with fixture API; no production data",
+  "blankYearsAndPages": true,
+  "clientErrorFocus": true,
+  "duplicateIsbnFocus": true,
+  "pendingDisablesFields": true,
+  "createWithoutIsbn": true,
+  "copiesConfirmed": true,
+  "unchangedEditDisabled": true,
+  "partialPatchOnlyTitle": true,
+  "unrelatedConcurrentValuesPreserved": true,
+  "conflictIsNotAlwaysIsbn": true,
+  "dirtyCancelAndLinkProtected": true,
+  "cancelDoesNotSave": true,
+  "deleteNamesBookAndPreservesHistoryNotice": true,
+  "cancelledDeleteSendsNothing": true,
+  "deleteConflictAndRetry": true,
+  "darkTheme": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "pageErrors": []
+}
