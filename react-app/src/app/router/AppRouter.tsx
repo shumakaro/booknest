@@ -31,6 +31,10 @@ const WishlistPage = lazy(async () => {
   const module = await import("../../pages/wishlist/WishlistPage");
   return { default: module.WishlistPage };
 });
+const LibrarianPage = lazy(async () => {
+  const module = await import("../../pages/librarian/LibrarianPage");
+  return { default: module.LibrarianPage };
+});
 
 const BookFormPage = lazy(
   async () => {
@@ -89,6 +93,7 @@ export function AppRouter() {
         />
 
         <Route element={<RequireAuth role="librarian" />}>
+        <Route path="librarian" element={<Suspense fallback={<Spinner label="Загружаем рабочее место…" />}><LibrarianPage /></Suspense>} />
         <Route
           path="books/new"
           element={
