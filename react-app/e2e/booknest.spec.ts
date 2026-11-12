@@ -40,7 +40,7 @@ test('вход создание редактирование выдача воз
   await expect(page.getByLabel('Издательство', { exact: true })).toHaveValue('Проверенное издательство');
   await expect(page.getByLabel('Количество страниц', { exact: true })).toHaveValue('137');
   await page.getByLabel('Название', { exact: true }).fill(title + ' изменена');
-  // Облачная БД отвечает медленнее localhost: ожидается именно завершение записи.
+  // Ожидается подтвержденная запись, а не только оптимистичная смена интерфейса.
   const updated = page.waitForResponse(response => response.request().method() === 'PATCH' && new URL(response.url()).pathname.endsWith(`/books/${id}`) && response.status() === 200);
   await page.getByRole('button', { name: 'Сохранить изменения', exact: true }).click();
   await updated;
@@ -63,7 +63,7 @@ test('вход создание редактирование выдача воз
     await page.getByRole('button', { name: 'Следующая', exact: true }).click();
     loanPage = await (await loaded).json();
   }
-  const returnButton = page.getByRole('button', { name: `Вернуть книгу №${id}`, exact: true });
+  const returnButton = page.getByRole('button', { name: `Вернуть «${title} изменена»`, exact: true });
   await expect(returnButton).toBeVisible();
   const returned = page.waitForResponse(response => response.request().method() === 'PATCH' && new URL(response.url()).pathname.includes('/loans/') && response.status() === 200);
   await returnButton.click();

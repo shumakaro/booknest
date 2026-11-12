@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# Новая версия того же PR заменяет его старый прогон, не отменяя другие PR.
+concurrency:
+  group: booknest-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   checks:
     runs-on: ubuntu-latest
@@ -48,26 +52,36 @@ jobs:
               db.execute('CREATE DATABASE booknest_test')
           PY
       - run: python -m ruff check app tests migrations examples
-      - run: python -m pytest -q --cov=app --cov-report=term-missing
+      - name: Check maintained verification tools
+        run: python -m ruff check tools/check_container_http.py tools/generate_api_types.py tools/measure_orm.py tools/check_orm_metadata.py tools/prepare_container_check.py
+      - name: Verify current API types without rewriting files
+        run: python tools/generate_api_types.py --check
+      - run: python -m pytest -q --cov=app --cov-report=term-missing --junitxml=artifacts/backend-tests.xml
       - run: npm --prefix react-app ci
       - run: npm --prefix react-app run lint
-      - run: npm --prefix react-app run test
+      - run: npm --prefix react-app run test -- --maxWorkers=2
       - run: npm --prefix react-app run build
+      - name: Save backend test result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-tests
+          path: artifacts/backend-tests.xml
+          retention-days: 7
+          if-no-files-found: ignore
   containers:
     needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      COMPOSE_PROJECT_NAME: booknest-ci-${{ github.run_id }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
       - name: Generate disposable container configuration
-        run: |
-          python - <<'PY'
-          import pathlib, secrets
-          pathlib.Path('.env').write_text('POSTGRES_DB=booknest\nPOSTGRES_USER=booknest\nPOSTGRES_PASSWORD='+secrets.token_hex(24)+'\nSECRET_KEY='+secrets.token_hex(32)+'\nWEB_BIND=127.0.0.1\nWEB_PORT=8080\nCORS_ORIGINS=["http://127.0.0.1:8080"]\nCOOKIE_SECURE=false\nPLAYWRIGHT_BASE_URL=http://127.0.0.1:8080\n')
-          PY
+        run: python tools/prepare_container_check.py --output .env --port 8080
       - run: docker compose config --quiet
       - run: docker compose up -d --build --wait
       - name: Build and smoke the unified Render image
@@ -97,14 +111,15 @@ jobs:
           BOOKNEST_CHECK_BASE_URL=http://127.0.0.1:8090 python tools/check_container_http.py
       - name: Smoke and persistence without deleting volumes
         run: |
-          python tools/check_container_http.py
+          BOOKNEST_CHECK_IMMUTABLE=1 python tools/check_container_http.py
           docker compose down
           docker compose up -d --wait
-          python tools/check_container_http.py
+          BOOKNEST_CHECK_IMMUTABLE=1 python tools/check_container_http.py
           docker compose ps
           docker image ls booknest-api:local
           docker image ls booknest-web:local
           python tools/check_image_sizes.py
+          docker run --rm --entrypoint python booknest-api:local -c "import os; from pathlib import Path; assert os.geteuid() != 0; assert not Path('/app/tests').exists(); assert not Path('/app/docs').exists(); print('Runtime API: non-root, no tests or documentation')"
       - name: Verify backup and restore into a new database
         run: |
           COMPOSE_ENV_FILE=.env BACKUP_DIR=.tools/backups sh deployment/backup.sh
@@ -129,6 +144,21 @@ jobs:
           python tools/check_proxy_rate.py
       - name: Test profile with independent database
         run: docker compose --profile test up --build --abort-on-container-exit --exit-code-from test test
+      - name: Collect isolated container test report
+        if: always()
+        run: |
+          mkdir -p artifacts
+          if [ -n "$(docker compose ps -aq test)" ]; then
+            docker compose cp test:/app/.tools/container-tests.xml artifacts/container-tests.xml || true
+          fi
+      - name: Save container test result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-tests
+          path: artifacts/container-tests.xml
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Diagnostics
         if: failure()
         run: |

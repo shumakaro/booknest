@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-12",
+  "local": {
+    "docker": "not installed or found in PATH/standard Docker Desktop path",
+    "frontend": {
+      "tests": 95,
+      "files": 18,
+      "seconds": 54.25,
+      "passed": true
+    },
+    "build": "TypeScript/Vite passed",
+    "lint": "ESLint/Ruff/API --check/diff check passed",
+    "e2e": "listed 1 scenario, not executed locally",
+    "config_guard": "create once/refuse overwrite/no secret values in stdout passed in-process in workspace"
+  },
+  "ci": {
+    "url": "https://github.com/shumakaro/booknest/actions/runs/43262560871",
+    "sha": "4c8bf1e8f13e16156acf1cade96a7c556d6b276e",
+    "conclusion": "success",
+    "jobs": {
+      "checks": "success",
+      "containers": "success"
+    },
+    "backend_tests": 140,
+    "backend_seconds": 20.28,
+    "backend_warnings": 2,
+    "frontend_tests": 95,
+    "container_profile_tests": 140,
+    "container_profile_seconds": 22.7,
+    "container_warnings": 2,
+    "browser_scenarios": 1,
+    "browser_seconds": 6.6,
+    "web_image_display_mb": 93.4,
+    "api_image_display_mb": 166,
+    "web_image_inspect_mb": 26.23,
+    "api_image_inspect_mb": 38.69,
+    "backup_restore_counts": [
+      30,
+      20
+    ],
+    "restore_existing_refused": true,
+    "rate_codes": [
+      401,
+      401,
+      401,
+      401,
+      401,
+      429
+    ]
+  },
+  "production": "No Neon/Render service access or deployment; fresh runner only",
+  "final_reports_answers_screenshots": "not edited; technical CI captures are not final evidence for submission"
+}

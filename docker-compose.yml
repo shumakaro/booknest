@@ -8,6 +8,8 @@ x-api-env: &api-env
   SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
   CORS_ORIGINS: ${CORS_ORIGINS:-[]}
   COOKIE_SECURE: ${COOKIE_SECURE:-false}
+  # В контейнерных журналах не выводятся учебные коды подтверждения.
+  LOG_EMAIL_CONFIRMATION: "false"
   # Доверяем ровно одному прокси, а не всем отправителям сети.
   FORWARDED_ALLOW_IPS: ${WEB_INTERNAL_IP:-172.29.241.10}
   ACCESS_TTL_MIN: ${ACCESS_TTL_MIN:-15}
