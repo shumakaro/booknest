@@ -13,9 +13,11 @@ from app.schemas import ErrorRead
 
 # Один документированный конверт для общих HTTP-ошибок всех ресурсов.
 ERROR_RESPONSES = {
+    400: {"model": ErrorRead, "description": "Некорректный запрос"},
     401: {"model": ErrorRead, "description": "Требуется действительный токен"},
     403: {"model": ErrorRead, "description": "Недостаточно прав"},
     404: {"model": ErrorRead, "description": "Ресурс не найден"},
+    405: {"model": ErrorRead, "description": "Метод не поддерживается"},
     409: {"model": ErrorRead, "description": "Конфликт состояния или уникальности"},
     422: {"model": ErrorRead, "description": "Ошибка серверной проверки данных"},
     429: {"model": ErrorRead, "description": "Слишком много запросов"},
