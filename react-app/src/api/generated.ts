@@ -1,4 +1,12 @@
 // Файл создан tools/generate_api_types.py из OpenAPI. Правки вносятся в схемы Python.
+export interface AuditEventRead {
+  id: number;
+  user_id: number | null;
+  method: string;
+  path: string;
+  created_at: string;
+}
+
 export interface AuthorCreate {
   name: string;
   birth_year?: number | null;
@@ -140,6 +148,13 @@ export interface LoanReturn {
 
 export interface MessageRead {
   message: string;
+}
+
+export interface Page_AuditEventRead_ {
+  items: (AuditEventRead)[];
+  total: number;
+  page: number;
+  size: number;
 }
 
 export interface Page_AuthorRead_ {

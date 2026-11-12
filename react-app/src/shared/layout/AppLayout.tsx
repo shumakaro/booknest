@@ -74,6 +74,9 @@ export function AppLayout() {
 
           {user && <NavLink to="/loans" className={getNavClass}>Выдачи</NavLink>}
           {user?.role === "librarian" && (
+          <NavLink to="/librarian" className={getNavClass}>Библиотекарю</NavLink>
+          )}
+          {user?.role === "librarian" && (
           <NavLink
             to="/books/new"
             className={getNavClass}

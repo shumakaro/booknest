@@ -1,6 +1,6 @@
 """Хранилище учётных записей, отзыва токенов и журнала действий."""
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from app.models import AuditEvent, DeniedToken, User
 
@@ -41,3 +41,12 @@ class AuthRepository:
     def audit(self, user_id: int, method: str, path: str) -> None:
         self.db.add(AuditEvent(user_id=user_id, method=method, path=path))
         self.db.flush()
+
+    def list_audit(self, page: int, size: int, method: str | None = None) -> dict:
+        # Условия применяются в SQL до count/limit, порядок однозначен даже при одинаковой дате.
+        stmt = select(AuditEvent)
+        if method is not None:
+            stmt = stmt.where(AuditEvent.method == method)
+        total = self.db.scalar(select(func.count()).select_from(stmt.subquery()))
+        items = list(self.db.scalars(stmt.order_by(AuditEvent.id.desc()).offset((page - 1) * size).limit(size)))
+        return {"items": items, "total": total, "page": page, "size": size}

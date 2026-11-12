@@ -1,10 +1,22 @@
 """Контракты запросов и ответов BookNest."""
 
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated, Generic, Literal, TypeVar
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 T = TypeVar("T")
+
+
+class AuditEventRead(BaseModel):
+    """Явный список полей исключает пароли, токены и данные тела изменяющего запроса."""
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    user_id: int | None
+    method: str
+    path: str
+    created_at: datetime
+
+
 Genre = Literal["scifi", "history", "poetry", "cs", "fiction"]
 Sort = Annotated[str, Field(pattern=r"^-?(title|year|id)(,-?(title|year|id))*$")]
 
