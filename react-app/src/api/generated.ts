@@ -19,7 +19,7 @@ export interface AuthorRead {
 }
 
 export interface AuthorUpdate {
-  name?: string | null;
+  name?: string;
   birth_year?: number | null;
 }
 
@@ -66,17 +66,17 @@ export interface BookRead {
 }
 
 export interface BookUpdate {
-  title?: string | null;
-  author_id?: number | null;
-  year?: number | null;
+  title?: string;
+  author_id?: number;
+  year?: number;
   isbn?: string | null;
-  genre?: "scifi" | "history" | "poetry" | "cs" | "fiction" | null;
-  total_copies?: number | null;
-  description?: string | null;
-  publisher?: string | null;
-  language?: string | null;
-  edition_year?: number | null;
-  pages?: number | null;
+  genre?: "scifi" | "history" | "poetry" | "cs" | "fiction";
+  total_copies?: number;
+  description?: string;
+  publisher?: string;
+  language?: string;
+  edition_year?: number;
+  pages?: number;
 }
 
 export interface ConfirmationRequest {
@@ -86,7 +86,7 @@ export interface ConfirmationRequest {
 export interface ErrorRead {
   code: string;
   message: string;
-  details?: unknown | null;
+  details?: (ValidationIssueRead)[] | null;
   request_id: string;
 }
 
@@ -143,7 +143,7 @@ export interface LoanRead {
 }
 
 export interface LoanReturn {
-  state: string;
+  state: "returned";
 }
 
 export interface MessageRead {
@@ -185,7 +185,7 @@ export interface RegisterRequest {
 
 export interface TokenRead {
   access_token: string;
-  token_type: string;
+  token_type: "bearer";
   expires_in: number;
 }
 
@@ -195,4 +195,10 @@ export interface UserRead {
   role: "member" | "librarian";
   is_active: boolean;
   email_verified: boolean;
+}
+
+export interface ValidationIssueRead {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
 }

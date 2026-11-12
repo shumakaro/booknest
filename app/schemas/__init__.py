@@ -7,6 +7,19 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 T = TypeVar("T")
 
 
+def describe_patch(schema: dict, nullable: set[str]) -> None:
+    """Необязательное поле PATCH можно пропустить, но это не всегда разрешение передать null."""
+    for name, field in schema.get("properties", {}).items():
+        if name in nullable:
+            continue
+        alternatives = [item for item in field.get("anyOf", []) if item.get("type") != "null"]
+        if len(alternatives) == 1:
+            field.pop("anyOf", None)
+            field.update(alternatives[0])
+        # None — внутренний маркер отсутствующего поля, а не допустимое значение запроса.
+        field.pop("default", None)
+
+
 class AuditEventRead(BaseModel):
     """Явный список полей исключает пароли, токены и данные тела изменяющего запроса."""
     model_config = ConfigDict(from_attributes=True)
@@ -45,7 +58,7 @@ class AuthorCreate(BaseModel):
 
 
 class AuthorUpdate(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", json_schema_extra=lambda schema: describe_patch(schema, {"birth_year"}))
     name: str | None = Field(default=None, min_length=1, max_length=120)
     birth_year: int | None = Field(default=None, ge=1000, le=2100)
 
@@ -121,7 +134,7 @@ class BookCreate(BaseModel):
 
 
 class BookUpdate(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", json_schema_extra=lambda schema: describe_patch(schema, {"isbn"}))
     title: str | None = Field(default=None, min_length=1, max_length=200)
     author_id: int | None = Field(default=None, gt=0)
     year: int | None = Field(default=None, ge=1450, le=2100)
@@ -176,10 +189,17 @@ class HealthRead(BaseModel):
     status: str
 
 
+class ValidationIssueRead(BaseModel):
+    """Только безопасные поля ошибки проверки: без входных значений и контекста исключения."""
+    loc: list[str | int]
+    msg: str
+    type: str
+
+
 class ErrorRead(BaseModel):
     code: str
     message: str
-    details: object | None = None
+    details: list[ValidationIssueRead] | None = None
     request_id: str
 
 

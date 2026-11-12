@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-12",
+  "backend": {
+    "tests": 119,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 46.785,
+    "warnings": 1,
+    "database": "existing local PostgreSQL _test; rollback fixtures; no Neon"
+  },
+  "frontend": {
+    "tests": 95,
+    "files": 18,
+    "passed": true,
+    "seconds": 72.67,
+    "command": "npm test -- --run --maxWorkers=2"
+  },
+  "build": "TypeScript/Vite passed after type regeneration",
+  "lint": "ESLint and Ruff modified Python passed; diff check passed",
+  "schema": "live OpenAPI == docs/api/openapi.json; generated types match; --check does not write and returns 1 on stale file",
+  "browser": "not rerun in stage 11; runtime frontend unchanged",
+  "docker": "not run",
+  "production": "no deploy or merge; no migrations or real data changes"
+}
