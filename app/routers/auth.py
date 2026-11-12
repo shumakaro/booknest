@@ -92,7 +92,7 @@ def me(user: CurrentUser, response: Response):
     return user
 
 
-@router.post("/logout", response_model=None, status_code=204)
+@router.post("/logout", response_model=None, status_code=204, openapi_extra={"security": [{}]})
 def logout(
     request: Request, db: Database, token: Annotated[str | None, Depends(optional_oauth2)] = None
 ) -> Response:
