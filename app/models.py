@@ -54,6 +54,9 @@ class Book(Base):
         CheckConstraint("pages BETWEEN 1 AND 10000", name="books_pages_ck"),
         CheckConstraint("length(trim(title)) > 0", name="books_title_ck"),
         CheckConstraint("isbn IS NULL OR isbn ~ '^[0-9]{13}$'", name="books_isbn_ck"),
+        # Эти ограничения уже созданы миграцией 006; metadata должна описывать ту же схему.
+        CheckConstraint("external_work_id IS NULL OR external_work_id ~ '^OL[0-9]+W$'", name="books_external_work_id_ck"),
+        CheckConstraint("cover_id IS NULL OR cover_id > 0", name="books_cover_id_ck"),
         Index("books_author_year_idx", "author_id", "year", "id"),
         Index("books_search_idx", text("to_tsvector('simple',title)"), postgresql_using="gin"),
     )
