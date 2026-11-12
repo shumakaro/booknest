@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-12",
+  "frontend": {
+    "tests": 95,
+    "files": 18,
+    "passed": true,
+    "seconds": 71.51,
+    "command": "npm test -- --run --maxWorkers=2"
+  },
+  "build": "TypeScript/Vite passed",
+  "lint": "ESLint and node --check passed",
+  "backend": "not rerun in stage 10; backend unchanged; stage 9 recorded 107 passed",
+  "browser": "local production build, fixture API, no real accounts; wishlist/loans/auth/librarian regressions passed",
+  "manualRemaining": [
+    "Real screen reader speech",
+    "Native browser zoom 200%",
+    "Final production screenshots after Neon and Render"
+  ],
+  "docker": "not run",
+  "production": "no deploy or merge"
+}

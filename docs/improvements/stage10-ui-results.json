@@ -1,0 +1,42 @@
+{
+  "source": "Local production build; fixture API; no real account or production data",
+  "pathTitleAndMainFocus": true,
+  "queryKeepsInputFocus": true,
+  "notificationFocusPausesTimeout": true,
+  "newMessageKeepsCloseButton": true,
+  "closeReturnsFocus": true,
+  "notificationHoverPausesTimeout": true,
+  "longUnbrokenNoticeWraps": true,
+  "navLinks44px": true,
+  "skipLinkKeyboard": true,
+  "reducedMotion": true,
+  "contrastPairs": {
+    "light": {
+      "text/surface": 13.56,
+      "muted/surface": 5.5,
+      "button-text/primary": 6.71,
+      "danger/danger-soft": 5.3,
+      "badge-text/primary-soft": 7.26
+    },
+    "dark": {
+      "text/surface": 13.39,
+      "muted/surface": 7.85,
+      "button-text/primary": 9.33,
+      "danger/danger-soft": 7.82,
+      "badge-text/primary-soft": 7.59
+    }
+  },
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "pageErrors": [],
+  "manualRemaining": [
+    "Real screen reader speech",
+    "Native browser zoom 200%",
+    "Final production screenshots after Neon and Render"
+  ]
+}

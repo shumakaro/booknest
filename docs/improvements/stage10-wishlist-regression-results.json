@@ -1,0 +1,24 @@
+{
+  "source": "Local production build; fixture private API; no production data",
+  "all102BooksRead": true,
+  "authorBeyondFirst100Found": true,
+  "availabilityAndSort": true,
+  "oldTablePreserved": true,
+  "detailReturnKeepsFiltersAndScroll": true,
+  "failedDeleteRollsBack": true,
+  "retryDelete": true,
+  "detailSaveRollsBackAndRetries": true,
+  "pendingDisabled": true,
+  "accountSwitchHasNoOldBooks": true,
+  "guestRedirectWithoutPrivateRead": true,
+  "emptyListDistinctFromNoMatches": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "overflow": false,
+  "darkTheme": true,
+  "pageErrors": []
+}
