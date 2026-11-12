@@ -1,0 +1,14 @@
+/* Интегрированные формы ЛР10 сохраняют общую кремовую тему и видимый фокус. */
+.auth-page { max-width: 560px; margin: 24px auto; padding: 28px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+.page .auth-page form { margin-bottom: 0; padding: 0; border: 0; background: transparent; display: block; }
+.auth-page fieldset { display: grid; gap: 20px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.auth-page fieldset > p { margin: 0; }
+.auth-page label { display: block; margin-bottom: 8px; }
+.auth-help { color: var(--muted); line-height: 1.6; }
+.auth-page input[aria-invalid="true"] { border-color: var(--danger); }
+.page .auth-page button:not(.btn), .page .auth-page input:not([type="checkbox"]) { min-height: 44px; }
+.auth-password { display: flex; gap: 8px; align-items: stretch; }
+.auth-password input { min-width: 0; flex: 1; }
+.auth-password button { flex: 0 0 auto; }
+.session-account { margin: 0 0 12px; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 540px) { .auth-page { padding: 20px; } .auth-password { display: grid; grid-template-columns: minmax(0, 1fr); } .auth-password button { justify-self: start; } }
