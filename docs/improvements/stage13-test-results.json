@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-12",
+  "backend": {
+    "tests": 140,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 74.49,
+    "warnings": 1,
+    "database": "existing local PostgreSQL _test; rollback fixtures; no Neon"
+  },
+  "targeted": "10 new cases passed after fixing two registration fixture addresses; final full run includes 11 new cases",
+  "initialFailure": "2 failed/32 passed: example.test registration addresses rejected; changed fixtures to example.com, validation unchanged",
+  "lint": "Ruff modified Python passed; API generator --check passed; diff check passed",
+  "trackedRuntimeEnvOrKeyPaths": [],
+  "scanScope": "tracked filenames only, excluding .env.example; no secret values printed; not a full history/content scan",
+  "frontend": "not rerun; unchanged",
+  "browser": "not rerun; HTTP and DB tests, no production TLS claim",
+  "docker": "not run, next stage",
+  "production": "no Neon/Render access or changes; no deploy/merge"
+}
