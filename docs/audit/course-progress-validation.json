@@ -11,16 +11,16 @@
   "source_context_items": 57,
   "matrix_rows": 356,
   "matrix_counts": {
-    "DONE": 128,
+    "DONE": 138,
     "PARTIAL": 70,
-    "NOT_VERIFIED": 131,
+    "NOT_VERIFIED": 121,
     "EXCLUDED_PEER_TASK": 19,
     "MISSING": 5,
     "BLOCKED": 3
   },
   "own_practice15_tasks": 8,
   "application_files_unchanged": false,
-  "production_files_unchanged": true,
+  "production_files_unchanged": false,
   "defense_docx_unchanged": true,
   "new_application_tests_run": true,
   "tests_executed_by_this_checker": false

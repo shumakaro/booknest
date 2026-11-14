@@ -19,6 +19,19 @@ def test_live_schema_snapshot_and_generated_types_match():
     assert {} in actual["paths"]["/api/v1/auth/logout"]["post"]["security"]
     assert {} not in actual["paths"]["/api/v1/auth/me"]["get"]["security"]
     assert render_types(actual) == Path("react-app/src/api/generated.ts").read_text(encoding="utf-8")
+    # Поиск, детали и импорт могут зависеть от внешнего сервиса.
+    # Общий ответ 500 не должен скрывать их реальные 502/503/504.
+    for path, method in [
+        ("/api/v1/discover/books", "get"),
+        ("/api/v1/discover/books/{work_id}", "get"),
+        ("/api/v1/discover/imports", "post"),
+    ]:
+        responses = actual["paths"][path][method]["responses"]
+        for status in ["502", "503", "504"]:
+            assert responses[status]["content"]["application/json"]["schema"] == {
+                "$ref": "#/components/schemas/ErrorRead"
+            }
+        assert responses["503"]["headers"]["Retry-After"]["schema"]["type"] == "integer"
     for path, item in actual["paths"].items():
         for method, operation in item.items():
             if method not in {"get", "post", "patch", "delete"}:

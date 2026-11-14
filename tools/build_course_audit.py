@@ -409,9 +409,16 @@ payload = {
     "date": "2026-11-14", "baseline": "cc256a7", "branch": subprocess.check_output(
         ["git", "branch", "--show-current"], cwd=ROOT, text=True
     ).strip(),
-    "application_code": "98a1be3", "rows": rows, "counts": dict(counts),
-    "new_application_tests": bool(updates.get("frontend_validation")),
+    "application_code_baseline": "98a1be3",
+    "application_code": subprocess.check_output(
+        ["git", "log", "-1", "--format=%H", "--", "app/", "react-app/src/"],
+        cwd=ROOT, text=True,
+    ).strip(),
+    "rows": rows, "counts": dict(counts),
+    "new_application_tests": bool(updates.get("frontend_validation") or updates.get("backend_validation")),
     "new_test_protocol": updates.get("frontend_validation"),
+    "new_backend_test_protocol": updates.get("backend_validation"),
+    "new_ci_protocol": updates.get("ci_validation"),
     "source_inventory": inventory,
 }
 AUDIT.mkdir(parents=True, exist_ok=True)

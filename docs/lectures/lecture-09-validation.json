@@ -1,0 +1,878 @@
+{
+  "date_utc": "2026-11-14T13:18:25.409002+00:00",
+  "baseline": "605d0d5",
+  "branch": "codex/lecture-09-materials",
+  "scope": "in-process memory API and production OpenAPI without DB connections",
+  "pytest_args": [
+    "tests/test_catalog.py",
+    "tests/test_api_contracts.py",
+    "tests/test_discover.py",
+    "-k",
+    "not test_patch_schema_and_real_null_rules",
+    "-q"
+  ],
+  "pytest_exit_code": 0,
+  "pytest_seconds": 9.3,
+  "pytest": {
+    "tests": 44,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "database_connection_attempts": 0,
+  "database_writes": false,
+  "environment_files_modified": false,
+  "deployment_performed": false,
+  "public_http_requests": false,
+  "openapi_matches_snapshot": true,
+  "generated_types_match": true,
+  "paths": 22,
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/api/v1/books",
+      "operation_id": "list_books_api_v1_books_get",
+      "summary": "List Books",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books",
+      "operation_id": "create_book_api_v1_books_post",
+      "summary": "Create Book",
+      "responses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "201"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/books/{item_id}",
+      "operation_id": "get_book_api_v1_books__item_id__get",
+      "summary": "Get Book",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/books/{item_id}",
+      "operation_id": "update_book_api_v1_books__item_id__patch",
+      "summary": "Update Book",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/books/{item_id}",
+      "operation_id": "delete_book_api_v1_books__item_id__delete",
+      "summary": "Delete Book",
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "204"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/authors",
+      "operation_id": "list_authors_api_v1_authors_get",
+      "summary": "List Authors",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/authors",
+      "operation_id": "create_author_api_v1_authors_post",
+      "summary": "Create Author",
+      "responses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "201"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/authors/{item_id}",
+      "operation_id": "get_author_api_v1_authors__item_id__get",
+      "summary": "Get Author",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/authors/{item_id}",
+      "operation_id": "update_author_api_v1_authors__item_id__patch",
+      "summary": "Update Author",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/authors/{item_id}",
+      "operation_id": "delete_author_api_v1_authors__item_id__delete",
+      "summary": "Delete Author",
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "204"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/authors/{item_id}/books",
+      "operation_id": "author_books_api_v1_authors__item_id__books_get",
+      "summary": "Author Books",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books/{item_id}/loans",
+      "operation_id": "issue_book_api_v1_books__item_id__loans_post",
+      "summary": "Issue Book",
+      "responses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "201"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/loans",
+      "operation_id": "list_loans_api_v1_loans_get",
+      "summary": "List Loans",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/loans/{loan_id}",
+      "operation_id": "get_loan_api_v1_loans__loan_id__get",
+      "summary": "Get Loan",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/loans/{loan_id}",
+      "operation_id": "return_book_api_v1_loans__loan_id__patch",
+      "summary": "Return Book",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reports/overdue-loans",
+      "operation_id": "overdue_loans_api_v1_reports_overdue_loans_get",
+      "summary": "Overdue Loans",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit-events",
+      "operation_id": "list_audit_events_api_v1_audit_events_get",
+      "summary": "List Audit Events",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "operation_id": "register_api_v1_auth_register_post",
+      "summary": "Register",
+      "responses": [
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "201"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/token",
+      "operation_id": "token_api_v1_auth_token_post",
+      "summary": "Token",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "operation_id": "refresh_api_v1_auth_refresh_post",
+      "summary": "Refresh",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "operation_id": "me_api_v1_auth_me_get",
+      "summary": "Me",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "operation_id": "logout_api_v1_auth_logout_post",
+      "summary": "Logout",
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "204"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/confirm-email",
+      "operation_id": "confirm_email_api_v1_auth_confirm_email_post",
+      "summary": "Confirm Email",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/wishlist",
+      "operation_id": "list_wishlist_api_v1_wishlist_get",
+      "summary": "List Wishlist",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/wishlist/{book_id}",
+      "operation_id": "add_wishlist_api_v1_wishlist__book_id__post",
+      "summary": "Add Wishlist",
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "204"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/wishlist/{book_id}",
+      "operation_id": "remove_wishlist_api_v1_wishlist__book_id__delete",
+      "summary": "Remove Wishlist",
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "204"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/discover/books",
+      "operation_id": "search_books_api_v1_discover_books_get",
+      "summary": "Search Books",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/discover/books/{work_id}",
+      "operation_id": "book_details_api_v1_discover_books__work_id__get",
+      "summary": "Book Details",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/discover/imports",
+      "operation_id": "import_selected_api_v1_discover_imports_post",
+      "summary": "Import Selected",
+      "responses": [
+        "200",
+        "201",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504"
+      ],
+      "success_codes": [
+        "200",
+        "201"
+      ],
+      "bearer_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "operation_id": "health_health_get",
+      "summary": "Health",
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "405",
+        "409",
+        "422",
+        "429",
+        "500"
+      ],
+      "success_codes": [
+        "200"
+      ],
+      "bearer_required": false
+    }
+  ],
+  "memory_http_cases": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "request_id_present": true,
+      "body": {
+        "status": "ok"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/docs",
+      "status": 200,
+      "request_id_present": true,
+      "body_bytes": 936
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/authors",
+      "status": 201,
+      "request_id_present": true,
+      "body": {
+        "name": "Автор проверки лекции",
+        "birth_year": null,
+        "id": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books",
+      "status": 201,
+      "request_id_present": true,
+      "body": {
+        "title": "Учебная книга",
+        "author_id": 1,
+        "year": 2020,
+        "isbn": "9780306406157",
+        "genre": "fiction",
+        "total_copies": 1,
+        "description": "",
+        "publisher": "Учебное издательство",
+        "language": "ru",
+        "edition_year": 2021,
+        "pages": 200,
+        "id": 1,
+        "available": 1,
+        "author": "Автор проверки лекции",
+        "external_work_id": null,
+        "cover_id": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books",
+      "status": 409,
+      "request_id_present": true,
+      "body": {
+        "code": "HTTP_409",
+        "message": "Книга с таким ISBN уже существует",
+        "details": null,
+        "request_id": "a2c47401-cdea-4473-a082-0d27492c5e3e"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books",
+      "status": 422,
+      "request_id_present": true,
+      "body": {
+        "code": "HTTP_422",
+        "message": "Проверьте введённые данные",
+        "details": [
+          {
+            "loc": [
+              "body",
+              "year"
+            ],
+            "msg": "Input should be a valid integer, unable to parse string as an integer",
+            "type": "int_parsing"
+          }
+        ],
+        "request_id": "1a7c6df3-5eec-4f71-839b-7f1567e644ff"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/books?q=Учебная&page=1&size=1",
+      "status": 200,
+      "request_id_present": true,
+      "body": {
+        "items": [
+          {
+            "title": "Учебная книга",
+            "author_id": 1,
+            "year": 2020,
+            "isbn": "9780306406157",
+            "genre": "fiction",
+            "total_copies": 1,
+            "description": "",
+            "publisher": "Учебное издательство",
+            "language": "ru",
+            "edition_year": 2021,
+            "pages": 200,
+            "id": 1,
+            "available": 1,
+            "author": "Автор проверки лекции",
+            "external_work_id": null,
+            "cover_id": null
+          }
+        ],
+        "total": 1,
+        "page": 1,
+        "size": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/books/999",
+      "status": 404,
+      "request_id_present": true,
+      "body": {
+        "code": "HTTP_404",
+        "message": "Запись не найдена",
+        "details": null,
+        "request_id": "b6679788-2e9d-4231-8489-1871655a3c33"
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/books/1",
+      "status": 200,
+      "request_id_present": true,
+      "body": {
+        "title": "Уточненное название",
+        "author_id": 1,
+        "year": 2020,
+        "isbn": "9780306406157",
+        "genre": "fiction",
+        "total_copies": 1,
+        "description": "",
+        "publisher": "Учебное издательство",
+        "language": "ru",
+        "edition_year": 2021,
+        "pages": 200,
+        "id": 1,
+        "available": 1,
+        "author": "Автор проверки лекции",
+        "external_work_id": null,
+        "cover_id": null
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/books/1",
+      "status": 204,
+      "request_id_present": true,
+      "body_bytes": 0
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/books/1",
+      "status": 404,
+      "request_id_present": true,
+      "body": {
+        "code": "HTTP_404",
+        "message": "Запись не найдена",
+        "details": null,
+        "request_id": "d33d4007-37ff-46f1-8594-aab75ffd073c"
+      }
+    }
+  ],
+  "user_read_filters_service_field": true,
+  "swagger_html_served": true,
+  "swagger_browser_screenshot_taken": false
+}

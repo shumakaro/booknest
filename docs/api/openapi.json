@@ -3611,6 +3611,45 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Некорректный ответ Open Library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Внешний поиск временно занят или ограничил запросы",
+            "headers": {
+              "Retry-After": {
+                "description": "Через сколько секунд можно повторить запрос",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Истекло время ожидания Open Library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
           }
         }
       }
@@ -3735,6 +3774,45 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Некорректный ответ Open Library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Внешний поиск временно занят или ограничил запросы",
+            "headers": {
+              "Retry-After": {
+                "description": "Через сколько секунд можно повторить запрос",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Истекло время ожидания Open Library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
           }
         }
       }
@@ -3849,6 +3927,45 @@
           },
           "500": {
             "description": "Внутренняя ошибка без раскрытия подробностей",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Некорректный ответ Open Library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Внешний поиск временно занят или ограничил запросы",
+            "headers": {
+              "Retry-After": {
+                "description": "Через сколько секунд можно повторить запрос",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1.0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRead"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Истекло время ожидания Open Library",
             "content": {
               "application/json": {
                 "schema": {
