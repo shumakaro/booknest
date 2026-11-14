@@ -4,7 +4,7 @@ from sqlalchemy.engine import make_url
 
 from tools.backup_neon import (
     SafetyError, child_environment, connection_options, private_directory,
-    require_new_database, validate_connections,
+    require_new_database, reuse_default_public_schema, validate_connections,
 )
 
 DIRECT = "postgresql+psycopg://source:p%40ss@unit.neon.tech/books?sslmode=require"
@@ -54,3 +54,15 @@ def test_restore_refuses_existing_database_without_mutation():
 
     with pytest.raises(SafetyError, match="restore_target_already_exists"):
         require_new_database(ExistingDatabase(), "booknest_check_restore_test")
+
+
+def test_restore_list_preserves_all_data_and_other_schemas():
+    contents = ("1; 2615 2200 SCHEMA - public owner\n"
+                "2; 2615 2201 SCHEMA - other owner\n"
+                "3; 1259 100 TABLE public books owner\n"
+                "4; 0 100 TABLE DATA public books owner\n")
+    listing = reuse_default_public_schema(contents)
+    assert ";1; 2615 2200 SCHEMA - public owner" in listing
+    assert "\n2; 2615 2201 SCHEMA - other owner\n" in listing
+    assert "\n3; 1259 100 TABLE public books owner\n" in listing
+    assert "\n4; 0 100 TABLE DATA public books owner\n" in listing

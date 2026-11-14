@@ -101,6 +101,18 @@ def require_new_database(admin: psycopg.Connection, target: str) -> None:
         raise SafetyError("restore_target_already_exists")
 
 
+def reuse_default_public_schema(contents: str) -> str:
+    """Оставляет штатную public новой БД; данные, таблицы и другие схемы не исключаются."""
+    lines = []
+    for line in contents.splitlines():
+        if re.match(r"^\d+;\s+\d+\s+\d+\s+SCHEMA\s+-\s+public\s+", line):
+            lines.append("; public уже существует в только что созданной БД")
+            lines.append(";" + line)
+        else:
+            lines.append(line)
+    return "\n".join(lines) + "\n"
+
+
 def verify_backup(args: argparse.Namespace) -> dict:
     root = Path.cwd().resolve()
     if args.report.exists():
@@ -132,20 +144,37 @@ def verify_backup(args: argparse.Namespace) -> dict:
             if int(admin.execute("SHOW server_version_num").fetchone()[0]) // 10000 < source_major:
                 raise SafetyError("restore_server_is_older_than_source_server")
             before = fingerprint(connection)
-            snapshot = connection.execute("SELECT pg_export_snapshot()").fetchone()[0]
             folder = private / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid4().hex[:8])
             folder.mkdir(parents=True, exist_ok=False)
-            archive = folder / "booknest-public.dump"
-            # Экспортированный снимок фиксирует один набор строк даже при параллельной работе сайта.
-            run_tool([str(dump_binary), "--no-password", "--format=custom", "--schema=public",
-                      "--no-owner", "--no-privileges", "--snapshot=" + snapshot, "--file=" + str(archive)],
-                     child_environment(connection_options(source)), folder / "dump-private.log")
+            (folder / "snapshot-private.json").write_text(json.dumps(before), encoding="utf-8")
+            if args.archive:
+                archive = args.archive.resolve()
+                private_directory(root, archive.parent)
+                checksum = archive.with_suffix(archive.suffix + ".sha256")
+                if not archive.is_file() or not checksum.is_file() or archive.stat().st_size == 0:
+                    raise SafetyError("complete_private_archive_required")
+                if hashlib.sha256(archive.read_bytes()).hexdigest() != checksum.read_text(encoding="ascii").strip():
+                    raise SafetyError("private_archive_checksum_mismatch")
+            else:
+                snapshot = connection.execute("SELECT pg_export_snapshot()").fetchone()[0]
+                archive = folder / "booknest-public.dump"
+                # Экспортированный снимок фиксирует один набор строк при параллельной работе сайта.
+                run_tool([str(dump_binary), "--no-password", "--format=custom", "--schema=public",
+                          "--no-owner", "--no-privileges", "--snapshot=" + snapshot,
+                          "--lock-wait-timeout=15000", "--file=" + str(archive)],
+                         child_environment(connection_options(source)), folder / "dump-private.log")
         archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
         (folder / "booknest-public.dump.sha256").write_text(archive_hash + "\n", encoding="ascii")
         require_new_database(admin, args.restore_name)
         admin.execute(sql.SQL("CREATE DATABASE {} TEMPLATE template0").format(sql.Identifier(args.restore_name)))
+        listing = subprocess.run([str(restore_binary), "--list", str(archive)],
+                                 capture_output=True, check=True, timeout=30)
+        restore_list = folder / "restore-private.list"
+        restore_list.write_text(reuse_default_public_schema(listing.stdout.decode("utf-8")), encoding="utf-8")
+        # Изменяется только TOC создания стандартной public: DROP/--clean здесь нет.
         run_tool([str(restore_binary), "--no-password", "--no-owner", "--no-privileges", "--exit-on-error",
-                  "--single-transaction", "--dbname=" + args.restore_name, str(archive)],
+                  "--single-transaction", "--use-list=" + str(restore_list),
+                  "--dbname=" + args.restore_name, str(archive)],
                  child_environment(connection_options(local, args.restore_name)), folder / "restore-private.log")
     with psycopg.connect(**connection_options(local, args.restore_name)) as restored:
         restored.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
@@ -155,6 +184,8 @@ def verify_backup(args: argparse.Namespace) -> dict:
         "status": "ok" if matches else "needs_attention",
         "checked_at_utc": datetime.now(timezone.utc).isoformat(),
         "scope": "existing_neon_public_schema", "source_snapshot_used": True,
+        "existing_private_archive_reused": bool(args.archive),
+        "comparison_scope": "read_only_source_snapshot_at_verification",
         "source_read_only": True, "source_client_tls": True, "production_writes": False,
         "restore_database_is_new_and_local": True, "restore_target": args.restore_name,
         "revision": before["revision"], "archive_sha256": archive_hash,
@@ -172,6 +203,7 @@ def main() -> int:
     parser.add_argument("--private-dir", type=Path, default=Path("backups/neon"))
     parser.add_argument("--pg-bin", type=Path, default=Path(".tools/postgresql/pgsql/bin"))
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--archive", type=Path, help="Проверить существующий приватный дамп с SHA-256 без нового pg_dump")
     args = parser.parse_args()
     try:
         result = verify_backup(args)
