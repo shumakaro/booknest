@@ -17,6 +17,13 @@ from psycopg import sql
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class Utf8Buffer(io.StringIO):
+    """Alembic использует encoding потока для русских описаний ревизий."""
+    @property
+    def encoding(self) -> str:
+        return "utf-8"
+
+
 def schema(connection: psycopg.Connection) -> dict:
     """Возвращает характеристики схемы без пользовательских строк."""
     columns = connection.execute("""
@@ -69,7 +76,8 @@ def main() -> None:
                       CORS_ORIGINS='["http://testserver"]')
     from alembic import command
     from alembic.config import Config
-    cfg = Config(str(ROOT / "alembic.ini"))
+    output = Utf8Buffer()
+    cfg = Config(str(ROOT / "alembic.ini"), stdout=output)
     command.upgrade(cfg, "001_schema")
     with psycopg.connect(**options, dbname=names[1], autocommit=True) as db:
         initial = schema(db)
@@ -78,7 +86,6 @@ def main() -> None:
         db.execute("UPDATE profiles SET full_name='Имя  Фамилия ' WHERE user_id=1")
         original_names = db.execute("SELECT user_id,full_name FROM profiles ORDER BY user_id").fetchall()
     command.upgrade(cfg, "head")
-    output = io.StringIO()
     with redirect_stdout(output):
         command.check(cfg)
         command.history(cfg)

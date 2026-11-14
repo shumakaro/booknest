@@ -1443,7 +1443,8 @@
     ]
   },
   "current_revision": "006_external_books",
-  "metadata_check": "",
+  "metadata_check": "No new upgrade operations detected.\n005_wishlist -> 006_external_books (head), Добавляет происхождение и обложку, сохраняя существующие книги и связи.\n004_book_form_fields -> 005_wishlist, Постоянный персональный список желаемого, без изменения прежних таблиц.\n003_auth -> 004_book_form_fields, Сохраняет поля существующей React-формы в PostgreSQL без выдуманных значений при редактировании.\n002_profile_names -> 003_auth, Расширения для отзыва токенов и аудита, без изменения имеющихся данных.\n001_schema -> 002_profile_names, Добавление языка, мягкого удаления и обратимое разделение имени.\n<base> -> 001_schema, Начальная нормализованная схема, зафиксированная независимо от db/schema.sql.\n",
   "upgrade_downgrade_upgrade": true,
-  "names_including_spaces_preserved": true
+  "names_including_spaces_preserved": true,
+  "metadata_capture_note": "Повторный read-only check/history: stdout Config захвачен явно; миграции не применялись."
 }
