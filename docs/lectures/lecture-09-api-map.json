@@ -1,0 +1,336 @@
+{
+  "paths": 22,
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/api/v1/books",
+      "purpose": "Список книг",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "422",
+      "operation_id": "list_books_api_v1_books_get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books",
+      "purpose": "Создать книгу",
+      "role": "librarian",
+      "success": [
+        "201"
+      ],
+      "errors": "401,403,404,409,422,429",
+      "operation_id": "create_book_api_v1_books_post"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/books/{item_id}",
+      "purpose": "Детали книги",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "404,422",
+      "operation_id": "get_book_api_v1_books__item_id__get"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/books/{item_id}",
+      "purpose": "Изменить переданные поля",
+      "role": "librarian",
+      "success": [
+        "200"
+      ],
+      "errors": "401,403,404,409,422,429",
+      "operation_id": "update_book_api_v1_books__item_id__patch"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/books/{item_id}",
+      "purpose": "Мягкое удаление книги",
+      "role": "librarian",
+      "success": [
+        "204"
+      ],
+      "errors": "401,403,404,409,422,429",
+      "operation_id": "delete_book_api_v1_books__item_id__delete"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/authors",
+      "purpose": "Список авторов",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "422",
+      "operation_id": "list_authors_api_v1_authors_get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/authors",
+      "purpose": "Создать автора",
+      "role": "librarian",
+      "success": [
+        "201"
+      ],
+      "errors": "401,403,409,422,429",
+      "operation_id": "create_author_api_v1_authors_post"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/authors/{item_id}",
+      "purpose": "Детали автора",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "404,422",
+      "operation_id": "get_author_api_v1_authors__item_id__get"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/authors/{item_id}",
+      "purpose": "Изменить автора",
+      "role": "librarian",
+      "success": [
+        "200"
+      ],
+      "errors": "401,403,404,409,422,429",
+      "operation_id": "update_author_api_v1_authors__item_id__patch"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/authors/{item_id}",
+      "purpose": "Удалить автора без книг",
+      "role": "librarian",
+      "success": [
+        "204"
+      ],
+      "errors": "401,403,404,409,422,429",
+      "operation_id": "delete_author_api_v1_authors__item_id__delete"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/authors/{item_id}/books",
+      "purpose": "Книги автора",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "404,422",
+      "operation_id": "author_books_api_v1_authors__item_id__books_get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/books/{item_id}/loans",
+      "purpose": "Оформить выдачу",
+      "role": "member: себе; librarian: выбранному читателю",
+      "success": [
+        "201"
+      ],
+      "errors": "401,403,404,409,422,429",
+      "operation_id": "issue_book_api_v1_books__item_id__loans_post"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/loans",
+      "purpose": "Список выдач",
+      "role": "member: свои; librarian: все",
+      "success": [
+        "200"
+      ],
+      "errors": "401,422",
+      "operation_id": "list_loans_api_v1_loans_get"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/loans/{loan_id}",
+      "purpose": "Детали выдачи",
+      "role": "Владелец или librarian",
+      "success": [
+        "200"
+      ],
+      "errors": "401,404,422",
+      "operation_id": "get_loan_api_v1_loans__loan_id__get"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/loans/{loan_id}",
+      "purpose": "Вернуть книгу",
+      "role": "Владелец или librarian",
+      "success": [
+        "200"
+      ],
+      "errors": "401,404,409,422,429",
+      "operation_id": "return_book_api_v1_loans__loan_id__patch"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reports/overdue-loans",
+      "purpose": "Просроченные выдачи",
+      "role": "librarian",
+      "success": [
+        "200"
+      ],
+      "errors": "401,403,422",
+      "operation_id": "overdue_loans_api_v1_reports_overdue_loans_get"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit-events",
+      "purpose": "Журнал действий",
+      "role": "librarian",
+      "success": [
+        "200"
+      ],
+      "errors": "401,403,422",
+      "operation_id": "list_audit_events_api_v1_audit_events_get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "purpose": "Зарегистрировать читателя",
+      "role": "Любая",
+      "success": [
+        "201"
+      ],
+      "errors": "409,422,429",
+      "operation_id": "register_api_v1_auth_register_post"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/token",
+      "purpose": "Войти, получить access и refresh",
+      "role": "Любая с верными учетными данными",
+      "success": [
+        "200"
+      ],
+      "errors": "401,422,429",
+      "operation_id": "token_api_v1_auth_token_post"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "purpose": "Обновить токены",
+      "role": "Действующий refresh-cookie",
+      "success": [
+        "200"
+      ],
+      "errors": "401,403,429",
+      "operation_id": "refresh_api_v1_auth_refresh_post"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "purpose": "Свой профиль без хеша пароля",
+      "role": "Авторизованный пользователь",
+      "success": [
+        "200"
+      ],
+      "errors": "401",
+      "operation_id": "me_api_v1_auth_me_get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "purpose": "Отозвать сеанс и очистить cookie",
+      "role": "Access необязателен; проверяется Origin",
+      "success": [
+        "204"
+      ],
+      "errors": "403,429",
+      "operation_id": "logout_api_v1_auth_logout_post"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/confirm-email",
+      "purpose": "Подтвердить адрес одноразовым токеном",
+      "role": "Обладатель действующего токена",
+      "success": [
+        "200"
+      ],
+      "errors": "401,422,429",
+      "operation_id": "confirm_email_api_v1_auth_confirm_email_post"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/wishlist",
+      "purpose": "Свой список желаемого",
+      "role": "Авторизованный пользователь",
+      "success": [
+        "200"
+      ],
+      "errors": "401,422",
+      "operation_id": "list_wishlist_api_v1_wishlist_get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/wishlist/{book_id}",
+      "purpose": "Добавить в желаемое, повтор безопасен",
+      "role": "Авторизованный пользователь",
+      "success": [
+        "204"
+      ],
+      "errors": "401,404,409,422,429",
+      "operation_id": "add_wishlist_api_v1_wishlist__book_id__post"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/wishlist/{book_id}",
+      "purpose": "Убрать из желаемого",
+      "role": "Авторизованный пользователь",
+      "success": [
+        "204"
+      ],
+      "errors": "401,422,429",
+      "operation_id": "remove_wishlist_api_v1_wishlist__book_id__delete"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/discover/books",
+      "purpose": "Внешний поиск по названию и автору",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "422,502,503,504",
+      "operation_id": "search_books_api_v1_discover_books_get"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/discover/books/{work_id}",
+      "purpose": "Внешние подробности книги",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "404,422,502,503,504",
+      "operation_id": "book_details_api_v1_discover_books__work_id__get"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/discover/imports",
+      "purpose": "Импорт одной выбранной книги",
+      "role": "librarian",
+      "success": [
+        "201",
+        "200"
+      ],
+      "errors": "401,403,404,409,422,429,502,503,504",
+      "operation_id": "import_selected_api_v1_discover_imports_post"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "purpose": "Жив ли процесс (без запроса в БД)",
+      "role": "Любая",
+      "success": [
+        "200"
+      ],
+      "errors": "500",
+      "operation_id": "health_health_get"
+    }
+  ]
+}
