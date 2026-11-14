@@ -220,7 +220,7 @@ for lab in DATA["labs"]:
         for label, key in [("Полный ответ", "answer"), ("Реализация", "implementation"), ("Краткий ответ", "oral"), ("Демонстрация", "demo"), ("Типичная ошибка", "mistake")]:
             md += ["**" + label + ".** " + item[key], ""]
         c = item["code"]
-        md += [f"Код: {c['path']}:{c['line']} {c['symbol'] or ''}", ""]
+        md += [f"Код: {c['path']}:{c['line']} {c['symbol'] or ''}".rstrip(), ""]
         origin = lab["source"] if item["id"].endswith("O01") else "tools/build_detailed_reports.py LABS.qa; сверка " + lab["source"]
         check.append(f"| {item['id']} | {item['question']} | {origin} | {c['path']}:{c['line']} | CONTENT_VERIFIED |")
 md += ["## Дополнительные авторские вопросы", ""]
