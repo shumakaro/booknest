@@ -385,6 +385,15 @@ def last_commit(path: str) -> tuple[str, str]:
     return path, result.stdout.strip()
 
 
+# Первоначальный аудит сохраняется в Git. Поздние закрытия требований применяются
+# отдельным журналом, чтобы генератор не возвращал уже готовым ответам MISSING.
+updates_path = AUDIT / "requirement-updates.json"
+updates = json.loads(updates_path.read_text(encoding="utf-8")) if updates_path.exists() else {"items": []}
+for update in updates["items"]:
+    row = next(r for r in rows if r["id"] == update["id"])
+    for key in ["status", "files", "check", "note"]:
+        row[key] = update[key]
+    row["updated_at"] = update["date"]
 paths = sorted({f for row in rows for f in row["files"]})
 for path in paths:
     assert (ROOT / path).is_file(), path
@@ -397,9 +406,13 @@ assert len({r["id"] for r in rows}) == len(rows)
 assert sum("-Q" in r["id"] for r in rows) == 82
 counts = Counter(r["status"] for r in rows)
 payload = {
-    "date": "2026-11-14", "baseline": "cc256a7", "branch": "codex/lecture-practice-audit",
+    "date": "2026-11-14", "baseline": "cc256a7", "branch": subprocess.check_output(
+        ["git", "branch", "--show-current"], cwd=ROOT, text=True
+    ).strip(),
     "application_code": "98a1be3", "rows": rows, "counts": dict(counts),
-    "new_application_tests": False, "source_inventory": inventory,
+    "new_application_tests": bool(updates.get("frontend_validation")),
+    "new_test_protocol": updates.get("frontend_validation"),
+    "source_inventory": inventory,
 }
 AUDIT.mkdir(parents=True, exist_ok=True)
 (AUDIT / "requirements-matrix.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -416,6 +429,7 @@ md = [
     "Все строки и машинные данные: requirements-matrix.json. Полные тексты: docs/course/odt/.",
     "Теория, планы, Learning Objectives, демонстрации и примеры зарегистрированы в source-inventory.md.",
     "Матрица содержит вопросы, домашние задания и индивидуальные проверяемые результаты практик.",
+    "Закрытия после первоначального аудита учитываются через requirement-updates.json; исходный срез остается в Git f9b1c8c.",
     "Нумерованные планы SOURCE_CONTEXT сохранены для полноты, но не считаются дополнительными домашними заданиями. CODE_EXAMPLE означает анализ учебного фрагмента.",
     "DONE означает выполнение указанного пункта по приведенным подтверждениям, не завершение всей работы.",
     "Сохраненный CI/SQL/браузерный протокол не является новым запуском. SHA отражает последнее изменение файла, а не автоматически выполнение проверки.",

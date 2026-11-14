@@ -69,3 +69,24 @@ Backend, frontend, Docker и production в этом блоке заново не
 Проверка индекса матрицы обнаружила дополнительную пустую строку в конце
 source-inventory.md. Удалена только завершающая пустая строка, исправлен генератор.
 Это замечание оформления не меняет строки требований или результат сверки.
+
+## Лекция 8 Маршруты и формы
+
+14 ноября 2026, CWD C:/Users/comp/Documents/booknest/react-app,
+ветка codex/lecture-08-materials от f9b1c8c.
+
+| Команда | Фактический результат |
+| --- | --- |
+| npm.cmd test -- --reporter=json --outputFile=../.tools/lecture08/vitest.json | 95 тестов, 94 passed, 1 timeout 5000 ms Login при параллельных lint/build. Причина не установлена, успехом не считается. |
+| npm.cmd test -- src/tests/Login.test.tsx --reporter=json --outputFile=../.tools/lecture08/login-retry.json | 5 passed, 0 failed. |
+| npm.cmd test -- src/tests/RoutingAcceptance.test.tsx --reporter=json --outputFile=../.tools/lecture08/routing.json | 4 новых passed. |
+| npm.cmd test -- --maxWorkers=2 --reporter=json --outputFile=../.tools/lecture08/full-retry.json | 99 passed, 0 failed, 19 файлов, 54,06 с. Таймауты и утверждения тестов не менялись. |
+| npm.cmd run lint | Финальный запуск успешен после добавления тестов. |
+| npm.cmd run build | tsc -b и Vite успешны после добавления тестов. |
+| TypeScript AST, src/**/*.ts и src/**/*.tsx | 90 файлов, 0 AnyKeyword; вызов expect.any не считается типом any. |
+| curl.exe GET /health с Accept: application/json | Первая попытка exit28/60,11 с; повтор exit0/200, status=ok/0,54 с. Не означает проверки БД, входа или всего CRUD. |
+
+Протокол docs/lectures/lecture-08-validation.json, извлечение всех результатов
+Vitest и реальные lint/build логи в docs/test-results/lecture-08/.
+Сборщик проверил оригиналы 10 вопросов, 23 кодовые ссылки и SHA-256 DOCX защиты.
+Backend-тесты не повторялись: серверный код не менялся. Нового deploy нет.
