@@ -17,3 +17,7 @@
 - Приложение, Neon, Render, миграции, прежние DOCX и docs.zip не изменялись.
 
 Текущие статусы: docs/audit/stages-progress.md.
+
+Этап 1 завершен: DOCX принят после просмотра всех 40 страниц и автоматической
+проверки 37 ответов. Опубликованы 283ee1d, edc11c1, 1c4ceb0, 9f00b32 и PR34
+https://github.com/shumakaro/booknest/pull/34 без merge/deploy.
