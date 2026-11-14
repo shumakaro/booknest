@@ -1,0 +1,303 @@
+{
+  "lecture": 8,
+  "title": "Маршрутизация, формы и архитектура клиентского приложения",
+  "date": "2026-11-14",
+  "source": "веблекц.odt",
+  "source_sha256": "334c2946c9ad31b98e46e75cc0e1032c1728fa2f6870355d97f4d2e9d4adb94e",
+  "application_baseline": "f9b1c8c",
+  "questions": [
+    {
+      "id": "L08-Q01",
+      "number": 1,
+      "question": "Почему в SPA нельзя переходить по <a href> и что делает <Link>?",
+      "source_paragraph": 166,
+      "answer": "Обычная ссылка a выполняет стандартную навигацию браузера и может загрузить документ заново. Для внутренних экранов SPA Link передает переход клиентскому роутеру: меняется адрес и отображаемая страница. Это сохраняет оболочку приложения. Запрет в вопросе относится к внутренним переходам: обычная ссылка остается уместной для внешнего сайта, скачивания или намеренной полной загрузки. При прямом открытии URL сервер все равно должен вернуть оболочку SPA.",
+      "booknest": "В NotFoundPage переход назад реализован Link to=/books. AppLayout использует NavLink и отмечает активный раздел. Раздача прямых ссылок в Compose и Render настроена отдельно от React Router.",
+      "oral": "Внутренние переходы выполняются через Link. Обычный a может перезагрузить документ. Для внешних ссылок обычный a допустим.",
+      "demo": "Открыть неизвестный путь, нажать «Вернуться в каталог» и проверить /books. Прямую перезагрузку проверять отдельно: компонентный тест не подтверждает конфигурацию публичного сервера.",
+      "sources": [
+        "router_navigation"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/pages/not-found/NotFoundPage.tsx",
+          "line": 3,
+          "marker": "export function NotFoundPage"
+        },
+        {
+          "path": "react-app/src/shared/layout/AppLayout.tsx",
+          "line": 24,
+          "marker": "export function AppLayout"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q02",
+      "number": 2,
+      "question": "Как реализуется общий layout для группы маршрутов?",
+      "source_paragraph": 167,
+      "answer": "Общий макет становится родительским элементом группы маршрутов. В нем размещаются постоянные части интерфейса, а Outlet задает место дочерней страницы. При переходе между дочерними URL оболочка сохраняется, а содержимое Outlet меняется. Вложенная проверка доступа может иметь свой Outlet, пропуская только разрешенные дочерние маршруты.",
+      "booknest": "AppRouter оборачивает страницы родительским Route с AppLayout. В AppLayout остаются навигация и уведомления. Внутри этой группы RequireAuth отдельно ограничивает личные страницы и действия библиотекаря.",
+      "oral": "Макет является родителем маршрутов. Дочерняя страница выводится в Outlet. Шапка и навигация остаются общими.",
+      "demo": "Перейти из каталога на 404 и обратно. Показать общий AppLayout и место Outlet в исходнике.",
+      "sources": [
+        "router_routing"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/app/router/AppRouter.tsx",
+          "line": 65,
+          "marker": "export function AppRouter"
+        },
+        {
+          "path": "react-app/src/shared/layout/AppLayout.tsx",
+          "line": 24,
+          "marker": "export function AppLayout"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q03",
+      "number": 3,
+      "question": "Какое состояние следует держать в URL, а какое — в компоненте? Приведите по два примера.",
+      "source_paragraph": 168,
+      "answer": "В URL помещается состояние, которое должно восстановиться по ссылке: поисковый запрос и номер страницы являются двумя примерами. В компоненте можно хранить локальное временное состояние: раскрытие меню и индикатор отправки. Критерий выбора состоит в том, должна ли другая вкладка открыть тот же результат. Смена фильтра обычно сбрасывает страницу, а неверные параметры нормализуются перед запросом.",
+      "booknest": "BooksPage читает q, sort, genre, available и page через useSearchParams и catalogFilters. LoansPage хранит state и page в URL. Состояния loading и pending остаются локальными и не превращаются в параметры ссылки.",
+      "oral": "Поиск и страница сохраняются в URL. Открытое меню и отправка остаются внутри компонента. Тогда скопированная ссылка восстанавливает существенное состояние.",
+      "demo": "Использовать /loans?state=returned&page=2 в тестовой сессии и проверить выбранный фильтр. Другой пользователь увидит свои записи: одинаковый URL не отменяет серверную проверку владельца.",
+      "sources": [
+        "router_url"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/pages/books/BooksPage.tsx",
+          "line": 17,
+          "marker": "export function BooksPage"
+        },
+        {
+          "path": "react-app/src/pages/loans/LoansPage.tsx",
+          "line": 16,
+          "marker": "export function LoansPage"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q04",
+      "number": 4,
+      "question": "Что вернёт useParams() для маршрута /books/:bookId при переходе на /books/42?",
+      "source_paragraph": 169,
+      "answer": "Для выбранного маршрута результат содержит bookId со строковым значением '42'. useParams не преобразует его в число и не подтверждает наличие книги. В BookNest строковый ID передается API-адаптеру и кодируется как сегмент URL. На стороне FastAPI числовой параметр проверяется отдельно. Неверный формат и отсутствующая запись являются разными случаями: валидация и 404.",
+      "booknest": "BookFormPage получает bookId из useParams и по его наличию выбирает режим. getBookDetailsById принимает string. Новый RoutingAcceptance.test проверяет настоящий AppRouter на /books/42 и передачу строкового ID странице деталей.",
+      "oral": "bookId будет строкой '42'. Роутер не проверяет существование записи. Тип и наличие ресурса проверяются следующими слоями.",
+      "demo": "Открыть тест прямой ссылки, затем BookFormPage и API-адаптер. Не утверждать, что запись 42 существует в production.",
+      "sources": [
+        "router_url"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/pages/books/BookFormPage.tsx",
+          "line": 14,
+          "marker": "export function BookFormPage"
+        },
+        {
+          "path": "react-app/src/api/books.ts",
+          "line": 20,
+          "marker": "export async function getBookDetailsById"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q05",
+      "number": 5,
+      "question": "Зачем нужны три уровня валидации и что произойдёт при отказе от серверного?",
+      "source_paragraph": 170,
+      "answer": "HTML-ограничения дают простую браузерную проверку, схема Zod проверяет форму и межполевые правила до запроса, а сервер проверяет данные независимо от клиента. Первые два уровня улучшают обратную связь; серверный уровень обязателен, поскольку запрос можно отправить напрямую. В BookNest нативные required/type=email применяются в форме входа. У BookForm задан noValidate: всплывающая проверка браузера отключена, сообщения ведет Zod. Поэтому нельзя утверждать, что все три механизма одновременно блокируют отправку именно этой формы.",
+      "booknest": "bookSchema проверяет поля и соотношение годов. saveBook отправляет значения, а Pydantic и CatalogService заново проверяют их. Серверный PATCH проверяет итоговую запись после объединения со старыми полями, а не доверяет dirtyFields клиента.",
+      "oral": "HTML и Zod помогают пользователю исправить ввод. Сервер повторяет проверку независимо от браузера. У формы книги noValidate оставляет клиентские сообщения под управлением Zod.",
+      "demo": "Сравнить нативные атрибуты LoginPage и noValidate BookForm. Показать тест, где невалидная форма не вызывает saveBook, и серверную схему.",
+      "sources": [
+        "mdn_validation",
+        "zod_basics"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/features/books/bookSchema.ts",
+          "line": 4,
+          "marker": "export const bookSchema"
+        },
+        {
+          "path": "react-app/src/features/books/components/BookForm.tsx",
+          "line": 39,
+          "marker": "export function BookForm"
+        },
+        {
+          "path": "app/services/catalog.py",
+          "line": 31,
+          "marker": "    def save("
+        }
+      ]
+    },
+    {
+      "id": "L08-Q06",
+      "number": 6,
+      "question": "Как отобразить ошибку 422 от сервера на конкретном поле формы?",
+      "source_paragraph": 171,
+      "answer": "Ответ 422 разбирается по пути поля в loc и сообщению msg. Последний сегмент пути сопоставляется с именем поля интерфейса, после чего setError добавляет сообщение. Неизвестная ошибка должна остаться общей ошибкой формы, а введенные данные сохраняются. Учебный пример ожидает исходный detail; текущий BookNest возвращает единый details. Эти форматы нельзя механически смешивать.",
+      "booknest": "readError получает массив body.details. saveBook переводит year в publicationYear, edition_year в editionYear, author_id в author и total_copies в totalCopies. BookForm вызывает setError для известных полей и переносит фокус; 409 ISBN показывается у isbn. Тесты проверяют и неизвестную ошибку без потери введенного.",
+      "oral": "Путь ошибки сервера переводится в имя поля формы. Сообщение передается через setError. Если поле неизвестно, показывается общая ошибка без потери ввода.",
+      "demo": "Открыть BookFormApi.test.ts и BookForm.test.tsx. Для визуального кадра использовать тестовый ответ, не повреждая рабочие записи.",
+      "sources": [
+        "rhf_useform"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/api/bookForm.ts",
+          "line": 19,
+          "marker": "export async function saveBook"
+        },
+        {
+          "path": "react-app/src/features/books/components/BookForm.tsx",
+          "line": 39,
+          "marker": "export function BookForm"
+        },
+        {
+          "path": "react-app/src/api/client.ts",
+          "line": 26,
+          "marker": "async function readError"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q07",
+      "number": 7,
+      "question": "Чем контролируемый ввод отличается от неконтролируемого и почему react-hook-form экономит перерисовки?",
+      "source_paragraph": 172,
+      "answer": "При контролируемом вводе значение задается React-состоянием, а onChange обновляет его. При неконтролируемом вводе текущее значение хранит DOM. React Hook Form может регистрировать обычные поля через ref и подписывать компоненты на нужные части состояния формы. Поэтому не требуется отдельно менять родительский useState на каждый символ. Controller используется для компонентов, которым нужен контролируемый интерфейс. Число перерисовок зависит от подписок: без измерения нельзя обещать отсутствие всех перерисовок.",
+      "booknest": "BookForm применяет register и useForm, а тип BookFormValues выводится из bookSchema. Отдельные useState используются для общей ошибки и сохранения, а не для значения каждого текстового поля. Явный mode не указан, поэтому начальная проверка идет в стандартном режиме onSubmit, а не onBlur.",
+      "oral": "Контролируемое значение хранится в React-состоянии. Неконтролируемое значение хранит DOM. React Hook Form позволяет не обновлять родителя вручную на каждый символ.",
+      "demo": "Показать register и отсутствие useState для каждого поля. Требование onBlur и полную форму выдачи оставить в перечне практики 8.",
+      "sources": [
+        "rhf_useform",
+        "zod_basics"
+      ],
+      "refs": [
+        {
+          "path": "react-app/src/features/books/components/BookForm.tsx",
+          "line": 39,
+          "marker": "export function BookForm"
+        },
+        {
+          "path": "react-app/src/features/books/bookSchema.ts",
+          "line": 74,
+          "marker": "export type BookFormValues"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q08",
+      "number": 8,
+      "question": "Как защитить форму от двойной отправки?",
+      "source_paragraph": 173,
+      "answer": "На время запроса блокируются отправка и редактирование полей, а пользователь видит состояние ожидания. Дополнительный синхронный флаг защищает от второго события до обновления React-состояния. После завершения запроса блокировка снимается в finally. На сервере остаются собственные ограничения и транзакции: выключенная кнопка не обеспечивает уникальность или однократность всех сетевых запросов.",
+      "booknest": "BookForm объединяет saving и isSubmitting в busy. Fieldset disabled блокирует вложенную кнопку, а lock.current не допускает повторного saveBook. Тест незавершенного Promise проверяет отключение поля и кнопки и ровно один вызов сохранения.",
+      "oral": "Во время запроса кнопка и поля блокируются. Синхронный lock закрывает окно до перерисовки. Сервер все равно проверяет свои ограничения.",
+      "demo": "Показать тест с незавершенным Promise и его проверку вызовов. Не отправлять повторные POST в production ради демонстрации.",
+      "sources": [],
+      "refs": [
+        {
+          "path": "react-app/src/features/books/components/BookForm.tsx",
+          "line": 39,
+          "marker": "export function BookForm"
+        },
+        {
+          "path": "react-app/src/tests/BookForm.test.tsx",
+          "line": 47,
+          "marker": "it('блокирует поля"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q09",
+      "number": 9,
+      "question": "Что такое защищённый маршрут и почему он не является мерой безопасности?",
+      "source_paragraph": 174,
+      "answer": "Защищенный маршрут решает, какой интерфейс показать при текущем состоянии сеанса. Гость направляется ко входу, а роль может ограничить форму библиотекаря. Однако пользователь может обойти интерфейс и отправить HTTP-запрос напрямую. Поэтому сервер проверяет токен, роль и владельца ресурса независимо от React. Ожидание восстановления сеанса также отделяется от состояния гостя.",
+      "booknest": "RequireAuth показывает Spinner при loading, сохраняет location в state.from для гостя и выводит отказ при неподходящей роли. Сервер использует get_current_user, require_role и get_own_loan. Новые тесты AppRouter проверяют прямое открытие /books/new гостем и читателем.",
+      "oral": "RequireAuth управляет доступными экранами. Сервер не доверяет результату этой проверки. Токен, роль и владелец проверяются на backend независимо.",
+      "demo": "Показать два теста прямого открытия формы. Серверные 401/403/404 подтверждать отдельными API-тестами, а не наличием скрытой кнопки.",
+      "sources": [],
+      "refs": [
+        {
+          "path": "react-app/src/app/router/RequireAuth.tsx",
+          "line": 5,
+          "marker": "export function RequireAuth"
+        },
+        {
+          "path": "app/core/auth.py",
+          "line": 45,
+          "marker": "def get_own_loan"
+        }
+      ]
+    },
+    {
+      "id": "L08-Q10",
+      "number": 10,
+      "question": "Сформулируйте правило зависимостей между слоями вашего проекта.",
+      "source_paragraph": 175,
+      "answer": "Правило курса задает направление pages → features → shared → api и запрещает обратный импорт shared → features. app собирает роутер и провайдеры; pages связывают сценарии, features содержат предметное поведение, а shared должен оставаться общим. В проекте сохранились также components и lib. Текущая структура не полностью следует строгой схеме: AppLayout в shared импортирует RouteAccessibility из features и useAuth/useTheme из app. Такой макет фактически зависит от приложения; это технический долг, а не пример чистого shared.",
+      "booknest": "Разделение HTTP и интерфейса уже есть: сетевые вызовы размещены в api, правила формы в bookSchema, экран собирается в BookFormPage. Для дальнейшей очистки AppLayout следует рассматривать как композицию app, сохраняя поведение и исторические ветки. Автоматического запрета обратных импортов в ESLint сейчас нет, поэтому успешный lint не доказывает соблюдение всей архитектуры.",
+      "oral": "Страницы связывают сценарии, features содержат функции, shared содержит общее. Обратные зависимости следует ограничивать. В текущем макете есть конкретный долг, который обозначен явно.",
+      "demo": "Открыть импорты AppLayout и показать фактическое направление. Не представлять схему каталогов как доказательство отсутствия обратных зависимостей.",
+      "sources": [],
+      "refs": [
+        {
+          "path": "react-app/src/shared/layout/AppLayout.tsx",
+          "line": 24,
+          "marker": "export function AppLayout"
+        },
+        {
+          "path": "react-app/src/pages/books/BookFormPage.tsx",
+          "line": 14,
+          "marker": "export function BookFormPage"
+        },
+        {
+          "path": "react-app/src/api/bookForm.ts",
+          "line": 19,
+          "marker": "export async function saveBook"
+        }
+      ]
+    }
+  ],
+  "sources": {
+    "router_routing": [
+      "React Router 7.18.4 Routing",
+      "https://reactrouter.com/7.18.4/start/declarative/routing"
+    ],
+    "router_navigation": [
+      "React Router 7.18.4 Navigating",
+      "https://reactrouter.com/7.18.4/start/declarative/navigating"
+    ],
+    "router_url": [
+      "React Router 7.18.4 URL Values",
+      "https://reactrouter.com/7.18.4/start/declarative/url-values"
+    ],
+    "rhf_useform": [
+      "React Hook Form useForm",
+      "https://react-hook-form.com/docs/useform"
+    ],
+    "zod_basics": [
+      "Zod Basic usage",
+      "https://zod.dev/basics"
+    ],
+    "mdn_validation": [
+      "MDN Client-side form validation",
+      "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation"
+    ]
+  },
+  "practical_limitations": [
+    "Форма книги не заменяет требуемую в практике 8 форму выдачи с двумя датами.",
+    "Защита несохраненных данных через confirm не закрывает все переходы history.",
+    "Макет в shared имеет обратные зависимости; это отмеченный технический долг.",
+    "Браузерная ручная приемка и личная демонстрация компетенций еще не выполнены."
+  ]
+}
