@@ -1,0 +1,1507 @@
+[
+  {
+    "id": "lab7-01",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "GET /api/v1/books — список с параметрами q, genre, available_only, page, size, sort; ответ в конверте {items, total, page, size}.",
+    "status": "Код + CI",
+    "note": "Контракт и ошибки проверяются автоматическими сценариями; Swagger после деплоя ожидает пользовательских кадров.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "tests/test_catalog.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab7-02",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "GET /api/v1/books/{id} — детали; 404 при отсутствии.",
+    "status": "Код + CI",
+    "note": "Контракт и ошибки проверяются автоматическими сценариями; Swagger после деплоя ожидает пользовательских кадров.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "tests/test_catalog.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab7-03",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "POST /api/v1/books — создание; 201 и созданный объект; 409 при дублировании ISBN; 422 при нарушении ограничений.",
+    "status": "Код + CI",
+    "note": "Контракт и ошибки проверяются автоматическими сценариями; Swagger после деплоя ожидает пользовательских кадров.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "tests/test_catalog.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab7-04",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "PATCH /api/v1/books/{id} — частичное обновление только переданных полей.",
+    "status": "Код + CI",
+    "note": "Контракт и ошибки проверяются автоматическими сценариями; Swagger после деплоя ожидает пользовательских кадров.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "tests/test_catalog.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab7-05",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "DELETE /api/v1/books/{id} — 204 без тела; 404 при отсутствии.",
+    "status": "Код + CI",
+    "note": "Контракт и ошибки проверяются автоматическими сценариями; Swagger после деплоя ожидает пользовательских кадров.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "tests/test_catalog.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab7-06",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "Полный аналогичный набор для ресурса authors + GET /api/v1/authors/{id}/books.",
+    "status": "Код + CI",
+    "note": "Контракт и ошибки проверяются автоматическими сценариями; Swagger после деплоя ожидает пользовательских кадров.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "tests/test_catalog.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab7-07",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "GET /health для проверки работоспособности.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-08",
+    "source_section": "lab7, Функциональные требования",
+    "requirement": "Swagger UI содержит описания всех эндпоинтов, примеры и перечень возможных кодов ошибок.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-09",
+    "source_section": "lab7, Технические требования",
+    "requirement": "Структура: app/{main,config,schemas/,routers/,repositories/,core/}; main.py не длиннее 60 строк.",
+    "status": "Статическая сверка",
+    "note": "main.py содержит 52 строки; in-memory сохранен отдельно от текущего PostgreSQL.",
+    "evidence": [
+      "app/main.py",
+      "app/legacy.py",
+      "app/repositories/memory.py"
+    ]
+  },
+  {
+    "id": "lab7-10",
+    "source_section": "lab7, Технические требования",
+    "requirement": "Схемы разделены на Create, Update, Read; у каждого эндпоинта заданы response_model и status_code.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-11",
+    "source_section": "lab7, Технические требования",
+    "requirement": "Валидация — исключительно средствами Pydantic (Field, Literal, собственные валидаторы); не менее двух пользовательских валидаторов.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-12",
+    "source_section": "lab7, Технические требования",
+    "requirement": "Пагинация реализована через зависимость и переиспользована минимум в двух эндпоинтах.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-13",
+    "source_section": "lab7, Технические требования",
+    "requirement": "В путях нет глаголов; версионирование через префикс /api/v1.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-14",
+    "source_section": "lab7, Технические требования",
+    "requirement": "Middleware логирования запросов с временем обработки.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-15",
+    "source_section": "lab7, Технические требования",
+    "requirement": "requirements.txt с зафиксированными версиями; README.md с инструкцией запуска; экспортированный openapi.json.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-16",
+    "source_section": "lab7, Технические требования",
+    "requirement": "Линтер (ruff) без замечаний; аннотации типов у всех функций.",
+    "status": "Код + статическая сверка",
+    "note": "Ruff успешен; AST текущего app не нашел функций без аннотаций параметров/возврата, кроме self/cls. Это не запуск mypy.",
+    "evidence": [
+      "app",
+      "docs/audit/SELF_WORK.md"
+    ]
+  },
+  {
+    "id": "lab7-17",
+    "source_section": "lab7, Дополнительные задания",
+    "requirement": "+ Сортировка по нескольким полям с валидацией допустимых значений параметра sort.",
+    "status": "Код + CI",
+    "note": "Допустимые поля sort валидируются; добавлен стабильный порядок по id.",
+    "evidence": [
+      "app/schemas/__init__.py",
+      "app/repositories/catalog.py",
+      "tests/test_api_contracts.py"
+    ]
+  },
+  {
+    "id": "lab7-18",
+    "source_section": "lab7, Дополнительные задания",
+    "requirement": "+ Единый формат ошибки через централизованный обработчик исключений (задел на ЛР 10).",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab7-19",
+    "source_section": "lab7, Дополнительные задания",
+    "requirement": "+ Генерация TypeScript-типов клиента из openapi.json и использование их в React.",
+    "status": "Код + проверка",
+    "note": "OpenAPI и generated.ts согласованы командой --check без перезаписи.",
+    "evidence": [
+      "tools/generate_api_types.py",
+      "docs/api/openapi.json",
+      "react-app/src/api/generated.ts"
+    ]
+  },
+  {
+    "id": "lab7-20",
+    "source_section": "lab7, Дополнительные задания",
+    "requirement": "+ Ограничение частоты запросов (простое, в памяти) на изменяющие эндпоинты.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/legacy.py",
+      "app/routers/catalog_db.py",
+      "app/schemas/__init__.py",
+      "tests/test_catalog.py",
+      "docs/improvements/STAGE11.md"
+    ]
+  },
+  {
+    "id": "lab8-01",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "A. ER-диаграмма и схема из не менее 6 таблиц: authors, books, genres, book_genres, users, profiles, loans.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-02",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "A. Реализованы все три типа связей: 1:N, M:N (таблица-связка с составным ключом), 1:1.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-03",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "A. Не менее 10 ограничений целостности; для каждого внешнего ключа осознанно выбрано поведение ON DELETE.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-04",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "A. Скрипт наполнения: 5 авторов, 30 книг, 5 жанров, 10 пользователей, 20 выдач (часть возвращена, часть просрочена).",
+    "status": "Код + исторический протокол",
+    "note": "Seed относится к отдельному учебному набору; production повторно не заполняется. SQL-результаты сохранены.",
+    "evidence": [
+      "db/seed.sql",
+      "db/queries.sql",
+      "docs/lab8/sql-results.txt"
+    ]
+  },
+  {
+    "id": "lab8-05",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "A. 12 SQL-запросов: каталог с агрегатами, просроченные выдачи, топ авторов, читатели без выдач, статистика по жанрам, пагинация и др.",
+    "status": "Код + исторический протокол",
+    "note": "Seed относится к отдельному учебному набору; production повторно не заполняется. SQL-результаты сохранены.",
+    "evidence": [
+      "db/seed.sql",
+      "db/queries.sql",
+      "docs/lab8/sql-results.txt"
+    ]
+  },
+  {
+    "id": "lab8-06",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "A. 2 индекса с обоснованием и планами EXPLAIN ANALYZE до и после.",
+    "status": "Код + исторические планы",
+    "note": "Исходные планы двух индексов и поздний benchmark сохраняются с датой/условиями, не выдаются за сегодняшние production-замеры.",
+    "evidence": [
+      "db/benchmark.sql",
+      "docs/lab12/catalog-benchmark.json"
+    ]
+  },
+  {
+    "id": "lab8-07",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "B. Модели SQLAlchemy, полностью соответствующие схеме части A.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-08",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "B. Не менее двух ревизий Alembic; upgrade head поднимает схему на пустой базе; downgrade -1 работает.",
+    "status": "Код + исторический протокол",
+    "note": "Шесть ревизий; upgrade/downgrade испытывались отдельно. На production откат не повторяется.",
+    "evidence": [
+      "migrations/versions",
+      "docs/lab8/migrations-results.txt",
+      "tools/check_migrations.py"
+    ]
+  },
+  {
+    "id": "lab8-09",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "B. Все эндпоинты ЛР 7 работают на PostgreSQL без изменения контракта API; фильтрация, сортировка и пагинация выполняются на стороне БД.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-10",
+    "source_section": "lab8, Функциональные требования",
+    "requirement": "B. Реализована операция выдачи книги в транзакции с проверкой доступности экземпляров и кодом 409 при конфликте.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-11",
+    "source_section": "lab8, Технические требования",
+    "requirement": "Схема в 3NF; отсутствуют поля со списками значений и дублирование данных между таблицами.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-12",
+    "source_section": "lab8, Технические требования",
+    "requirement": "Слои routers → services → repositories; правила предметной области — только в сервисах; SQL — только в репозиториях.",
+    "status": "Код + оговорка",
+    "note": "Основной поток routers → services → repositories; импорт имеет отдельный orchestration-сервис с SQL и требует объяснения исключения в отчете.",
+    "evidence": [
+      "app/routers/catalog_db.py",
+      "app/services/catalog.py",
+      "app/repositories/catalog.py",
+      "app/services/import_book.py"
+    ]
+  },
+  {
+    "id": "lab8-13",
+    "source_section": "lab8, Технические требования",
+    "requirement": "Сессия — через зависимость get_db, одна на запрос; expire_on_commit=False; отсутствие сессий на уровне модуля.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-14",
+    "source_section": "lab8, Технические требования",
+    "requirement": "Запрещён Base.metadata.create_all() в прикладном коде; схема только через миграции.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-15",
+    "source_section": "lab8, Технические требования",
+    "requirement": "Все связи в списках загружаются жадно (selectinload); в PR приложены логи SQL, подтверждающие отсутствие N+1.",
+    "status": "Код + измерение",
+    "note": "Текущий контролируемый lazy/eager пример: 41/3 SELECT; текущие списки size1/20: 4/4. Не смешивается с прежним 26/3.",
+    "evidence": [
+      "tools/measure_orm.py",
+      "docs/improvements/stage12-orm-measurements.json"
+    ]
+  },
+  {
+    "id": "lab8-16",
+    "source_section": "lab8, Технические требования",
+    "requirement": "Строка подключения — из переменных окружения (pydantic-settings), не в коде.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-17",
+    "source_section": "lab8, Технические требования",
+    "requirement": "db/README.md с ER-диаграммой, описанием таблиц и порядком запуска.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab8-18",
+    "source_section": "lab8, Дополнительные задания",
+    "requirement": "+ Миграция с преобразованием данных и работающим downgrade.",
+    "status": "Код + исторический протокол",
+    "note": "Шесть ревизий; upgrade/downgrade испытывались отдельно. На production откат не повторяется.",
+    "evidence": [
+      "migrations/versions",
+      "docs/lab8/migrations-results.txt",
+      "tools/check_migrations.py"
+    ]
+  },
+  {
+    "id": "lab8-19",
+    "source_section": "lab8, Дополнительные задания",
+    "requirement": "+ Полнотекстовый поиск PostgreSQL (tsvector + GIN-индекс) вместо ILIKE со сравнением производительности.",
+    "status": "Частично",
+    "note": "FTS/GIN реализованы. Поздний benchmark индексов не доказывает отдельное актуальное сравнение FTS с ILIKE.",
+    "evidence": [
+      "app/repositories/catalog.py",
+      "db/schema.sql",
+      "docs/lab12/catalog-benchmark.json"
+    ]
+  },
+  {
+    "id": "lab8-20",
+    "source_section": "lab8, Дополнительные задания",
+    "requirement": "+ Представление (VIEW) для отчёта по просроченным выдачам и его использование в API.",
+    "status": "Код + CI",
+    "note": "Отчет репозитория действительно обращается к overdue_loans.",
+    "evidence": [
+      "db/schema.sql",
+      "app/repositories/catalog.py",
+      "app/routers/loans.py",
+      "tests/test_database.py"
+    ]
+  },
+  {
+    "id": "lab8-21",
+    "source_section": "lab8, Дополнительные задания",
+    "requirement": "+ Скрипт резервного копирования и восстановления БД с проверкой на реальных данных.",
+    "status": "Реальная копия Neon + локальное восстановление",
+    "note": "Согласованный снимок public восстановлен только в новую локальную БД; все таблицы сверены по счетчикам и содержимому, дамп приватный.",
+    "evidence": [
+      "tools/backup_neon.py",
+      "docs/audit/neon-backup-restore-20261114.json"
+    ]
+  },
+  {
+    "id": "lab8-22",
+    "source_section": "lab8, Дополнительные задания",
+    "requirement": "+ Мягкое удаление (deleted_at) с корректной фильтрацией во всех запросах.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "db/README.md",
+      "db/schema.sql",
+      "app/models.py",
+      "tests/test_database.py",
+      "docs/improvements/STAGE12.md"
+    ]
+  },
+  {
+    "id": "lab9-01",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "POST /auth/register — регистрация с валидацией пароля (минимум 8 символов, буквы и цифры); 409 при занятом e-mail.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-02",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "POST /auth/token — вход по OAuth2 password flow; выдача access- и refresh-токена; одинаковое сообщение при любой неудаче.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-03",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "POST /auth/refresh — обновление access-токена по refresh-токену.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-04",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "GET /auth/me — данные текущего пользователя без служебных полей.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-05",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "Права: member — читать каталог, брать и возвращать свои книги; librarian — управлять каталогом и видеть все выдачи.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-06",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "Все изменяющие эндпоинты каталога требуют роль librarian: 401 без токена, 403 при недостатке прав.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-07",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "GET /loans/{id} возвращает 404 при попытке доступа к чужой выдаче (не 403).",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-08",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "Клиент: страница входа и регистрации, хранение токена, автоматическое добавление заголовка, редирект на /login при 401, реальная работа RequireAuth, скрытие недоступных действий по роли.",
+    "status": "Код + ручная приемка",
+    "note": "Access только в памяти, refresh HttpOnly/SameSite cookie. Фактический Secure production ожидает кадра N03 без значения cookie.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "app/routers/auth.py",
+      "tests/test_security_regressions.py",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  },
+  {
+    "id": "lab9-09",
+    "source_section": "lab9, Функциональные требования",
+    "requirement": "CORS настроен явным списком разрешённых источников.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-10",
+    "source_section": "lab9, Технические требования",
+    "requirement": "Пароли — только bcrypt через passlib; хеш никогда не покидает сервер.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-11",
+    "source_section": "lab9, Технические требования",
+    "requirement": "Токен: HS256, срок жизни access — 15–30 минут, refresh — до 7 дней; в payload только sub, role, exp, iat, type.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-12",
+    "source_section": "lab9, Технические требования",
+    "requirement": "Три отдельные зависимости: get_current_user, require_role, проверка владения объектом.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-13",
+    "source_section": "lab9, Технические требования",
+    "requirement": "SECRET_KEY — только из окружения, без значения по умолчанию; .env в .gitignore, .env.example в репозитории.",
+    "status": "Код + ограниченная проверка",
+    "note": "Ключ обязателен, .env исключен. Проверка имен файлов не является полным сканированием всей истории на секреты.",
+    "evidence": [
+      "app/config.py",
+      ".gitignore",
+      "docs/security-review.md"
+    ]
+  },
+  {
+    "id": "lab9-14",
+    "source_section": "lab9, Технические требования",
+    "requirement": "Все эндпоинты возвращают данные через response_model; схема UserRead не содержит хеша пароля.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-15",
+    "source_section": "lab9, Технические требования",
+    "requirement": "Клиент добавляет токен в единственном месте (перехватчик в api/client.ts).",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-16",
+    "source_section": "lab9, Технические требования",
+    "requirement": "Обязательный отчёт docs/security-review.md по 15 пунктам с указанием строк кода.",
+    "status": "Документ обновлен",
+    "note": "15 пунктов безопасности связаны с актуальными файлами и тестами; эксплуатационные ограничения отмечены явно.",
+    "evidence": [
+      "docs/security-review.md"
+    ]
+  },
+  {
+    "id": "lab9-17",
+    "source_section": "lab9, Дополнительные задания",
+    "requirement": "+ Ограничение частоты запросов на /auth/token (например, 5 попыток за 5 минут) с кодом 429.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-18",
+    "source_section": "lab9, Дополнительные задания",
+    "requirement": "+ Хранение refresh-токена в HttpOnly cookie с обоснованием выбора в отчёте.",
+    "status": "Код + ручная приемка",
+    "note": "Access только в памяти, refresh HttpOnly/SameSite cookie. Фактический Secure production ожидает кадра N03 без значения cookie.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "app/routers/auth.py",
+      "tests/test_security_regressions.py",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  },
+  {
+    "id": "lab9-19",
+    "source_section": "lab9, Дополнительные задания",
+    "requirement": "+ Отзыв токенов через список отозванных (denylist) в БД.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "app/core/security.py",
+      "app/core/auth.py",
+      "app/routers/auth.py",
+      "tests/test_auth.py",
+      "docs/improvements/STAGE13.md"
+    ]
+  },
+  {
+    "id": "lab9-20",
+    "source_section": "lab9, Дополнительные задания",
+    "requirement": "+ Подтверждение e-mail «в консоль» (без реальной отправки) со временным токеном.",
+    "status": "Код + CI, локальный opt-in",
+    "note": "Учебный токен появляется только при LOG_EMAIL_CONFIRMATION=true на локальном стенде; production по умолчанию его не печатает.",
+    "evidence": [
+      "app/services/auth.py",
+      "tests/test_security_regressions.py"
+    ]
+  },
+  {
+    "id": "lab9-21",
+    "source_section": "lab9, Дополнительные задания",
+    "requirement": "+ Журнал действий (кто, что, когда) для операций библиотекаря.",
+    "status": "Код + CI",
+    "note": "Журнал содержит user_id, метод, путь, время; только librarian, read-only UI. Это не полный аудит всех событий приложения.",
+    "evidence": [
+      "app/models.py",
+      "app/routers/audit.py",
+      "tests/test_audit_read.py"
+    ]
+  },
+  {
+    "id": "lab10-01",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Сквозной сценарий без ручных правок: регистрация → вход → просмотр каталога → создание записи → редактирование → выдача книги → возврат → выход.",
+    "status": "CI + ручная приемка",
+    "note": "E2E в изолированном runner успешен. Полный production-сценарий после деплоя ожидает пользовательских результатов.",
+    "evidence": [
+      "react-app/e2e/booknest.spec.ts",
+      "docs/improvements/stage16-ci-results.json",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  },
+  {
+    "id": "lab10-02",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Клиент полностью работает с собственным API (внешний Open Library больше не используется как источник каталога).",
+    "status": "Код + публичный GET",
+    "note": "Моя библиотека читает PostgreSQL через собственный API; Open Library оставлен отдельным независимым поиском по прямому запросу владелицы.",
+    "evidence": [
+      "react-app/src/pages/books/BooksPage.tsx",
+      "app/repositories/catalog.py",
+      "app/routers/discover.py",
+      "docs/improvements/stage16-release-verification.json"
+    ]
+  },
+  {
+    "id": "lab10-03",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Единый формат ошибки API (code, message, details, request_id) и его корректное отображение в интерфейсе.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-04",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Обработка истечения токена: 401 → однократная попытка обновления → при неудаче переход на страницу входа с сохранением намерения.",
+    "status": "Код + тесты, ручная приемка",
+    "note": "Общий refresh для одновременных запросов, одна повторная попытка и returnTo; реальные пользовательские кадры еще ожидаются.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "react-app/src/tests",
+      "docs/improvements/STAGE8.md"
+    ]
+  },
+  {
+    "id": "lab10-05",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Все состояния интерфейса присутствуют на каждой странице с данными: загрузка, успех, пусто, ошибка.",
+    "status": "Код + автоматические проверки",
+    "note": "Loading/success/empty/error реализованы и проверялись по страницам; ручная доступность/телефон еще не подтверждены.",
+    "evidence": [
+      "docs/improvements/stage2-loading-results.json",
+      "docs/improvements/STAGE10_MANUAL.md",
+      "react-app/src/tests"
+    ]
+  },
+  {
+    "id": "lab10-06",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Не менее 10 автоматических тестов: минимум 8 API (включая 201, 401, 403, 404, 422 и главное бизнес-правило с 409) и 2 клиентских.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-07",
+    "source_section": "lab10, Функциональные требования",
+    "requirement": "Запуск проекта на чужой машине по README без правки исходного кода.",
+    "status": "CI + ограничение",
+    "note": "Чистый Linux-runner собирает приложение; это не независимая проверка чужим человеком строго по README.",
+    "evidence": [
+      "README.md",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-08",
+    "source_section": "lab10, Технические требования",
+    "requirement": "Ни одного захардкоженного адреса, порта, пароля или ключа: всё через окружение; .env.example актуален и полон.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-09",
+    "source_section": "lab10, Технические требования",
+    "requirement": "В разработке используется dev-proxy Vite; базовый URL клиента — относительный.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-10",
+    "source_section": "lab10, Технические требования",
+    "requirement": "Централизованный обработчик исключений на сервере; клиенту не отдаются внутренние трассировки.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-11",
+    "source_section": "lab10, Технические требования",
+    "requirement": "Логирование с идентификатором запроса; идентификатор возвращается в заголовке ответа.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-12",
+    "source_section": "lab10, Технические требования",
+    "requirement": "Тесты выполняются на отдельной БД, изолированы транзакцией и не зависят от порядка запуска; повторный прогон зелёный.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-13",
+    "source_section": "lab10, Технические требования",
+    "requirement": "Клиентские тесты ищут элементы по роли и метке, проверяют поведение, а не разметку.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-14",
+    "source_section": "lab10, Технические требования",
+    "requirement": "README содержит разделы: стек, схема БД, переменные окружения, запуск, запуск тестов.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "react-app/src/api/client.ts",
+      "tests/test_integration.py",
+      "react-app/src/tests",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-15",
+    "source_section": "lab10, Дополнительные задания",
+    "requirement": "+ ErrorBoundary в React с осмысленным экраном сбоя и кнопкой возврата.",
+    "status": "Код + тесты",
+    "note": "ErrorBoundary проверяется клиентскими тестами; намеренный сбой production не устраивается.",
+    "evidence": [
+      "react-app/src",
+      "react-app/src/tests"
+    ]
+  },
+  {
+    "id": "lab10-16",
+    "source_section": "lab10, Дополнительные задания",
+    "requirement": "+ Один e2e-тест на Playwright, проходящий сценарий «вход → создание → проверка в списке».",
+    "status": "CI",
+    "note": "Настоящий браузерный E2E выполнен в изолированном контейнерном окружении.",
+    "evidence": [
+      "react-app/e2e/booknest.spec.ts",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab10-17",
+    "source_section": "lab10, Дополнительные задания",
+    "requirement": "+ Оптимистичное обновление одной операции с откатом при ошибке сервера.",
+    "status": "Код + тесты",
+    "note": "Удаление из желаемого оптимистично, при ошибке возвращает запись.",
+    "evidence": [
+      "react-app/src/pages/wishlist/WishlistPage.tsx",
+      "react-app/src/tests"
+    ]
+  },
+  {
+    "id": "lab10-18",
+    "source_section": "lab10, Дополнительные задания",
+    "requirement": "+ Отчёт покрытия (pytest --cov) с анализом двух самых непокрытых модулей.",
+    "status": "Покрытие + анализ",
+    "note": "Историческое покрытие не переносится на новые исходники; свежий результат и анализ помещаются в SELF_WORK.",
+    "evidence": [
+      "docs/lab10/validation.md",
+      "docs/audit/SELF_WORK.md"
+    ]
+  },
+  {
+    "id": "lab11-01",
+    "source_section": "lab11, Функциональные требования",
+    "requirement": "docker compose up -d --build на чистой машине поднимает работоспособное приложение; никаких дополнительных ручных шагов, кроме заполнения .env.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-02",
+    "source_section": "lab11, Функциональные требования",
+    "requirement": "Сервисы: db (PostgreSQL с томом), api (FastAPI, миграции применяются при старте), web (Nginx со собранной статикой и проксированием /api).",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-03",
+    "source_section": "lab11, Функциональные требования",
+    "requirement": "Данные БД сохраняются между docker compose down и up.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-04",
+    "source_section": "lab11, Функциональные требования",
+    "requirement": "Клиентская маршрутизация работает: прямое обращение к /books/42 и обновление страницы не дают 404.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-05",
+    "source_section": "lab11, Функциональные требования",
+    "requirement": "Приложение доступно на одном порту; API не публикуется в сеть напрямую.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-06",
+    "source_section": "lab11, Функциональные требования",
+    "requirement": "CI-workflow: линтер и тесты выполняются на каждый Pull Request с отображением статуса.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-07",
+    "source_section": "lab11, Технические требования",
+    "requirement": "Multi-stage Dockerfile для клиента (сборка Node → раздача Nginx); итоговый образ менее 100 МБ.",
+    "status": "CI + исторические размеры",
+    "note": "Размеры проверены CI; image ls и inspect Size не смешиваются. Локального Docker нет.",
+    "evidence": [
+      "tools/check_image_sizes.py",
+      "docs/improvements/STAGE14.md",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-08",
+    "source_section": "lab11, Технические требования",
+    "requirement": "Dockerfile backend с корректным порядком слоёв (зависимости до кода) и запуском от непривилегированного пользователя.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-09",
+    "source_section": "lab11, Технические требования",
+    "requirement": ".dockerignore в обоих контекстах: исключены node_modules, .git, .env, кэши, тесты сборки.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-10",
+    "source_section": "lab11, Технические требования",
+    "requirement": "Healthcheck БД и depends_on: condition: service_healthy для api.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-11",
+    "source_section": "lab11, Технические требования",
+    "requirement": "Все секреты и параметры — через переменные окружения из .env; в образах и в docker-compose.yml нет захардкоженных секретов.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-12",
+    "source_section": "lab11, Технические требования",
+    "requirement": "Именованный том для данных PostgreSQL; политика restart: unless-stopped.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-13",
+    "source_section": "lab11, Технические требования",
+    "requirement": "Обращения между сервисами — по имени сервиса, не по localhost.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-14",
+    "source_section": "lab11, Технические требования",
+    "requirement": "README.md с разделом «Запуск в Docker» и перечнем всех переменных окружения.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-15",
+    "source_section": "lab11, Дополнительные задания",
+    "requirement": "+ Профиль test в compose, выполняющий тесты в контейнере с корректным кодом выхода.",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker/api.Dockerfile",
+      "react-app/Dockerfile",
+      ".github/workflows/ci.yml",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab11-16",
+    "source_section": "lab11, Дополнительные задания",
+    "requirement": "+ Сборка и публикация образа в GitHub Container Registry из CI по тегу.",
+    "status": "Подготовлено, не опубликовано",
+    "note": "Workflow GHCR по тегу существует; реальные образы новым тегом в этой работе не публиковались.",
+    "evidence": [
+      ".github/workflows/images.yml"
+    ]
+  },
+  {
+    "id": "lab11-17",
+    "source_section": "lab11, Дополнительные задания",
+    "requirement": "+ Отдельная конфигурация для разработки (docker-compose.override.yml) с горячей перезагрузкой кода.",
+    "status": "Код, отдельный режим",
+    "note": "Используется явно подключаемый docker-compose.dev.yml, а не автоматически применяемый override, чтобы не менять production.",
+    "evidence": [
+      "docker-compose.dev.yml"
+    ]
+  },
+  {
+    "id": "lab11-18",
+    "source_section": "lab11, Дополнительные задания",
+    "requirement": "+ Уменьшить образ backend ниже 200 МБ (slim-база, отказ от лишних зависимостей) с фиксацией результата замера.",
+    "status": "CI + исторические размеры",
+    "note": "Размеры проверены CI; image ls и inspect Size не смешиваются. Локального Docker нет.",
+    "evidence": [
+      "tools/check_image_sizes.py",
+      "docs/improvements/STAGE14.md",
+      "docs/improvements/stage16-ci-results.json"
+    ]
+  },
+  {
+    "id": "lab12-01",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "Приложение доступно по публичному адресу (домен или поддомен) по протоколу HTTPS с действительным сертификатом.",
+    "status": "Публичный HTTPS GET",
+    "note": "Запросы с проверкой TLS успешны; пользовательский кадр сертификата еще ожидается.",
+    "evidence": [
+      "docs/improvements/stage16-public-after.json",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  },
+  {
+    "id": "lab12-02",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "HTTP автоматически перенаправляется на HTTPS.",
+    "status": "Реальный HTTP-запрос",
+    "note": "Проверен 301 с Location на нужный HTTPS URL, без автоматического upgrade браузера.",
+    "evidence": [
+      "docs/audit/http-redirect-20261114.json"
+    ]
+  },
+  {
+    "id": "lab12-03",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "Работают все функции: регистрация, вход, каталог, создание, выдача, возврат; прямые ссылки на внутренние страницы открываются.",
+    "status": "Частично: публичные GET + CI",
+    "note": "Поиск/каталог/страницы проверены публично, личные изменяющие production-действия ожидают ручной приемки.",
+    "evidence": [
+      "docs/improvements/stage16-release-verification.json",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  },
+  {
+    "id": "lab12-04",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "Миграции применены; в базе есть демонстрационные данные и две учётные записи с разными ролями для проверяющего.",
+    "status": "БД проверена, роли — приемка",
+    "note": "Ревизия 006 актуальна, данные есть; действующий доступ проверяющего к двум ролям требуется подтвердить без публикации паролей.",
+    "evidence": [
+      "docs/improvements/stage15-neon-results.json",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  },
+  {
+    "id": "lab12-05",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "Выполнено повторное развёртывание после изменения кода (демонстрируется на защите): git pull → пересборка → применение миграций.",
+    "status": "Облачное повторное обновление",
+    "note": "Владелица выполнила согласованный manual deploy и сообщила Live; assets/контракт совпали. SSH git pull не выдавался за выполненный.",
+    "evidence": [
+      "docs/improvements/STAGE16.md",
+      "docs/improvements/stage16-release-verification.json"
+    ]
+  },
+  {
+    "id": "lab12-06",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "Создана и проверена резервная копия БД (дамп восстановлен в тестовую базу).",
+    "status": "Реальная копия Neon + локальное восстановление",
+    "note": "Согласованный снимок public восстановлен только в новую локальную БД; все таблицы сверены по счетчикам и содержимому, дамп приватный.",
+    "evidence": [
+      "tools/backup_neon.py",
+      "docs/audit/neon-backup-restore-20261114.json"
+    ]
+  },
+  {
+    "id": "lab12-07",
+    "source_section": "lab12, Функциональные требования",
+    "requirement": "Runbook docs/deployment.md: подготовка сервера, переменные окружения, запуск, обновление, резервное копирование, восстановление, диагностика (какие команды выполнять при недоступности приложения).",
+    "status": "Код + протокол",
+    "note": "Реализация и существующие проверки найдены; общий CI не заменяет отдельную ручную приемку.",
+    "evidence": [
+      "docs/deployment.md",
+      "docker/render.Dockerfile",
+      "docs/improvements/STAGE16.md",
+      "docs/improvements/stage16-release-verification.json"
+    ]
+  },
+  {
+    "id": "lab12-08",
+    "source_section": "lab12, Технические требования",
+    "requirement": "Доступ к серверу по SSH-ключу; вход по паролю для root отключён; firewall разрешает только 22, 80, 443.",
+    "status": "Облачный вариант, отдельное ограничение",
+    "note": "Собственного VPS нет. SSH/ufw/certbot-операции подготовлены, но не выполнялись; TLS Render не доказывает запуск certbot.",
+    "evidence": [
+      "docs/deployment.md",
+      "deployment/nginx-https.conf.template"
+    ]
+  },
+  {
+    "id": "lab12-09",
+    "source_section": "lab12, Технические требования",
+    "requirement": "Nginx выступает единственной точкой входа; порты БД и API не доступны из интернета.",
+    "status": "Два разных контура",
+    "note": "Compose использует Nginx. Render обслуживает единый ASGI-образ за прокси провайдера; его нельзя называть личным VPS/Nginx.",
+    "evidence": [
+      "react-app/nginx.conf",
+      "docker-compose.yml",
+      "docker/render.Dockerfile"
+    ]
+  },
+  {
+    "id": "lab12-10",
+    "source_section": "lab12, Технические требования",
+    "requirement": "Секреты заданы только в .env на сервере и отсутствуют в репозитории и в истории коммитов.",
+    "status": "Код + ограничение проверки",
+    "note": "Секреты исключены, CLI-диагностика их не печатает. Полный исторический secret-scan не заявляется.",
+    "evidence": [
+      ".gitignore",
+      "docker/render.Dockerfile.dockerignore",
+      "docs/security-review.md"
+    ]
+  },
+  {
+    "id": "lab12-11",
+    "source_section": "lab12, Технические требования",
+    "requirement": "Отдельный SECRET_KEY для эксплуатационной среды (не тот, что использовался в разработке).",
+    "status": "Непубличная настройка не подтверждена",
+    "note": "Различие production/dev ключей не проверялось сравнением значений. Реальные ключи в чат не запрашиваются и не меняются.",
+    "evidence": [
+      "app/config.py",
+      "docs/deployment.md"
+    ]
+  },
+  {
+    "id": "lab12-12",
+    "source_section": "lab12, Технические требования",
+    "requirement": "Сертификат получен автоматизированно (Let's Encrypt / certbot) с настроенным продлением.",
+    "status": "Облачный вариант, отдельное ограничение",
+    "note": "Собственного VPS нет. SSH/ufw/certbot-операции подготовлены, но не выполнялись; TLS Render не доказывает запуск certbot.",
+    "evidence": [
+      "docs/deployment.md",
+      "deployment/nginx-https.conf.template"
+    ]
+  },
+  {
+    "id": "lab12-13",
+    "source_section": "lab12, Технические требования",
+    "requirement": "Заданы политика перезапуска контейнеров и ротация журналов.",
+    "status": "Compose настроен; облачная эксплуатация отдельно",
+    "note": "Restart/log rotation описаны; фактический VPS/провайдерский runtime не подтверждается чтением YAML.",
+    "evidence": [
+      "docker-compose.yml",
+      "docker-compose.production.yml",
+      "docs/deployment.md"
+    ]
+  },
+  {
+    "id": "lab12-14",
+    "source_section": "lab12, Технические требования",
+    "requirement": "В README указан публичный адрес и тестовые учётные данные для проверки.",
+    "status": "Частично",
+    "note": "Публичный адрес указан; реальные пароли production-ролей публично не размещаются. Доступ проверяющему передается отдельно.",
+    "evidence": [
+      "README.md",
+      "docs/deployment.md"
+    ]
+  },
+  {
+    "id": "lab12-15",
+    "source_section": "lab12, Дополнительные задания",
+    "requirement": "+ Автоматическое развёртывание из CI по тегу (GitHub Actions + SSH-деплой) с ручным подтверждением.",
+    "status": "Workflow подготовлен, не выполнен",
+    "note": "SSH-deploy требует отдельного VPS, secrets/environment и согласия; не запускается из этого PR.",
+    "evidence": [
+      ".github/workflows/deploy.yml",
+      "tools/verify_release.py"
+    ]
+  },
+  {
+    "id": "lab12-16",
+    "source_section": "lab12, Дополнительные задания",
+    "requirement": "+ Мониторинг: эндпоинт /health + внешняя проверка доступности (uptime-сервис) со скриншотом истории.",
+    "status": "Частично",
+    "note": "health доступен; независимый uptime-сервис с накопленной историей еще не подключен.",
+    "evidence": [
+      "app/main.py",
+      "docs/improvements/stage16-public-after.json"
+    ]
+  },
+  {
+    "id": "lab12-17",
+    "source_section": "lab12, Дополнительные задания",
+    "requirement": "+ Автоматическое ежедневное резервное копирование по расписанию с ротацией.",
+    "status": "Подготовка, не расписание",
+    "note": "Разовая копия проверяется отдельно. VPS systemd timer не установлен, ежедневное копирование Neon не настроено.",
+    "evidence": [
+      "tools/backup_neon.py",
+      "deployment/booknest-backup.timer",
+      "docs/deployment.md"
+    ]
+  },
+  {
+    "id": "lab12-18",
+    "source_section": "lab12, Дополнительные задания",
+    "requirement": "+ Настройка заголовков безопасности (HSTS, X-Content-Type-Options, базовый CSP) и подтверждение внешним сканером.",
+    "status": "Новая правка + тесты",
+    "note": "HSTS/nosniff/базовый CSP добавлены в отдельной ветке. Деплой и внешний сканер новой версии не выполнялись.",
+    "evidence": [
+      "app/render.py",
+      "tests/test_render.py",
+      "docs/audit/SELF_WORK.md"
+    ]
+  },
+  {
+    "id": "lab12-19",
+    "source_section": "lab12, Дополнительные задания",
+    "requirement": "+ Оптимизация: gzip/brotli, кэширующие заголовки для ассетов, Lighthouse Performance ≥ 90 на мобильном.",
+    "status": "Новая правка; Lighthouse ожидается",
+    "note": "Публичные assets получают gzip/immutable в новой ветке. Performance ≥90 не обещается без реального нового измерения.",
+    "evidence": [
+      "app/render.py",
+      "tests/test_render.py",
+      "docs/improvements/STAGE17_USER_CHECKLIST.md"
+    ]
+  }
+]

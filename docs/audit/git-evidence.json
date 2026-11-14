@@ -1,0 +1,2098 @@
+{
+  "source_head": "98a1be3a00d8327f44e62c38e9984410360a696b",
+  "branch": "codex/lab7-12-final-audit",
+  "base": "lab-6b/router-forms",
+  "count_after_lab6": 147,
+  "count_in_head": 211,
+  "lab_branches": [
+    {
+      "lab": 7,
+      "branch": "lab-7/fastapi",
+      "sha": "0c8d9841d42407571a6f5111bf5f24bd292503cb",
+      "base_for_count": "lab-6b/router-forms",
+      "base_is_ancestor": true,
+      "new_commits": 3
+    },
+    {
+      "lab": 8,
+      "branch": "lab-8/postgresql-orm",
+      "sha": "19bdbf2d594a41fef3da4076311d31bf180ad1cb",
+      "base_for_count": "lab-7/fastapi",
+      "base_is_ancestor": true,
+      "new_commits": 3
+    },
+    {
+      "lab": 9,
+      "branch": "lab-9/jwt-auth",
+      "sha": "2b1f5dd8c5f090704f9ec6bf8fc329778eb320be",
+      "base_for_count": "lab-8/postgresql-orm",
+      "base_is_ancestor": true,
+      "new_commits": 2
+    },
+    {
+      "lab": 10,
+      "branch": "lab-10/fullstack",
+      "sha": "3018cf258a067a302c8a5c31d73a580e6bf81ac2",
+      "base_for_count": "lab-9/jwt-auth",
+      "base_is_ancestor": true,
+      "new_commits": 2
+    },
+    {
+      "lab": 11,
+      "branch": "lab-11/docker",
+      "sha": "13fcd07573b5a55c7c591638ea115432a6ede008",
+      "base_for_count": "lab-10/fullstack",
+      "base_is_ancestor": true,
+      "new_commits": 4
+    },
+    {
+      "lab": 12,
+      "branch": "lab-12/deployment",
+      "sha": "1065a49d73230d302d2713b50e5c106bde0443a7",
+      "base_for_count": "lab-11/docker",
+      "base_is_ancestor": true,
+      "new_commits": 17
+    }
+  ],
+  "prs": [
+    {
+      "number": 33,
+      "url": "https://github.com/shumakaro/booknest/pull/33",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/lab7-12-final-audit",
+      "base": "codex/manual-acceptance-checklist",
+      "sha": "98a1be3a00d8327f44e62c38e9984410360a696b"
+    },
+    {
+      "number": 32,
+      "url": "https://github.com/shumakaro/booknest/pull/32",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/manual-acceptance-checklist",
+      "base": "codex/render-release-check",
+      "sha": "efa73a717beb7351147d0bd5c3ff5f2c38c6e297"
+    },
+    {
+      "number": 31,
+      "url": "https://github.com/shumakaro/booknest/pull/31",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/render-release-check",
+      "base": "codex/neon-verification",
+      "sha": "39b1f44b6c4900aa57eaeade5376a776dd2afafc"
+    },
+    {
+      "number": 30,
+      "url": "https://github.com/shumakaro/booknest/pull/30",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/neon-verification",
+      "base": "codex/container-ci-reproducibility",
+      "sha": "1eb0eb934a82ca0671a93dfd625f8548cb8a8492"
+    },
+    {
+      "number": 29,
+      "url": "https://github.com/shumakaro/booknest/pull/29",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/container-ci-reproducibility",
+      "base": "codex/security-regressions",
+      "sha": "c21b1da396962fd1e39a88698b16d0e497906882"
+    },
+    {
+      "number": 28,
+      "url": "https://github.com/shumakaro/booknest/pull/28",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/security-regressions",
+      "base": "codex/orm-measurements",
+      "sha": "8c005d6ba4bc986e94782d6748c65b024bdb0fa9"
+    },
+    {
+      "number": 27,
+      "url": "https://github.com/shumakaro/booknest/pull/27",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/orm-measurements",
+      "base": "codex/api-contracts",
+      "sha": "d9737c5a1d371b2abab1e584da30dff2911d1c94"
+    },
+    {
+      "number": 26,
+      "url": "https://github.com/shumakaro/booknest/pull/26",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/api-contracts",
+      "base": "codex/accessibility-feedback",
+      "sha": "ca4fe2cc43cac83e66c9bf3cc376efbf98bca1d0"
+    },
+    {
+      "number": 25,
+      "url": "https://github.com/shumakaro/booknest/pull/25",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/accessibility-feedback",
+      "base": "codex/librarian-workspace",
+      "sha": "7909922855e39b0da6ca11d1e856cc21af5e806f"
+    },
+    {
+      "number": 24,
+      "url": "https://github.com/shumakaro/booknest/pull/24",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/librarian-workspace",
+      "base": "codex/auth-session-usability",
+      "sha": "50524717b6b835afe205052f832377a534d60cef"
+    },
+    {
+      "number": 23,
+      "url": "https://github.com/shumakaro/booknest/pull/23",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/auth-session-usability",
+      "base": "codex/loans-history",
+      "sha": "361195137720529f0d198b85d40c1d6aa2440772"
+    },
+    {
+      "number": 22,
+      "url": "https://github.com/shumakaro/booknest/pull/22",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/loans-history",
+      "base": "codex/wishlist-usability",
+      "sha": "9c7c78433a8560bb0199c72a44f9f839cd3fd392"
+    },
+    {
+      "number": 21,
+      "url": "https://github.com/shumakaro/booknest/pull/21",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/wishlist-usability",
+      "base": "codex/catalog-forms-crud",
+      "sha": "82951d5f390aea0d65f3a5918fbd7be48e88107e"
+    },
+    {
+      "number": 20,
+      "url": "https://github.com/shumakaro/booknest/pull/20",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/catalog-forms-crud",
+      "base": "codex/book-details-import",
+      "sha": "8377de1f7aee739aad223add3ef3975d794c024d"
+    },
+    {
+      "number": 19,
+      "url": "https://github.com/shumakaro/booknest/pull/19",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/book-details-import",
+      "base": "codex/catalog-search-filters",
+      "sha": "6625bbfc71fd587158de5e7425a7685a8c8d4752"
+    },
+    {
+      "number": 18,
+      "url": "https://github.com/shumakaro/booknest/pull/18",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/catalog-search-filters",
+      "base": "codex/loading-transitions",
+      "sha": "cf8c564a619e7202a808f4079644488164e393f5"
+    },
+    {
+      "number": 17,
+      "url": "https://github.com/shumakaro/booknest/pull/17",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/loading-transitions",
+      "base": "codex/book-card-polish",
+      "sha": "21ce00cb037ad8577fcfe4550f8c563cf36ffed3"
+    },
+    {
+      "number": 16,
+      "url": "https://github.com/shumakaro/booknest/pull/16",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/book-card-polish",
+      "base": "codex/lab-reports-7-12",
+      "sha": "1c3dadee71080768bbafd3745a9ab5770e0a4bb7"
+    },
+    {
+      "number": 15,
+      "url": "https://github.com/shumakaro/booknest/pull/15",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/lab-reports-7-12",
+      "base": "codex/global-book-search",
+      "sha": "86f16703d7d4d74b769c8f578e406880909b244a"
+    },
+    {
+      "number": 14,
+      "url": "https://github.com/shumakaro/booknest/pull/14",
+      "state": "open",
+      "merged_at": null,
+      "head": "codex/global-book-search",
+      "base": "lab-12/deployment",
+      "sha": "b95281484abeadbd971dc3c0bf5a2272b1fc97c4"
+    },
+    {
+      "number": 13,
+      "url": "https://github.com/shumakaro/booknest/pull/13",
+      "state": "open",
+      "merged_at": null,
+      "head": "lab-12/deployment",
+      "base": "lab-11/docker",
+      "sha": "1065a49d73230d302d2713b50e5c106bde0443a7"
+    },
+    {
+      "number": 12,
+      "url": "https://github.com/shumakaro/booknest/pull/12",
+      "state": "open",
+      "merged_at": null,
+      "head": "lab-11/docker",
+      "base": "lab-10/fullstack",
+      "sha": "13fcd07573b5a55c7c591638ea115432a6ede008"
+    },
+    {
+      "number": 11,
+      "url": "https://github.com/shumakaro/booknest/pull/11",
+      "state": "open",
+      "merged_at": null,
+      "head": "lab-10/fullstack",
+      "base": "lab-9/jwt-auth",
+      "sha": "3018cf258a067a302c8a5c31d73a580e6bf81ac2"
+    },
+    {
+      "number": 10,
+      "url": "https://github.com/shumakaro/booknest/pull/10",
+      "state": "open",
+      "merged_at": null,
+      "head": "lab-9/jwt-auth",
+      "base": "lab-8/postgresql-orm",
+      "sha": "2b1f5dd8c5f090704f9ec6bf8fc329778eb320be"
+    },
+    {
+      "number": 9,
+      "url": "https://github.com/shumakaro/booknest/pull/9",
+      "state": "open",
+      "merged_at": null,
+      "head": "lab-8/postgresql-orm",
+      "base": "lab-7/fastapi",
+      "sha": "19bdbf2d594a41fef3da4076311d31bf180ad1cb"
+    },
+    {
+      "number": 8,
+      "url": "https://github.com/shumakaro/booknest/pull/8",
+      "state": "open",
+      "merged_at": null,
+      "head": "lab-7/fastapi",
+      "base": "lab-6b/router-forms",
+      "sha": "0c8d9841d42407571a6f5111bf5f24bd292503cb"
+    }
+  ],
+  "commits": [
+    {
+      "sha": "1dc4d1c0f44d6adfee542e541c2fb31f00691612",
+      "author_date": "2026-11-06T11:43:56+05:00",
+      "subject": "feat: реализован REST API книг и авторов на FastAPI",
+      "changed_files": [
+        ".gitignore",
+        "app/__init__.py",
+        "app/config.py",
+        "app/core/__init__.py",
+        "app/core/http.py",
+        "app/core/pagination.py",
+        "app/main.py",
+        "app/repositories/__init__.py",
+        "app/repositories/memory.py",
+        "app/routers/__init__.py",
+        "app/routers/catalog.py",
+        "app/schemas/__init__.py",
+        "pyproject.toml",
+        "requirements.txt"
+      ]
+    },
+    {
+      "sha": "2a8a4bc275a734b5bf5704057569b6b83ebdbe8d",
+      "author_date": "2026-11-06T11:48:02+05:00",
+      "subject": "test: проверены контракты API и добавлены типы клиента из OpenAPI",
+      "changed_files": [
+        "app/routers/catalog.py",
+        "app/schemas/__init__.py",
+        "react-app/src/api/generated.ts",
+        "react-app/src/types.ts",
+        "requirements-lock.txt",
+        "tests/test_catalog.py",
+        "tools/check_swagger.cjs",
+        "tools/generate_api_types.py"
+      ]
+    },
+    {
+      "sha": "0c8d9841d42407571a6f5111bf5f24bd292503cb",
+      "author_date": "2026-11-06T11:50:26+05:00",
+      "subject": "docs: подготовлены материалы недели 9 и отчёт по лабораторной №7",
+      "changed_files": [
+        ".gitignore",
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "README.md",
+        "docs/api-design.md",
+        "docs/course/lab10.txt",
+        "docs/course/lab11.txt",
+        "docs/course/lab12.txt",
+        "docs/course/lab7.txt",
+        "docs/course/lab8.txt",
+        "docs/course/lab9.txt",
+        "docs/course/lec10.txt",
+        "docs/course/lec11.txt",
+        "docs/course/lec12.txt",
+        "docs/course/lec13.txt",
+        "docs/course/lec14.txt",
+        "docs/course/lec15.txt",
+        "docs/course/lec9.txt",
+        "docs/course/pr10.txt",
+        "docs/course/pr11.txt",
+        "docs/course/pr12.txt",
+        "docs/course/pr13.txt",
+        "docs/course/pr14.txt",
+        "docs/course/pr15.txt",
+        "docs/course/pr9.txt",
+        "docs/course/source-units.json",
+        "docs/course/syllabus-full.txt",
+        "docs/lab7/api.http",
+        "docs/lab7/openapi.json",
+        "docs/lab7/pr.md",
+        "docs/lab7/report.docx",
+        "docs/lab7/report.md",
+        "docs/lab7/swagger.png",
+        "tools/build_report.py",
+        "tools/create_pr.py",
+        "tools/extract_syllabus.py"
+      ]
+    },
+    {
+      "sha": "4870a42728533138e32a09d1a79c09b70d8e2d3a",
+      "author_date": "2026-11-06T11:51:38+05:00",
+      "subject": "feat: спроектирована схема PostgreSQL и подготовлены SQL-запросы",
+      "changed_files": [
+        "db/benchmark.sql",
+        "db/queries.sql",
+        "db/schema.sql",
+        "db/seed.sql"
+      ]
+    },
+    {
+      "sha": "0255f49a2aea753453bffde7963843f66b26858e",
+      "author_date": "2026-11-06T12:50:14+05:00",
+      "subject": "feat: API переведён на PostgreSQL с миграциями и транзакционной выдачей",
+      "changed_files": [
+        ".env.example",
+        "alembic.ini",
+        "app/config.py",
+        "app/db.py",
+        "app/legacy.py",
+        "app/main.py",
+        "app/models.py",
+        "app/repositories/catalog.py",
+        "app/routers/catalog.py",
+        "app/routers/catalog_db.py",
+        "app/routers/loans.py",
+        "app/schemas/__init__.py",
+        "app/services/__init__.py",
+        "app/services/catalog.py",
+        "db/README.md",
+        "db/er.mmd",
+        "db/er.png",
+        "docs/lab8/migrations-results.txt",
+        "docs/lab8/n-plus-one-after.log",
+        "docs/lab8/n-plus-one-before.log",
+        "docs/lab8/sql-results.txt",
+        "migrations/env.py",
+        "migrations/script.py.mako",
+        "migrations/versions/001_schema.py",
+        "migrations/versions/002_profile_names.py",
+        "tests/conftest.py",
+        "tests/test_catalog.py",
+        "tests/test_database.py",
+        "tools/check_migrations.py",
+        "tools/check_n_plus_one.py",
+        "tools/check_sql.py",
+        "tools/draw_er.py",
+        "tools/seed.py"
+      ]
+    },
+    {
+      "sha": "19bdbf2d594a41fef3da4076311d31bf180ad1cb",
+      "author_date": "2026-11-06T13:51:58+05:00",
+      "subject": "docs: завершены материалы недель 10–11 и сохранено восстановленное состояние",
+      "changed_files": [
+        "PROGRESS.md",
+        "README.md",
+        "app/repositories/catalog.py",
+        "app/routers/loans.py",
+        "app/schemas/__init__.py",
+        "app/services/catalog.py",
+        "docs/course/lecture-answers.json",
+        "docs/lab8/alembic-history.txt",
+        "docs/lab8/orm-sql-comparison.md",
+        "docs/lab8/pr.md",
+        "docs/lab8/report-body.md",
+        "docs/lab8/report.docx",
+        "docs/lab8/report.md",
+        "docs/lab8/resume-state.json",
+        "tests/conftest.py",
+        "tests/test_database.py",
+        "tools/check_migrations.py",
+        "tools/check_sql.py",
+        "tools/compare_sql.py",
+        "tools/compose_report.py",
+        "tools/resume_inspect.py"
+      ]
+    },
+    {
+      "sha": "f91c12cb0c4c0b05872bf88f565b8099e025c425",
+      "author_date": "2026-11-06T16:12:42+05:00",
+      "subject": "feat: реализованы JWT роли и защищённые выдачи с клиентской авторизацией",
+      "changed_files": [
+        ".env.example",
+        "app/config.py",
+        "app/core/auth.py",
+        "app/core/security.py",
+        "app/main.py",
+        "app/models.py",
+        "app/repositories/auth.py",
+        "app/routers/auth.py",
+        "app/routers/catalog_db.py",
+        "app/routers/loans.py",
+        "app/schemas/__init__.py",
+        "app/schemas/auth.py",
+        "app/services/auth.py",
+        "examples/mini_api/README.md",
+        "examples/mini_api/main.py",
+        "migrations/versions/003_auth.py",
+        "react-app/src/api/client.ts",
+        "react-app/src/app/AuthContext.ts",
+        "react-app/src/app/AuthProvider.tsx",
+        "react-app/src/app/router/AppRouter.tsx",
+        "react-app/src/app/router/RequireAuth.tsx",
+        "react-app/src/pages/login/LoginPage.tsx",
+        "react-app/src/shared/layout/AppLayout.tsx",
+        "react-app/vite.config.ts",
+        "tests/conftest.py",
+        "tests/test_auth.py",
+        "tests/test_mini_api.py",
+        "tools/apply_pending.py",
+        "tools/check_auth_browser.cjs",
+        "tools/create_demo_users.py"
+      ]
+    },
+    {
+      "sha": "2b1f5dd8c5f090704f9ec6bf8fc329778eb320be",
+      "author_date": "2026-11-06T16:12:43+05:00",
+      "subject": "docs: оформлены аудит безопасности и материалы недели 12",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/lab9/login-success.png",
+        "docs/lab9/pr.md",
+        "docs/lab9/report-body.md",
+        "docs/lab9/report.docx",
+        "docs/lab9/report.md",
+        "docs/lab9/validation.md",
+        "docs/permissions.md",
+        "docs/security-review.md",
+        "tools/write_security_review.py"
+      ]
+    },
+    {
+      "sha": "aa6a1c61809b2915de5c38284640e87b8be2b8c3",
+      "author_date": "2026-11-06T16:35:49+05:00",
+      "subject": "feat: выполнена интеграция BookNest с собственным API и реальными формами",
+      "changed_files": [
+        ".env.example",
+        ".gitignore",
+        "PROGRESS.md",
+        "app/core/http.py",
+        "app/main.py",
+        "app/models.py",
+        "app/repositories/catalog.py",
+        "app/repositories/wishlist.py",
+        "app/routers/wishlist.py",
+        "app/schemas/__init__.py",
+        "app/services/catalog.py",
+        "docs/lab10/fullstack-success.png",
+        "docs/lab10/openapi.json",
+        "docs/lab10/pr.md",
+        "docs/lab10/refresh-browser.json",
+        "docs/lab10/registration-browser.json",
+        "docs/lab10/regression-red.txt",
+        "docs/lab10/report-body.md",
+        "docs/lab10/report.docx",
+        "docs/lab10/report.md",
+        "docs/lab10/validation.md",
+        "migrations/versions/004_book_form_fields.py",
+        "migrations/versions/005_wishlist.py",
+        "react-app/e2e/booknest.spec.ts",
+        "react-app/package-lock.json",
+        "react-app/package.json",
+        "react-app/playwright.config.ts",
+        "react-app/src/App.tsx",
+        "react-app/src/api/bookForm.ts",
+        "react-app/src/api/books.ts",
+        "react-app/src/api/client.ts",
+        "react-app/src/api/generated.ts",
+        "react-app/src/api/wishlist.ts",
+        "react-app/src/app/router/AppRouter.tsx",
+        "react-app/src/components/ErrorBoundary.tsx",
+        "react-app/src/pages/books/BookDetailsPage.tsx",
+        "react-app/src/pages/books/BookFormPage.tsx",
+        "react-app/src/pages/books/BooksPage.tsx",
+        "react-app/src/pages/loans/LoansPage.tsx",
+        "react-app/src/pages/wishlist/WishlistPage.tsx",
+        "react-app/src/shared/layout/AppLayout.tsx",
+        "react-app/src/tests/ApiClient.test.ts",
+        "react-app/src/tests/BookForm.test.tsx",
+        "react-app/src/tests/Wishlist.test.tsx",
+        "react-app/src/tests/setup.ts",
+        "react-app/src/types.ts",
+        "react-app/vitest.config.ts",
+        "tests/test_database.py",
+        "tests/test_integration.py",
+        "tools/check_refresh_browser.cjs",
+        "tools/check_registration_browser.cjs",
+        "tools/check_regression.py",
+        "tools/generate_api_types.py"
+      ]
+    },
+    {
+      "sha": "3018cf258a067a302c8a5c31d73a580e6bf81ac2",
+      "author_date": "2026-11-06T16:36:57+05:00",
+      "subject": "docs: обновлены воспроизводимый запуск и описание проверок Full Stack",
+      "changed_files": [
+        "AI_USAGE.md",
+        "README.md",
+        "docs/course/readme-through-lab8.md"
+      ]
+    },
+    {
+      "sha": "57f999cc45e5fb3243a7341e4d2b9610748fd9bb",
+      "author_date": "2026-11-06T18:00:43+05:00",
+      "subject": "feat: добавлены контейнеры BookNest и проверки CI",
+      "changed_files": [
+        ".dockerignore",
+        ".env.example",
+        ".gitattributes",
+        ".github/workflows/ci.yml",
+        ".github/workflows/images.yml",
+        "docker-compose.dev.yml",
+        "docker-compose.yml",
+        "docker/api.Dockerfile",
+        "docker/entrypoint.sh",
+        "react-app/.dockerignore",
+        "react-app/Dockerfile",
+        "react-app/nginx.conf",
+        "requirements-runtime.txt",
+        "tools/apply_pending.py",
+        "tools/check_container_http.py",
+        "tools/check_image_sizes.py",
+        "tools/seed.py"
+      ]
+    },
+    {
+      "sha": "7642852b6058d58d6eb26ed723586183e02ee2dd",
+      "author_date": "2026-11-06T18:00:44+05:00",
+      "subject": "docs: оформлены диагностика Docker и материалы недели 14",
+      "changed_files": [
+        "PROGRESS.md",
+        "README.md",
+        "docs/docker-debug.md",
+        "docs/lab11/pr.md",
+        "docs/lab11/report-body.md",
+        "docs/lab11/report.docx",
+        "docs/lab11/report.md"
+      ]
+    },
+    {
+      "sha": "54f7b5dfcc7b9b750567b6a5fca7f9ba12bb1a76",
+      "author_date": "2026-11-06T18:16:44+05:00",
+      "subject": "fix: устранена гонка ожидания e2e и уточнён контроль размера образов",
+      "changed_files": [
+        "docker/api.Dockerfile",
+        "react-app/e2e/booknest.spec.ts",
+        "tools/check_image_sizes.py"
+      ]
+    },
+    {
+      "sha": "13fcd07573b5a55c7c591638ea115432a6ede008",
+      "author_date": "2026-11-06T18:36:49+05:00",
+      "subject": "test: подтверждены контейнеры и сохранность данных в GitHub Actions",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/lab11/ci-results.txt",
+        "docs/lab11/ci-status.json",
+        "docs/lab11/pr.md",
+        "docs/lab11/report-body.md",
+        "docs/lab11/report.docx",
+        "docs/lab11/report.md",
+        "tools/github_logs.py",
+        "tools/github_status.py"
+      ]
+    },
+    {
+      "sha": "92c16e50ef95c31c750a3bd2fd85ad280ec399f2",
+      "author_date": "2026-11-06T19:46:29+05:00",
+      "subject": "feat: подготовлено безопасное развертывание и восстановление BookNest",
+      "changed_files": [
+        ".env.example",
+        ".github/workflows/ci.yml",
+        ".github/workflows/deploy.yml",
+        ".gitignore",
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "app/core/http.py",
+        "app/main.py",
+        "app/routers/catalog.py",
+        "app/routers/catalog_db.py",
+        "app/schemas/__init__.py",
+        "deployment/backup.sh",
+        "deployment/booknest-backup.service",
+        "deployment/booknest-backup.timer",
+        "deployment/env.production.example",
+        "deployment/nginx-bootstrap.conf.template",
+        "deployment/nginx-container-trusted.conf",
+        "deployment/nginx-https.conf.template",
+        "deployment/restore.sh",
+        "deployment/update.sh",
+        "docker-compose.production.yml",
+        "docker-compose.yml",
+        "docker/entrypoint.sh",
+        "docs/deployment.md",
+        "docs/lab12/architecture.pptx",
+        "docs/lab12/bundle-before.json",
+        "docs/lab12/defense.md",
+        "docs/lab12/lighthouse-after.json",
+        "docs/lab12/lighthouse-before.json",
+        "docs/lab12/openapi.json",
+        "docs/lab12/pr.md",
+        "docs/lab12/report-body.md",
+        "docs/lab12/report.docx",
+        "docs/lab12/report.md",
+        "docs/lab12/self-review.md",
+        "react-app/index.html",
+        "react-app/nginx.conf",
+        "react-app/package-lock.json",
+        "react-app/package.json",
+        "react-app/src/App.css",
+        "react-app/src/api/generated.ts",
+        "react-app/src/app/router/AppRouter.tsx",
+        "tools/check_proxy_rate.py",
+        "tools/render_nginx.py",
+        "tools/verify_release.py"
+      ]
+    },
+    {
+      "sha": "1c6e2fc11587ed8e250082cdced40787a25ccd24",
+      "author_date": "2026-11-06T19:57:42+05:00",
+      "subject": "test: подтверждены резервное восстановление и защита прокси в CI",
+      "changed_files": [
+        "PROGRESS.md",
+        "README.md",
+        "docs/lab12/bundle-after.json",
+        "docs/lab12/catalog-benchmark.json",
+        "docs/lab12/ci-results.txt",
+        "docs/lab12/ci-status.json",
+        "docs/lab12/pr.md",
+        "docs/lab12/report-body.md",
+        "docs/lab12/report.docx",
+        "docs/lab12/report.md",
+        "docs/lab12/self-review.md",
+        "docs/security-review.md",
+        "package.json",
+        "tools/check_catalog_benchmark.py",
+        "tools/write_security_review.py"
+      ]
+    },
+    {
+      "sha": "fd199c96c14c758711f72bb6aec64752f086d244",
+      "author_date": "2026-11-06T20:35:12+05:00",
+      "subject": "docs: проверены все страницы шести отчетов и исправлено оформление",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "README.md",
+        "docs/lab10/report.docx",
+        "docs/lab11/report.docx",
+        "docs/lab12/pr.md",
+        "docs/lab12/report.docx",
+        "docs/lab12/self-review.md",
+        "docs/lab7/report.docx",
+        "docs/lab7/report.md",
+        "docs/lab8/report.docx",
+        "docs/lab9/report.docx",
+        "docs/report-qa.json",
+        "docs/report-qa.md",
+        "tools/build_report.py"
+      ]
+    },
+    {
+      "sha": "21f18fe22743f2c9ed5b054e7bb68b3bdd650849",
+      "author_date": "2026-11-10T18:52:08+05:00",
+      "subject": "docs: выполнен аудит требований ЛР 7–12 и составлен план доработок",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/audit/REQUIREMENTS.md",
+        "docs/audit/STAGE1.md",
+        "docs/audit/USER_CHECKS.md",
+        "docs/audit/evidence.json"
+      ]
+    },
+    {
+      "sha": "abfd7de8fe10604a57c803715a5aaf71988d0a92",
+      "author_date": "2026-11-10T19:01:54+05:00",
+      "subject": "feat: оформлены кремовая библиотека и адаптивные карточки с анимациями",
+      "changed_files": [
+        "react-app/src/App.css",
+        "react-app/src/components/BookCard.tsx",
+        "react-app/src/index.css"
+      ]
+    },
+    {
+      "sha": "b8f7869b5edba51371397789de239abcc415af08",
+      "author_date": "2026-11-10T19:01:55+05:00",
+      "subject": "feat: добавлены каркас загрузки и уведомления действий читателя",
+      "changed_files": [
+        "react-app/src/components/CatalogSkeleton.tsx",
+        "react-app/src/components/NoticeHost.tsx",
+        "react-app/src/features/books/components/BookForm.tsx",
+        "react-app/src/lib/notifications.ts",
+        "react-app/src/pages/books/BookDetailsPage.tsx",
+        "react-app/src/pages/books/BooksPage.tsx",
+        "react-app/src/pages/loans/LoansPage.tsx",
+        "react-app/src/pages/wishlist/WishlistPage.tsx",
+        "react-app/src/shared/layout/AppLayout.tsx"
+      ]
+    },
+    {
+      "sha": "fccd1988ea704100a8cf11d2d295d1ea3035d01a",
+      "author_date": "2026-11-10T19:03:06+05:00",
+      "subject": "test: проверены адаптивность темы и состояния нового интерфейса",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/stage2/README.md",
+        "docs/stage2/preview-fixtures.png",
+        "docs/stage2/ui-results.json",
+        "tools/check_design.cjs"
+      ]
+    },
+    {
+      "sha": "61ead29c003609057a054c201c975719462d1c6f",
+      "author_date": "2026-11-10T19:14:04+05:00",
+      "subject": "fix: разделены уведомления успеха и доступные ошибки выдачи",
+      "changed_files": [
+        "react-app/src/pages/books/BookDetailsPage.tsx",
+        "react-app/src/tests/BookActions.test.tsx"
+      ]
+    },
+    {
+      "sha": "82c9bc2b21c5ef4b7901d97ea29959ce4ce10ad6",
+      "author_date": "2026-11-10T19:14:06+05:00",
+      "subject": "fix: заблокированы повторные нажатия избранного во время записи",
+      "changed_files": [
+        "react-app/src/components/BookCard.tsx",
+        "react-app/src/components/BookList.tsx",
+        "react-app/src/pages/books/BooksPage.tsx"
+      ]
+    },
+    {
+      "sha": "b80720ea3c88b460b7616e76585609f32df1bb39",
+      "author_date": "2026-11-10T19:15:31+05:00",
+      "subject": "test: подтверждены реальные сценарии BookNest после редизайна",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/stage3/README.md",
+        "docs/stage3/before.json",
+        "docs/stage3/db-after.json",
+        "docs/stage3/db-baseline.json",
+        "docs/stage3/failed-run-cleanup.json",
+        "docs/stage3/pending-wishlist.json",
+        "docs/stage3/real-ui.json",
+        "react-app/e2e/booknest.spec.ts",
+        "tools/check_pending_wishlist.cjs",
+        "tools/check_real_ui.cjs"
+      ]
+    },
+    {
+      "sha": "018924a1799f96a375e9ba83207b312825ae335f",
+      "author_date": "2026-11-10T19:58:49+05:00",
+      "subject": "feat: настроены Neon CLI и конфигурация существующего облачного проекта",
+      "changed_files": [
+        ".env.example",
+        ".gitignore",
+        "neon.ts",
+        "package-lock.json",
+        "package.json"
+      ]
+    },
+    {
+      "sha": "1674c84ac67a6cd4604da3727c5cb0be18e2aa79",
+      "author_date": "2026-11-10T19:58:49+05:00",
+      "subject": "feat: подключены pooled и direct URL Neon с изоляцией тестовой базы",
+      "changed_files": [
+        "app/config.py",
+        "migrations/env.py",
+        "tests/conftest.py",
+        "tests/test_neon_config.py",
+        "tools/apply_pending.py",
+        "tools/create_demo_users.py"
+      ]
+    },
+    {
+      "sha": "709d0b2ff206bcb87b97bdf033260ff7e0f0cb12",
+      "author_date": "2026-11-10T19:58:50+05:00",
+      "subject": "test: подтверждена сквозная работа React FastAPI и Neon",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/neon/README.md",
+        "docs/neon/verification.json",
+        "react-app/e2e/booknest.spec.ts",
+        "tools/check_neon.py"
+      ]
+    },
+    {
+      "sha": "02384f49c374f5ab55205fe9d25ad8391b8b0606",
+      "author_date": "2026-11-10T20:15:26+05:00",
+      "subject": "feat: подготовлен единый Docker-образ React и FastAPI для Render",
+      "changed_files": [
+        "app/config.py",
+        "app/render.py",
+        "docker/render-entrypoint.sh",
+        "docker/render.Dockerfile",
+        "docker/render.Dockerfile.dockerignore"
+      ]
+    },
+    {
+      "sha": "496ec06023f3f75ecbbaddf7da0e59d5d0dd038f",
+      "author_date": "2026-11-10T20:15:27+05:00",
+      "subject": "test: добавлены проверки SPA origin и сквозной запуск Render-образа в CI",
+      "changed_files": [
+        ".github/workflows/ci.yml",
+        "tests/test_render.py",
+        "tools/check_container_http.py"
+      ]
+    },
+    {
+      "sha": "d7a85e6d4d4f2689189742167dc6062f8d4278bc",
+      "author_date": "2026-11-10T20:15:27+05:00",
+      "subject": "docs: описаны настройки Render секреты и фактические проверки публикации",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/render/README.md"
+      ]
+    },
+    {
+      "sha": "1065a49d73230d302d2713b50e5c106bde0443a7",
+      "author_date": "2026-11-10T20:21:40+05:00",
+      "subject": "docs: сохранены успешные CI сборка и сквозные проверки Render-образа",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/render/README.md",
+        "docs/render/ci-results.txt",
+        "docs/render/ci-status.json"
+      ]
+    },
+    {
+      "sha": "d94334667b884d6d555848c211ff240c8497fe37",
+      "author_date": "2026-11-10T21:00:23+05:00",
+      "subject": "feat: добавлен независимый поиск Open Library через FastAPI с кэшем и таймаутами",
+      "changed_files": [
+        "app/main.py",
+        "app/routers/discover.py",
+        "app/services/open_library.py",
+        "requirements-runtime.txt"
+      ]
+    },
+    {
+      "sha": "79a54a2b9a0de33a641e393c8b53d0e8b510c357",
+      "author_date": "2026-11-10T21:00:23+05:00",
+      "subject": "feat: разделены библиотека и глобальный поиск с накоплением страниц и деталями",
+      "changed_files": [
+        "react-app/src/App.css",
+        "react-app/src/api/discover.ts",
+        "react-app/src/app/router/AppRouter.tsx",
+        "react-app/src/components/BookCard.tsx",
+        "react-app/src/features/books/hooks/useGlobalBooks.ts",
+        "react-app/src/pages/books/BooksPage.tsx",
+        "react-app/src/pages/discover/DiscoverPage.tsx",
+        "react-app/src/pages/discover/ExternalBookPage.tsx",
+        "react-app/src/shared/layout/AppLayout.tsx"
+      ]
+    },
+    {
+      "sha": "d839813242640f68044326a4c7652bb42bbe6d50",
+      "author_date": "2026-11-10T21:00:24+05:00",
+      "subject": "test: проверены поиск за первыми тридцатью книгами пагинация ошибки и возврат из деталей",
+      "changed_files": [
+        "react-app/src/tests/Discover.test.tsx",
+        "tests/test_database.py",
+        "tests/test_discover.py"
+      ]
+    },
+    {
+      "sha": "459b22a1e8af63170b195fc6f327ec77565c8b7a",
+      "author_date": "2026-11-10T21:02:24+05:00",
+      "subject": "docs: сохранены причины замены поиска реальные проверки и план второй части",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/global-search/STAGE1.md",
+        "docs/global-search/stage1-results.json"
+      ]
+    },
+    {
+      "sha": "b817c3d8ca033cc2344eb4b2c307643df40fd41d",
+      "author_date": "2026-11-10T22:18:10+05:00",
+      "subject": "feat: добавлен транзакционный импорт книг без дублей и безопасная миграция происхождения",
+      "changed_files": [
+        "app/models.py",
+        "app/repositories/catalog.py",
+        "app/routers/discover.py",
+        "app/schemas/__init__.py",
+        "app/services/import_book.py",
+        "migrations/versions/006_external_books.py"
+      ]
+    },
+    {
+      "sha": "6a2d0daac94911aeb0dead552329ce1a5d5192ec",
+      "author_date": "2026-11-10T22:18:11+05:00",
+      "subject": "feat: добавлены форма импорта библиотекаря и обложки собственного каталога",
+      "changed_files": [
+        "docs/global-search/openapi.json",
+        "react-app/src/api/books.ts",
+        "react-app/src/api/generated.ts",
+        "react-app/src/pages/discover/ExternalBookPage.tsx",
+        "react-app/src/pages/discover/ImportBookForm.tsx"
+      ]
+    },
+    {
+      "sha": "63b8fdd831634a7c3c47f751e7f9a5e2f4d2e070",
+      "author_date": "2026-11-10T22:18:11+05:00",
+      "subject": "test: подтверждены повтор импорта права доступа сохранность правок и миграция копии Neon",
+      "changed_files": [
+        "docs/global-search/neon-migration-check.json",
+        "docs/global-search/pr.md",
+        "react-app/src/tests/Discover.test.tsx",
+        "react-app/src/tests/ImportBook.test.tsx",
+        "tests/test_import_book.py"
+      ]
+    },
+    {
+      "sha": "41c5c5710654d31a076b215f6bfa619cf1bcf942",
+      "author_date": "2026-11-10T22:23:33+05:00",
+      "subject": "feat: подготовлена защищенная замена учебных книг с проверенным восстановлением резервной копии",
+      "changed_files": [
+        "docs/global-search/catalog-restore-check.json",
+        "docs/global-search/real-books-plan.json",
+        "tests/test_refresh_catalog.py",
+        "tools/refresh_demo_catalog.py"
+      ]
+    },
+    {
+      "sha": "064a0a2a350462c896ce43715f17d97f2e523a0f",
+      "author_date": "2026-11-10T23:46:19+05:00",
+      "subject": "fix: включен инструмент обновления каталога в тестовый Docker-образ",
+      "changed_files": [
+        "docker/api.Dockerfile"
+      ]
+    },
+    {
+      "sha": "b95281484abeadbd971dc3c0bf5a2272b1fc97c4",
+      "author_date": "2026-11-10T23:53:04+05:00",
+      "subject": "docs: подтверждены обновление Neon публикация Render и успешная приемка двух каталогов",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/global-search/STAGE2.md",
+        "docs/global-search/final-ci-results.txt",
+        "docs/global-search/final-ci-status.json",
+        "docs/global-search/pr.md",
+        "docs/global-search/production-catalog-result.json",
+        "docs/global-search/render-auth-import-check.json",
+        "docs/global-search/render-browser-check.json",
+        "docs/global-search/render-library-check.json",
+        "docs/global-search/render-release-check.json"
+      ]
+    },
+    {
+      "sha": "3b0392d871754ca604c84fccda52346051b09d0c",
+      "author_date": "2026-11-11T00:36:50+05:00",
+      "subject": "docs: подготовлен подробный отчет ЛР 7 с практикой СРС и ответами",
+      "changed_files": [
+        "docs/reports/BookNest_LR07_podrobny_otchet.docx"
+      ]
+    },
+    {
+      "sha": "c8f85276dcd7efc981cc72b860a0161cffcfd6bf",
+      "author_date": "2026-11-11T00:36:51+05:00",
+      "subject": "docs: подготовлен подробный отчет ЛР 8 с практикой СРС и ответами",
+      "changed_files": [
+        "docs/reports/BookNest_LR08_podrobny_otchet.docx"
+      ]
+    },
+    {
+      "sha": "cb4d605d8db04cecf724f3e6884f23300a9089d4",
+      "author_date": "2026-11-11T00:36:51+05:00",
+      "subject": "docs: подготовлен подробный отчет ЛР 9 с практикой СРС и ответами",
+      "changed_files": [
+        "docs/reports/BookNest_LR09_podrobny_otchet.docx"
+      ]
+    },
+    {
+      "sha": "4279aa8bf57aa185bc08457b98e457bb8ef7408b",
+      "author_date": "2026-11-11T00:36:52+05:00",
+      "subject": "docs: подготовлен подробный отчет ЛР 10 с практикой СРС и ответами",
+      "changed_files": [
+        "docs/reports/BookNest_LR10_podrobny_otchet.docx"
+      ]
+    },
+    {
+      "sha": "5b31605fe3e7e29a5c08ba7e160511801f494408",
+      "author_date": "2026-11-11T00:36:53+05:00",
+      "subject": "docs: подготовлен подробный отчет ЛР 11 с практикой СРС и ответами",
+      "changed_files": [
+        "docs/reports/BookNest_LR11_podrobny_otchet.docx"
+      ]
+    },
+    {
+      "sha": "81c1bfc40671099836a393718c5b2123912d06a2",
+      "author_date": "2026-11-11T00:36:54+05:00",
+      "subject": "docs: подготовлен подробный отчет ЛР 12 с практикой СРС и ответами",
+      "changed_files": [
+        "docs/reports/BookNest_LR12_podrobny_otchet.docx"
+      ]
+    },
+    {
+      "sha": "2ebe0c5958545e85fbf199c9f4d552f8134544a4",
+      "author_date": "2026-11-11T00:37:37+05:00",
+      "subject": "docs: добавлены список скриншотов и проверка оформления шести отчетов",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/reports/README.md",
+        "docs/reports/SKRINSHOTY_DLYA_OTCHETOV.md",
+        "docs/reports/VERIFICATION.md",
+        "docs/reports/report-manifest.json",
+        "tools/build_detailed_reports.py"
+      ]
+    },
+    {
+      "sha": "86f16703d7d4d74b769c8f578e406880909b244a",
+      "author_date": "2026-11-11T00:38:46+05:00",
+      "subject": "docs: зафиксирована публикация отчетов и отдельный PR 15",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "f6a0abf70968c1d3d5c678bb81d729f495640891",
+      "author_date": "2026-11-11T00:50:42+05:00",
+      "subject": "feat: улучшены карточки книг эффекты фокус и отметки доступности",
+      "changed_files": [
+        "react-app/src/components/BookCard.css",
+        "react-app/src/components/BookCard.tsx"
+      ]
+    },
+    {
+      "sha": "5fed8874dfdd55fc546d4c19a204710e42c82cb9",
+      "author_date": "2026-11-11T00:50:43+05:00",
+      "subject": "test: проверены эффекты карточек адаптивность и сенсорное управление",
+      "changed_files": [
+        "docs/improvements/stage1-ui-results.json",
+        "tools/check_card_polish.cjs"
+      ]
+    },
+    {
+      "sha": "2078f64dd5683570be8cfee41a1cb06ef244cc29",
+      "author_date": "2026-11-11T00:50:43+05:00",
+      "subject": "docs: разделены семь этапов доработок и описан результат первого",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md"
+      ]
+    },
+    {
+      "sha": "1c3dadee71080768bbafd3745a9ab5770e0a4bb7",
+      "author_date": "2026-11-11T00:51:47+05:00",
+      "subject": "docs: сохранена ссылка на PR 16 первого этапа",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "586ddb83ffb1c3cc901d3b24902382c537f0e5b3",
+      "author_date": "2026-11-11T01:03:11+05:00",
+      "subject": "feat: добавлены плавное появление результатов и каркас загрузки ЛР10",
+      "changed_files": [
+        "react-app/src/components/CatalogSkeleton.tsx",
+        "react-app/src/features/books/components/AnimatedResults.tsx",
+        "react-app/src/features/books/components/LoadingTransitions.css",
+        "react-app/src/pages/books/BooksPage.tsx"
+      ]
+    },
+    {
+      "sha": "ff13a258df84199bf840e25296e1b439d4fa0bca",
+      "author_date": "2026-11-11T01:03:12+05:00",
+      "subject": "feat: улучшены подгрузка страниц и возврат к позиции глобального поиска",
+      "changed_files": [
+        "react-app/src/features/books/hooks/useGlobalBooks.ts",
+        "react-app/src/pages/discover/DiscoverPage.tsx",
+        "react-app/src/pages/discover/ExternalBookPage.tsx"
+      ]
+    },
+    {
+      "sha": "2c5c89281277b6ef71d672b3f825c9d334fc8ec6",
+      "author_date": "2026-11-11T01:03:13+05:00",
+      "subject": "test: проверены подгрузка анимации повтор ошибки и сохранение прокрутки",
+      "changed_files": [
+        "docs/improvements/stage2-card-regression-results.json",
+        "docs/improvements/stage2-loading-results.json",
+        "react-app/src/tests/Discover.test.tsx",
+        "tools/check_loading_transitions.cjs"
+      ]
+    },
+    {
+      "sha": "9a9240cfb0bd3139d7b2277e9d6bf996a39d9af7",
+      "author_date": "2026-11-11T01:03:14+05:00",
+      "subject": "docs: определены шестнадцать этапов только для лабораторных 7–12",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md"
+      ]
+    },
+    {
+      "sha": "21ce00cb037ad8577fcfe4550f8c563cf36ffed3",
+      "author_date": "2026-11-11T01:04:54+05:00",
+      "subject": "docs: сохранены PR 17 и повторная проверка второго этапа",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "6657e1b184c2b2c7309888eba1fb298a4a2a881e",
+      "author_date": "2026-11-11T01:26:12+05:00",
+      "subject": "feat: добавлен поиск книг по автору с учетом русского регистра и пробелов",
+      "changed_files": [
+        "app/repositories/catalog.py",
+        "docs/api-design.md"
+      ]
+    },
+    {
+      "sha": "135129f920717aca839372d142ffd94031d4b54b",
+      "author_date": "2026-11-11T01:26:13+05:00",
+      "subject": "feat: добавлены метки фильтров проверка ссылок и диапазон результатов",
+      "changed_files": [
+        "react-app/src/features/books/catalogFilters.ts",
+        "react-app/src/features/books/components/CatalogFilters.css",
+        "react-app/src/pages/books/BooksPage.tsx"
+      ]
+    },
+    {
+      "sha": "2e1b7989e236b953790509a5e2d2bae5501bd793",
+      "author_date": "2026-11-11T01:26:14+05:00",
+      "subject": "fix: сохранен возврат из книги к фильтрам странице и прокрутке каталога",
+      "changed_files": [
+        "react-app/src/pages/books/BookDetailsPage.tsx"
+      ]
+    },
+    {
+      "sha": "ec9558393a0229b43321a457ac3084f500b218ba",
+      "author_date": "2026-11-11T01:26:14+05:00",
+      "subject": "test: проверены поиск автора пагинация фильтры и навигация каталога",
+      "changed_files": [
+        "docs/improvements/stage3-card-regression-results.json",
+        "docs/improvements/stage3-loading-regression-results.json",
+        "docs/improvements/stage3-test-results.json",
+        "docs/improvements/stage3-ui-results.json",
+        "react-app/src/tests/CatalogSearch.test.tsx",
+        "tests/test_database.py",
+        "tools/check_catalog_search.cjs"
+      ]
+    },
+    {
+      "sha": "67aa858d998232770ae0b9329f7e478ae0a0cf4f",
+      "author_date": "2026-11-11T01:26:15+05:00",
+      "subject": "docs: описаны третий этап реальные проверки и ограничения поиска",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE3.md"
+      ]
+    },
+    {
+      "sha": "cf8c564a619e7202a808f4079644488164e393f5",
+      "author_date": "2026-11-11T01:28:00+05:00",
+      "subject": "docs: сохранены PR 18 и завершение третьего этапа",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "5f6af3a514672e404fcdf9386828f7606c2e1ae0",
+      "author_date": "2026-11-11T01:49:40+05:00",
+      "subject": "feat: оформлены страницы книг с обложками характеристиками и описанием",
+      "changed_files": [
+        "react-app/src/features/books/components/BookDetails.css",
+        "react-app/src/features/books/components/BookPresentation.tsx",
+        "react-app/src/pages/books/BookDetailsPage.tsx",
+        "react-app/src/pages/discover/ExternalBookPage.tsx"
+      ]
+    },
+    {
+      "sha": "3838e3254b95bd51576e61f74b849506d799a5a0",
+      "author_date": "2026-11-11T01:49:41+05:00",
+      "subject": "feat: добавлены предпросмотр импорта и защита повторной отправки",
+      "changed_files": [
+        "react-app/src/pages/discover/ImportBookForm.tsx"
+      ]
+    },
+    {
+      "sha": "02b9f0314a43dfb64a7b6bafde26c92b363d9635",
+      "author_date": "2026-11-11T01:49:42+05:00",
+      "subject": "fix: исключена подмена деталей книги запоздавшим ответом после отмены",
+      "changed_files": [
+        "react-app/src/features/books/hooks/useBookDetails.ts"
+      ]
+    },
+    {
+      "sha": "2b04bc09a72f1dd425bc0cf2616f89e81a68311f",
+      "author_date": "2026-11-11T01:49:43+05:00",
+      "subject": "test: проверены детали роли ошибки импорта и сохранение серверных данных",
+      "changed_files": [
+        "docs/improvements/stage4-catalog-regression-results.json",
+        "docs/improvements/stage4-loading-regression-results.json",
+        "docs/improvements/stage4-test-results.json",
+        "docs/improvements/stage4-ui-results.json",
+        "react-app/src/tests/BookDetailsRace.test.tsx",
+        "react-app/src/tests/BookPresentation.test.tsx",
+        "react-app/src/tests/ImportBook.test.tsx",
+        "tools/check_book_details.cjs"
+      ]
+    },
+    {
+      "sha": "18c01c7a72bada02d5592603b909ae69660e23c2",
+      "author_date": "2026-11-11T01:49:44+05:00",
+      "subject": "docs: описаны четвертый этап проверки и ограничения данных издания",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE4.md"
+      ]
+    },
+    {
+      "sha": "6625bbfc71fd587158de5e7425a7685a8c8d4752",
+      "author_date": "2026-11-11T01:51:11+05:00",
+      "subject": "docs: сохранены PR 19 и завершение четвертого этапа",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "8a5fa0c9cfb1ad0e63dace51c5f83261ebbc68db",
+      "author_date": "2026-11-11T09:28:31+05:00",
+      "subject": "fix: разрешен пустой ISBN и сохранение только измененных полей книги",
+      "changed_files": [
+        "react-app/src/api/bookForm.ts",
+        "react-app/src/features/books/bookSchema.ts",
+        "react-app/src/features/books/isbn.ts"
+      ]
+    },
+    {
+      "sha": "6f40fb28b8248234865874a8c5abc5685c5f5cee",
+      "author_date": "2026-11-11T09:28:32+05:00",
+      "subject": "feat: улучшены формы книг подсказки фокус и подтверждение отмены удаления",
+      "changed_files": [
+        "react-app/src/features/books/components/BookForm.css",
+        "react-app/src/features/books/components/BookForm.tsx",
+        "react-app/src/pages/books/BookDetailsPage.tsx",
+        "react-app/src/pages/books/BookFormPage.tsx"
+      ]
+    },
+    {
+      "sha": "c5e7c95be58d30b61a881f6da3a0fffa2ce647f3",
+      "author_date": "2026-11-11T09:28:33+05:00",
+      "subject": "fix: выделен конфликт ISBN без ошибочной подмены других конфликтов",
+      "changed_files": [
+        "app/services/catalog.py"
+      ]
+    },
+    {
+      "sha": "bf121bf25b5875bf0450f6027684d7f07786cc3b",
+      "author_date": "2026-11-11T09:28:35+05:00",
+      "subject": "test: проверены формы частичный PATCH ISBN и сохранение истории выдач",
+      "changed_files": [
+        "docs/improvements/stage5-details-regression-results.json",
+        "docs/improvements/stage5-search-regression-results.json",
+        "docs/improvements/stage5-test-results.json",
+        "docs/improvements/stage5-ui-results.json",
+        "react-app/src/tests/BookForm.test.tsx",
+        "react-app/src/tests/BookFormApi.test.ts",
+        "tests/test_integration.py",
+        "tools/check_catalog_forms.cjs"
+      ]
+    },
+    {
+      "sha": "5c6c5b04aea318d54b5a3e350062d8062d34d9c5",
+      "author_date": "2026-11-11T09:28:36+05:00",
+      "subject": "docs: описаны пятый этап проверки и восстановление локальной тестовой среды",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE5.md"
+      ]
+    },
+    {
+      "sha": "8377de1f7aee739aad223add3ef3975d794c024d",
+      "author_date": "2026-11-11T09:29:54+05:00",
+      "subject": "docs: сохранены PR 20 и завершение пятого этапа",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "9e63f03ae451b7895f70235ecd942bf13e71836c",
+      "author_date": "2026-11-11T09:46:24+05:00",
+      "subject": "feat: добавлено личное желаемое в детали книги с откатом ошибок",
+      "changed_files": [
+        "react-app/src/api/wishlist.ts",
+        "react-app/src/features/books/components/WishlistAction.tsx",
+        "react-app/src/pages/books/BookDetailsPage.tsx"
+      ]
+    },
+    {
+      "sha": "daa05739d713ccea7bc14c85d6a5ad0f41d2b6ad",
+      "author_date": "2026-11-11T09:46:30+05:00",
+      "subject": "feat: добавлены поиск сортировка и состояния списка желаемого",
+      "changed_files": [
+        "react-app/src/features/books/components/Wishlist.css",
+        "react-app/src/pages/wishlist/WishlistPage.tsx"
+      ]
+    },
+    {
+      "sha": "abe3751aa19b5eae167fa156726367fc8f74783f",
+      "author_date": "2026-11-11T09:46:36+05:00",
+      "subject": "test: проверены страницы желаемого владение и откат изменений",
+      "changed_files": [
+        "docs/improvements/stage6-details-regression-results.json",
+        "docs/improvements/stage6-forms-regression-results.json",
+        "docs/improvements/stage6-search-regression-results.json",
+        "docs/improvements/stage6-test-results.json",
+        "docs/improvements/stage6-ui-results.json",
+        "react-app/src/tests/BookActions.test.tsx",
+        "react-app/src/tests/Wishlist.test.tsx",
+        "react-app/src/tests/WishlistAction.test.tsx",
+        "react-app/src/tests/WishlistApi.test.ts",
+        "tests/test_integration.py",
+        "tools/check_book_details.cjs",
+        "tools/check_wishlist.cjs"
+      ]
+    },
+    {
+      "sha": "e9e171ca7666dcd3f0da16d05ce5e8f2702711e8",
+      "author_date": "2026-11-11T09:46:42+05:00",
+      "subject": "docs: описаны доработки желаемого проверки и ограничения этапа 6",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE6.md"
+      ]
+    },
+    {
+      "sha": "82951d5f390aea0d65f3a5918fbd7be48e88107e",
+      "author_date": "2026-11-11T09:47:23+05:00",
+      "subject": "docs: сохранены коммиты и PR 21 завершенного этапа желаемого",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "c38598fb142277b16c2e1e07841fb2b68143db1c",
+      "author_date": "2026-11-11T10:01:18+05:00",
+      "subject": "feat: добавлены SQL-фильтры выдач и актуальное состояние под блокировкой",
+      "changed_files": [
+        "app/repositories/catalog.py",
+        "app/routers/loans.py",
+        "app/schemas/__init__.py",
+        "docs/improvements/stage7-openapi.json",
+        "react-app/src/api/generated.ts"
+      ]
+    },
+    {
+      "sha": "017d74d8fde1da2573e3546ce92a6dad1064b48c",
+      "author_date": "2026-11-11T10:01:24+05:00",
+      "subject": "feat: разделены текущие выдачи просрочки и история возвратов",
+      "changed_files": [
+        "react-app/src/features/loans/Loans.css",
+        "react-app/src/features/loans/dates.ts",
+        "react-app/src/pages/loans/LoansPage.tsx"
+      ]
+    },
+    {
+      "sha": "ee54c18c33631bcb0be122d337d5eee594661438",
+      "author_date": "2026-11-11T10:01:31+05:00",
+      "subject": "fix: защищена повторная выдача и сохранен возврат к списку выдач",
+      "changed_files": [
+        "react-app/src/pages/books/BookDetailsPage.tsx"
+      ]
+    },
+    {
+      "sha": "08280d88f42857fb849df5596c5168d80dbac78b",
+      "author_date": "2026-11-11T10:01:38+05:00",
+      "subject": "test: проверены сроки возвраты последняя копия и регрессии интерфейса",
+      "changed_files": [
+        "docs/improvements/stage7-details-regression-results.json",
+        "docs/improvements/stage7-forms-regression-results.json",
+        "docs/improvements/stage7-test-results.json",
+        "docs/improvements/stage7-ui-results.json",
+        "docs/improvements/stage7-wishlist-regression-results.json",
+        "react-app/src/tests/BookActions.test.tsx",
+        "react-app/src/tests/Loans.test.tsx",
+        "tests/test_loans_usability.py",
+        "tools/check_loans.cjs"
+      ]
+    },
+    {
+      "sha": "688f190882380583b4be9ea857312d79cec57d0c",
+      "author_date": "2026-11-11T10:01:44+05:00",
+      "subject": "docs: описаны изменения выдач результаты и ограничения этапа 7",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE7.md"
+      ]
+    },
+    {
+      "sha": "9c7c78433a8560bb0199c72a44f9f839cd3fd392",
+      "author_date": "2026-11-11T10:03:06+05:00",
+      "subject": "docs: сохранены коммиты PR 22 и условия обновления Render",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE7.md"
+      ]
+    },
+    {
+      "sha": "d3e853316b60f0f4faae2512d7497595585ad9ab",
+      "author_date": "2026-11-12T20:09:48+05:00",
+      "subject": "fix: защищен сеанс от запоздавших ответов и повторов другого аккаунта",
+      "changed_files": [
+        "react-app/src/api/client.ts",
+        "react-app/src/app/AuthProvider.tsx"
+      ]
+    },
+    {
+      "sha": "4105719177055398c9e3636aab570b6db71439fb",
+      "author_date": "2026-11-12T20:09:55+05:00",
+      "subject": "feat: улучшены формы входа регистрации и сохранение страницы назначения",
+      "changed_files": [
+        "react-app/src/app/router/AppRouter.tsx",
+        "react-app/src/features/auth/Auth.css",
+        "react-app/src/features/auth/returnTo.ts",
+        "react-app/src/pages/login/LoginPage.tsx"
+      ]
+    },
+    {
+      "sha": "6e3bc528159f7cecbfae58d1f028baf3eac338a6",
+      "author_date": "2026-11-12T20:10:03+05:00",
+      "subject": "feat: показаны текущий пользователь и проверяемый выход из сеанса",
+      "changed_files": [
+        "react-app/src/shared/layout/AppLayout.tsx"
+      ]
+    },
+    {
+      "sha": "bb04dd39fd9ea8c74c2efb50319d9d48d78ee4f8",
+      "author_date": "2026-11-12T20:10:12+05:00",
+      "subject": "test: проверены гонки сеанса формы и регрессии личных действий",
+      "changed_files": [
+        "docs/improvements/stage8-forms-regression-results.json",
+        "docs/improvements/stage8-loans-regression-results.json",
+        "docs/improvements/stage8-test-results.json",
+        "docs/improvements/stage8-ui-results.json",
+        "docs/improvements/stage8-wishlist-regression-results.json",
+        "react-app/src/tests/AuthProvider.test.tsx",
+        "react-app/src/tests/Login.test.tsx",
+        "react-app/src/tests/SessionClient.test.ts",
+        "tools/check_auth_usability.cjs"
+      ]
+    },
+    {
+      "sha": "038866d45010f61d69b122eeb8b47324c7a6d1e7",
+      "author_date": "2026-11-12T20:10:23+05:00",
+      "subject": "docs: описаны результаты ограничения и возобновление этапа 8",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE8.md"
+      ]
+    },
+    {
+      "sha": "361195137720529f0d198b85d40c1d6aa2440772",
+      "author_date": "2026-11-12T20:11:51+05:00",
+      "subject": "docs: сохранены PR 23 и завершение восьмого этапа",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE8.md"
+      ]
+    },
+    {
+      "sha": "8bdaa23aa2a456f95b2d96505599705c48e4b4fe",
+      "author_date": "2026-11-12T20:25:46+05:00",
+      "subject": "feat: добавлено защищенное чтение журнала каталога с пагинацией",
+      "changed_files": [
+        "app/main.py",
+        "app/repositories/auth.py",
+        "app/routers/audit.py",
+        "app/schemas/__init__.py",
+        "docs/improvements/stage9-openapi.json",
+        "react-app/src/api/generated.ts"
+      ]
+    },
+    {
+      "sha": "62957c45ba3791ff65ec02980272941aab588d81",
+      "author_date": "2026-11-12T20:25:56+05:00",
+      "subject": "feat: создано рабочее место библиотекаря с журналом и переходами",
+      "changed_files": [
+        "react-app/src/pages/librarian/Librarian.css",
+        "react-app/src/pages/librarian/LibrarianPage.tsx"
+      ]
+    },
+    {
+      "sha": "3019fbc9c2df606ec5c129e3f814bc7780a80d62",
+      "author_date": "2026-11-12T20:26:05+05:00",
+      "subject": "feat: добавлены навигация библиотекаря и понятный запрет доступа",
+      "changed_files": [
+        "react-app/src/app/router/AppRouter.tsx",
+        "react-app/src/app/router/RequireAuth.tsx",
+        "react-app/src/features/auth/returnTo.ts",
+        "react-app/src/shared/layout/AppLayout.tsx"
+      ]
+    },
+    {
+      "sha": "1fd0e90a0b3f7fb3d14af537931c6121b8284cec",
+      "author_date": "2026-11-12T20:26:14+05:00",
+      "subject": "test: проверены права чтение журнала страницы и регрессии действий",
+      "changed_files": [
+        "docs/improvements/stage9-auth-regression-results.json",
+        "docs/improvements/stage9-forms-regression-results.json",
+        "docs/improvements/stage9-loans-regression-results.json",
+        "docs/improvements/stage9-test-results.json",
+        "docs/improvements/stage9-ui-results.json",
+        "react-app/src/tests/Librarian.test.tsx",
+        "tests/test_audit_read.py",
+        "tools/check_librarian.cjs"
+      ]
+    },
+    {
+      "sha": "3719dc19a70e1d960462ad69f14e2f548e3812e5",
+      "author_date": "2026-11-12T20:26:23+05:00",
+      "subject": "docs: описаны рабочее место журнал и результаты девятого этапа",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE9.md"
+      ]
+    },
+    {
+      "sha": "50524717b6b835afe205052f832377a534d60cef",
+      "author_date": "2026-11-12T20:27:57+05:00",
+      "subject": "docs: сохранены PR 24 и завершение девятого этапа",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE9.md"
+      ]
+    },
+    {
+      "sha": "ecce463486fc148ee6e1f508d9c7f02f8121c698",
+      "author_date": "2026-11-12T20:38:42+05:00",
+      "subject": "docs: закреплен порядок Neon Render скриншоты и отчеты в последнюю очередь",
+      "changed_files": [
+        "docs/improvements/PLAN.md"
+      ]
+    },
+    {
+      "sha": "63b27cce5813ac174b15e5d390b9050ec5487874",
+      "author_date": "2026-11-12T20:38:52+05:00",
+      "subject": "feat: добавлены названия страниц и клавиатурный фокус без потери прокрутки",
+      "changed_files": [
+        "react-app/src/features/accessibility/Accessibility.css",
+        "react-app/src/features/accessibility/RouteAccessibility.tsx",
+        "react-app/src/shared/layout/AppLayout.tsx"
+      ]
+    },
+    {
+      "sha": "f1a905cfe9effda217043fbf43196d1fb2dd337e",
+      "author_date": "2026-11-12T20:39:00+05:00",
+      "subject": "fix: сохранены уведомления при чтении и фокус после закрытия",
+      "changed_files": [
+        "react-app/src/components/NoticeHost.tsx"
+      ]
+    },
+    {
+      "sha": "4855868b717edefbaad79f46355c6d8c5f678ac4",
+      "author_date": "2026-11-12T20:39:08+05:00",
+      "subject": "test: проверены фокус уведомления контраст и регрессии интерфейса",
+      "changed_files": [
+        "docs/improvements/stage10-auth-regression-results.json",
+        "docs/improvements/stage10-librarian-regression-results.json",
+        "docs/improvements/stage10-loans-regression-results.json",
+        "docs/improvements/stage10-test-results.json",
+        "docs/improvements/stage10-ui-results.json",
+        "docs/improvements/stage10-wishlist-regression-results.json",
+        "react-app/src/tests/Accessibility.test.tsx",
+        "tools/check_accessibility.cjs"
+      ]
+    },
+    {
+      "sha": "cf1fcbf1f2bea7fa57e022b88899e31c8795d255",
+      "author_date": "2026-11-12T20:39:17+05:00",
+      "subject": "docs: описаны проверки доступности и оставшаяся ручная приемка",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/STAGE10.md",
+        "docs/improvements/STAGE10_MANUAL.md"
+      ]
+    },
+    {
+      "sha": "7909922855e39b0da6ca11d1e856cc21af5e806f",
+      "author_date": "2026-11-12T20:40:34+05:00",
+      "subject": "docs: сохранены PR 25 и завершение десятого этапа",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE10.md"
+      ]
+    },
+    {
+      "sha": "7a402fa46bc021f868e727f29f0449ff673b67ab",
+      "author_date": "2026-11-12T20:53:42+05:00",
+      "subject": "fix: согласованы схемы PATCH и безопасных ошибок с поведением API",
+      "changed_files": [
+        "app/core/http.py",
+        "app/schemas/__init__.py"
+      ]
+    },
+    {
+      "sha": "c3839a83a69ccaa33b836918f461a3bf3eee021c",
+      "author_date": "2026-11-12T20:53:50+05:00",
+      "subject": "fix: описан выход без обязательного access в OpenAPI",
+      "changed_files": [
+        "app/routers/auth.py"
+      ]
+    },
+    {
+      "sha": "41fdfe39a67ff52aac7638968642fb328d74b9c4",
+      "author_date": "2026-11-12T20:54:00+05:00",
+      "subject": "feat: добавлены актуальный контракт и проверка типов без перезаписи",
+      "changed_files": [
+        "docs/api/openapi.json",
+        "react-app/src/api/generated.ts",
+        "tools/generate_api_types.py"
+      ]
+    },
+    {
+      "sha": "9e8c1cc2182dddcb1922da2d5aca2dc513e6ce93",
+      "author_date": "2026-11-12T20:54:09+05:00",
+      "subject": "test: проверены дрейф контракта ошибки заголовки и правила PATCH",
+      "changed_files": [
+        "docs/improvements/stage11-test-results.json",
+        "tests/test_api_contracts.py"
+      ]
+    },
+    {
+      "sha": "5911e6da60919ef7e868b5c11065473ed1a0469c",
+      "author_date": "2026-11-12T20:54:17+05:00",
+      "subject": "docs: описаны контракты API генерация и результаты этапа 11",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/api/README.md",
+        "docs/api/ROUTES.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE11.md"
+      ]
+    },
+    {
+      "sha": "ca4fe2cc43cac83e66c9bf3cc376efbf98bca1d0",
+      "author_date": "2026-11-12T20:55:51+05:00",
+      "subject": "docs: сохранены PR 26 и завершение этапа контрактов API",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE11.md"
+      ]
+    },
+    {
+      "sha": "f9440f862222ab8ffedb0d649bcca4090bca0045",
+      "author_date": "2026-11-12T21:07:14+05:00",
+      "subject": "fix: согласованы ограничения модели книги с существующей миграцией",
+      "changed_files": [
+        "app/models.py"
+      ]
+    },
+    {
+      "sha": "c43442f73ce1ce6abe1702ae41b99f8a5b88d694",
+      "author_date": "2026-11-12T21:07:23+05:00",
+      "subject": "feat: добавлено безопасное измерение ORM с откатом тестовых данных",
+      "changed_files": [
+        "tools/measure_orm.py"
+      ]
+    },
+    {
+      "sha": "969fbc8632535975039f80ad72ef0ece24791d33",
+      "author_date": "2026-11-12T21:07:33+05:00",
+      "subject": "feat: добавлена проверка metadata без применения миграций",
+      "changed_files": [
+        "docs/improvements/stage12-alembic-check.txt",
+        "tools/check_orm_metadata.py"
+      ]
+    },
+    {
+      "sha": "47db00b9285d16c51d540d9f56a55aa28fcdaf39",
+      "author_date": "2026-11-12T21:07:42+05:00",
+      "subject": "test: проверены N+1 бюджеты запросов ограничения и безопасность стенда",
+      "changed_files": [
+        "docs/improvements/stage12-orm-measurements.json",
+        "docs/improvements/stage12-test-results.json",
+        "tests/test_orm_measurements.py"
+      ]
+    },
+    {
+      "sha": "4df8c6efbaff79ccb764b9256cdad9eaba4667d4",
+      "author_date": "2026-11-12T21:08:48+05:00",
+      "subject": "docs: сохранены измерения ORM и порядок начала работы с Neon",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE12.md"
+      ]
+    },
+    {
+      "sha": "d9737c5a1d371b2abab1e584da30dff2911d1c94",
+      "author_date": "2026-11-12T21:09:39+05:00",
+      "subject": "docs: сохранены PR 27 и завершение локальных ORM-проверок",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE12.md"
+      ]
+    },
+    {
+      "sha": "4779749172a5806967a39f118a8a3fe91d35f540",
+      "author_date": "2026-11-12T21:20:50+05:00",
+      "subject": "fix: выключен вывод учебного токена в обычные журналы",
+      "changed_files": [
+        ".env.example",
+        "app/config.py",
+        "app/services/auth.py",
+        "tests/test_auth.py"
+      ]
+    },
+    {
+      "sha": "56058e1e7efca8c2493bebea4f9f65d12b1bb00c",
+      "author_date": "2026-11-12T21:20:58+05:00",
+      "subject": "fix: защищены Origin входа и кэширование личных ответов",
+      "changed_files": [
+        "app/core/http.py",
+        "app/routers/auth.py"
+      ]
+    },
+    {
+      "sha": "69c04150f6be4817e814c5d21b6ce02e0a176b15",
+      "author_date": "2026-11-12T21:21:06+05:00",
+      "subject": "fix: отделен повтор желаемого от неизвестных конфликтов данных",
+      "changed_files": [
+        "app/routers/wishlist.py"
+      ]
+    },
+    {
+      "sha": "8bdac16f4b47ad95f3450fbd4d17831c997c59f0",
+      "author_date": "2026-11-12T21:21:17+05:00",
+      "subject": "test: проверены cookie отзыв роли журналирование и конфликты",
+      "changed_files": [
+        "docs/improvements/stage13-test-results.json",
+        "tests/test_security_regressions.py"
+      ]
+    },
+    {
+      "sha": "a246f6b75116b7ec92059839f8ee3e75d6a3528e",
+      "author_date": "2026-11-12T21:21:25+05:00",
+      "subject": "docs: описаны исправления безопасности и оставшиеся проверки",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE13.md"
+      ]
+    },
+    {
+      "sha": "8c005d6ba4bc986e94782d6748c65b024bdb0fa9",
+      "author_date": "2026-11-12T21:22:47+05:00",
+      "subject": "docs: сохранены PR 28 и результаты этапа безопасности",
+      "changed_files": [
+        "PROGRESS.md",
+        "docs/improvements/STAGE13.md"
+      ]
+    },
+    {
+      "sha": "344d3021cb4bf9b786deabb647a80c362afaf789",
+      "author_date": "2026-11-12T21:46:10+05:00",
+      "subject": "fix: включены контрактные зависимости в test-образ без утечки в runtime",
+      "changed_files": [
+        ".dockerignore",
+        "docker-compose.yml",
+        "docker/api.Dockerfile"
+      ]
+    },
+    {
+      "sha": "58cb2dd16753c2891953ecce60f483d31c30eb49",
+      "author_date": "2026-11-12T21:46:18+05:00",
+      "subject": "test: усилены проверки SPA статики кэша и возврата книги",
+      "changed_files": [
+        "react-app/e2e/booknest.spec.ts",
+        "react-app/nginx.conf",
+        "tools/check_container_http.py"
+      ]
+    },
+    {
+      "sha": "9315652a05cfa5f02ffb7afbb751724280192e83",
+      "author_date": "2026-11-12T21:46:26+05:00",
+      "subject": "feat: добавлена изолированная конфигурация стенда без перезаписи",
+      "changed_files": [
+        "tools/prepare_container_check.py"
+      ]
+    },
+    {
+      "sha": "dc1bb23195bf7f45c7b15c9362aacf2a3a9e0a9d",
+      "author_date": "2026-11-12T21:46:35+05:00",
+      "subject": "ci: добавлены проверка API артефакты и изоляция контейнерного прогона",
+      "changed_files": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "sha": "4c8bf1e8f13e16156acf1cade96a7c556d6b276e",
+      "author_date": "2026-11-12T21:46:44+05:00",
+      "subject": "docs: описаны контейнерный стенд и ожидающая проверка CI",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/CONTAINER_CHECK.md",
+        "docs/improvements/PLAN.md"
+      ]
+    },
+    {
+      "sha": "c21b1da396962fd1e39a88698b16d0e497906882",
+      "author_date": "2026-11-12T23:38:32+05:00",
+      "subject": "docs: сохранены успешный CI PR 29 и завершение этапа Docker",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE14.md",
+        "docs/improvements/stage14-ci-evidence.json",
+        "docs/improvements/stage14-ci-results.json",
+        "docs/improvements/stage14-test-results.json"
+      ]
+    },
+    {
+      "sha": "18198fb3551bf5a64583a765ffd652f26d62c3d0",
+      "author_date": "2026-11-14T11:19:49+05:00",
+      "subject": "feat: добавлен безопасный аудит Neon и тесты защиты отчета",
+      "changed_files": [
+        "tests/test_neon_audit.py",
+        "tools/audit_neon.py"
+      ]
+    },
+    {
+      "sha": "d4f63b3c18fa0d9c10782e5cc3528632a2f13647",
+      "author_date": "2026-11-14T11:19:58+05:00",
+      "subject": "docs: сохранены реальные результаты Neon и порядок безопасных миграций",
+      "changed_files": [
+        "docs/improvements/STAGE15.md",
+        "docs/improvements/stage15-neon-results.json"
+      ]
+    },
+    {
+      "sha": "07ac0d71c1b4fe043d9a076ec33cc177f31c1257",
+      "author_date": "2026-11-14T11:20:10+05:00",
+      "subject": "docs: уточнены прогресс Neon и этапы подготовки учебных материалов",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md"
+      ]
+    },
+    {
+      "sha": "2841e055461fd1f06d1567e7c76e9033447093b4",
+      "author_date": "2026-11-14T11:21:59+05:00",
+      "subject": "docs: зафиксированы PR 30 и проверки после возобновления работы",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/STAGE15.md"
+      ]
+    },
+    {
+      "sha": "1eb0eb934a82ca0671a93dfd625f8548cb8a8492",
+      "author_date": "2026-11-14T11:44:43+05:00",
+      "subject": "fix: включен аудитор Neon в тестовый Docker-образ",
+      "changed_files": [
+        "docker/api.Dockerfile"
+      ]
+    },
+    {
+      "sha": "7952b97c90cad9505108d626f132483df2c48718",
+      "author_date": "2026-11-14T11:51:55+05:00",
+      "subject": "docs: подготовлены проверка Render и безопасный план ручного обновления",
+      "changed_files": [
+        "docs/improvements/STAGE16.md",
+        "docs/improvements/stage16-public-before.json"
+      ]
+    },
+    {
+      "sha": "e904e1b97a383af06f7532e4dde3eca1efb49fbc",
+      "author_date": "2026-11-14T11:52:05+05:00",
+      "subject": "docs: отражены сбой CI и результаты подготовки Render",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "2e0502be76541cb32c96d0fbb051197f9024c0d5",
+      "author_date": "2026-11-14T12:09:04+05:00",
+      "subject": "docs: подтверждены успешный CI и точный коммит для обновления Render",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE16.md",
+        "docs/improvements/stage16-ci-results.json"
+      ]
+    },
+    {
+      "sha": "daf6f5c081d08913bd516ba3bf4d47d256551ed3",
+      "author_date": "2026-11-14T12:58:38+05:00",
+      "subject": "test: сохранены публичные проверки после обновления Render",
+      "changed_files": [
+        "docs/improvements/stage16-public-after.json",
+        "docs/improvements/stage16-release-verification.json"
+      ]
+    },
+    {
+      "sha": "39b1f44b6c4900aa57eaeade5376a776dd2afafc",
+      "author_date": "2026-11-14T12:58:52+05:00",
+      "subject": "docs: подтвержден Live и выделены оставшиеся проверки для скриншотов",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md",
+        "docs/improvements/STAGE16.md"
+      ]
+    },
+    {
+      "sha": "860d3b69c347650e3da685fb680ffe33cfddab32",
+      "author_date": "2026-11-14T13:22:45+05:00",
+      "subject": "docs: подготовлен полный список ручных проверок и скриншотов ЛР7–12",
+      "changed_files": [
+        "docs/improvements/STAGE17_USER_CHECKLIST.md"
+      ]
+    },
+    {
+      "sha": "bad7831fa0cbe6e2b1a020f5217e7994fda757b2",
+      "author_date": "2026-11-14T13:22:54+05:00",
+      "subject": "docs: отмечено ожидание ручной приемки и пользовательского DOCX",
+      "changed_files": [
+        "AI_USAGE.md",
+        "PROGRESS.md",
+        "docs/improvements/PLAN.md"
+      ]
+    },
+    {
+      "sha": "efa73a717beb7351147d0bd5c3ff5f2c38c6e297",
+      "author_date": "2026-11-14T13:35:26+05:00",
+      "subject": "docs: сохранена ссылка на PR 32 ручной приемки",
+      "changed_files": [
+        "PROGRESS.md"
+      ]
+    },
+    {
+      "sha": "72ac0514518199a3872aad77d55b747fe0099646",
+      "author_date": "2026-11-14T13:46:23+05:00",
+      "subject": "fix: добавлены кэш сборки gzip и защитные заголовки Render",
+      "changed_files": [
+        "app/core/http.py",
+        "app/render.py",
+        "tests/test_render.py"
+      ]
+    },
+    {
+      "sha": "2c51bb79b52f84f14be1a36c1c545e7b927d22c8",
+      "author_date": "2026-11-14T13:46:35+05:00",
+      "subject": "test: расширены контейнерные проверки сжатия кэша и отказов доступа",
+      "changed_files": [
+        ".github/workflows/ci.yml",
+        "tools/check_container_http.py"
+      ]
+    },
+    {
+      "sha": "7a7370c74bc2f5d7758208704f0bbf5979deb66c",
+      "author_date": "2026-11-14T14:10:55+05:00",
+      "subject": "fix: дополнены аннотации функций backend без изменения контракта API",
+      "changed_files": [
+        "app/config.py",
+        "app/core/auth.py",
+        "app/core/http.py",
+        "app/render.py",
+        "app/repositories/auth.py",
+        "app/repositories/catalog.py",
+        "app/routers/auth.py",
+        "app/routers/discover.py",
+        "app/routers/loans.py",
+        "app/services/auth.py",
+        "app/services/catalog.py",
+        "app/services/open_library.py"
+      ]
+    },
+    {
+      "sha": "6110133a97833969a91b30270db12f0655213e47",
+      "author_date": "2026-11-14T14:11:03+05:00",
+      "subject": "feat: добавлена защищенная копия Neon с проверкой нового локального восстановления",
+      "changed_files": [
+        "docker/api.Dockerfile",
+        "tests/test_neon_backup.py",
+        "tools/backup_neon.py"
+      ]
+    },
+    {
+      "sha": "98a1be3a00d8327f44e62c38e9984410360a696b",
+      "author_date": "2026-11-14T15:21:58+05:00",
+      "subject": "fix: проверены версии PostgreSQL и восстановление приватного дампа без очистки схемы",
+      "changed_files": [
+        "tests/test_neon_backup.py",
+        "tools/backup_neon.py"
+      ]
+    }
+  ]
+}
