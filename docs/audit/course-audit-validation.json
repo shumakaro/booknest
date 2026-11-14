@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-14",
+  "status": "AUDIT_STRUCTURE_OK",
+  "source_paragraphs": 1730,
+  "source_units": 16,
+  "source_hashes_match": true,
+  "numbered_items_covered": 204,
+  "lecture_questions": 82,
+  "practice_steps": 65,
+  "code_examples_reviewed_statically": 28,
+  "source_context_items": 57,
+  "matrix_rows": 356,
+  "matrix_counts": {
+    "MISSING": 16,
+    "DONE": 118,
+    "NOT_VERIFIED": 131,
+    "PARTIAL": 69,
+    "EXCLUDED_PEER_TASK": 19,
+    "BLOCKED": 3
+  },
+  "own_practice15_tasks": 8,
+  "application_files_unchanged": true,
+  "defense_docx_unchanged": true,
+  "new_application_tests_run": false
+}
