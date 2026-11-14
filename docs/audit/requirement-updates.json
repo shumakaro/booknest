@@ -122,7 +122,7 @@
         "docs/lectures/lecture-08-validation.json"
       ],
       "check": "Чек-лист по 24 формулировкам раздела 20 заполнен: 17 DONE, 5 PARTIAL, 2 NOT_VERIFIED. Новый Vitest 99/99, lint/build прошли.",
-      "note": "Личная демонстрация и ручные проверки еще не проведены. Публикация чек-листа в отдельном PR этого блока выполняется после сохранения материалов."
+      "note": "Чек-лист приложен к PR36 https://github.com/shumakaro/booknest/pull/36. Статус PARTIAL сохраняет ограничения ручного прохода и личной демонстрации; документ заново не создается."
     }
   ],
   "frontend_validation": "docs/lectures/lecture-08-validation.json"

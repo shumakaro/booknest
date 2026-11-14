@@ -32,8 +32,13 @@ Ruff: All checks passed. check_course_audit.py: AUDIT_STRUCTURE_OK.
 Аудит опубликован в PR35 https://github.com/shumakaro/booknest/pull/35
 (open, merged=false), base codex/lab-defense-questions.
 Коммиты: bff43f8, 4f577d6, 05e135e, f8cb811, 0f83efb.
-Точная следующая задача: этап 3, лекция 8, ответы и frontend-чек-лист;
-не начинать заново готовые работы и сборник защиты.
+Исходная точка продолжения после аудита - лекция 8; ее материалы подготовлены
+следующим блоком. Готовые работы и сборник защиты заново не начинаются.
+
+Блок лекции 8 опубликован в PR36 https://github.com/shumakaro/booknest/pull/36,
+base codex/lecture-practice-audit, open, merged=false. Коммиты: 371e392,
+6f88538, 21affd8, c1721ef. Ответы и заполненный чек-лист приложены;
+ручные пункты остаются открытыми. Следующий блок теперь лекция 9.
 
 Этап 1 опубликован в PR34 https://github.com/shumakaro/booknest/pull/34
 (open, merged=false), base codex/lab7-12-final-audit.

@@ -39,12 +39,15 @@ PR35: https://github.com/shumakaro/booknest/pull/35, open, merged=false.
 ## Этап 3 Лекция 8
 
 Ветка codex/lecture-08-materials от f9b1c8c.
+PR36: https://github.com/shumakaro/booknest/pull/36, open, merged=false,
+base codex/lecture-practice-audit.
 
 | SHA | Что выполнено | Проверка |
 | --- | --- | --- |
 | 371e392 | Четыре интеграционных теста настоящего AppRouter. | 404/возврат, строковый ID, намерение гостя и отказ роли; 4 passed. |
 | 6f88538 | 10 ответов, кодовые примеры, краткие ответы и демонстрации. | Дословные вопросы, 23 ссылки, сохранены все прежние ответы 10-15. |
 | 21affd8 | Чек-лист 24 компетенций и реальные протоколы. | 99 frontend passed, lint/build, AST 90 файлов/0 AnyKeyword, публичный GET health=200 после первого timeout. |
+| c1721ef | Обновления матрицы и прогресс без перезаписи исходного аудита. | Новая проверка --implementation-stage, production-код и DOCX сохранены. |
 
 Изменений production-кода нет. Старый backend CI165 не выдается за новый запуск.
 Полнота источников проверяется отдельно от личной демонстрации компетенций.
