@@ -3,6 +3,7 @@
 import logging
 import time
 from collections import defaultdict, deque
+from collections.abc import Awaitable, Callable
 from uuid import uuid4
 from fastapi import FastAPI, Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -45,7 +46,7 @@ def configure_http(app: FastAPI, write_limit: int) -> None:
     requests: dict[str, deque] = defaultdict(deque)
 
     @app.middleware("http")
-    async def trace(request: Request, call_next) -> Response:
+    async def trace(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         started = time.perf_counter()
         request.state.request_id = str(uuid4())
 

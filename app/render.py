@@ -3,8 +3,9 @@ import os
 import re
 from pathlib import Path
 from urllib.parse import urlsplit
+from collections.abc import Awaitable, Callable
 
-from fastapi import HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
@@ -31,7 +32,7 @@ class BuildAssets(StaticFiles):
         return response
 
 
-def create_render_app(static_dir: Path | None = None):
+def create_render_app(static_dir: Path | None = None) -> FastAPI:
     # Путь можно передать тесту; в Docker сюда копируется результат npm run build.
     directory = (static_dir or Path(os.environ.get("STATIC_DIR", "/app/static"))).resolve()
     if not (directory / "index.html").is_file():
@@ -45,7 +46,7 @@ def create_render_app(static_dir: Path | None = None):
     ), name="assets")
 
     @application.middleware("http")
-    async def render_headers(request: Request, call_next) -> Response:
+    async def render_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -63,7 +64,7 @@ def create_render_app(static_dir: Path | None = None):
         return response
 
     @application.get("/{path:path}", include_in_schema=False)
-    def frontend(path: str):
+    def frontend(path: str) -> FileResponse:
         # Неизвестные API и файлы не должны маскировать ошибку HTML-страницей.
         if path.split("/", 1)[0] in {"api", "auth", "assets", "health", "docs", "openapi.json", "redoc"}:
             raise HTTPException(404, "Путь не найден")

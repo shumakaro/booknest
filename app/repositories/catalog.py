@@ -1,8 +1,10 @@
 """SQL находится в репозитории; пагинация выполняется самой PostgreSQL."""
 
-from datetime import datetime, timezone
-from sqlalchemy import func, or_, select, text
-from sqlalchemy.orm import Session, selectinload
+from datetime import date, datetime, timezone
+from sqlalchemy import Select, func, or_, select, text
+from sqlalchemy.orm import InstrumentedAttribute, Session, selectinload
+from sqlalchemy.sql.elements import ColumnElement
+from sqlalchemy.sql.selectable import ScalarSelect
 from app.models import Author, Book, Genre, Loan, User
 
 
@@ -10,7 +12,7 @@ class CatalogRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def active_count(self):
+    def active_count(self) -> ScalarSelect[int]:
         # Коррелированный подзапрос не умножает число выдач при нескольких жанрах.
         return (
             select(func.count(Loan.id))
@@ -19,7 +21,7 @@ class CatalogRepository:
             .scalar_subquery()
         )
 
-    def book_query(self):
+    def book_query(self) -> Select:
         return (
             select(Book, (Book.total_copies - self.active_count()).label("available"))
             .where(Book.deleted_at.is_(None))
@@ -27,7 +29,7 @@ class CatalogRepository:
         )
 
     @staticmethod
-    def contains_text(column, query: str):
+    def contains_text(column: InstrumentedAttribute[str], query: str) -> ColumnElement[bool]:
         # В локальной PostgreSQL с C-locale ILIKE не меняет регистр кириллицы.
         # Явно приводятся русские буквы (включая Ё), Latin обрабатывается ILIKE.
         # Схема и настройки рабочей БД не меняются; значение остается параметром SQL.
@@ -140,7 +142,7 @@ class CatalogRepository:
             self.db.flush()
         return genre
 
-    def create(self, resource: str, data: dict):
+    def create(self, resource: str, data: dict) -> Book | Author:
         if resource == "books":
             values = data.copy()
             genre = self.genre(values.pop("genre"))
@@ -151,7 +153,7 @@ class CatalogRepository:
         self.db.flush()
         return item
 
-    def update(self, resource: str, item, data: dict) -> None:
+    def update(self, resource: str, item: Book | Author, data: dict) -> None:
         values = data.copy()
         if resource == "books" and "genre" in values:
             item.genres = [self.genre(values.pop("genre"))]
@@ -159,7 +161,7 @@ class CatalogRepository:
             setattr(item, field, value)
         self.db.flush()
 
-    def delete(self, resource: str, item) -> None:
+    def delete(self, resource: str, item: Book | Author) -> None:
         if resource == "books":
             item.deleted_at = datetime.now(timezone.utc)
         else:
@@ -214,7 +216,7 @@ class LoanRepository:
             is not None
         )
 
-    def create(self, book_id: int, user_id: int, due_date) -> Loan:
+    def create(self, book_id: int, user_id: int, due_date: date) -> Loan:
         loan = Loan(book_id=book_id, user_id=user_id, due_date=due_date)
         self.db.add(loan)
         self.db.flush()

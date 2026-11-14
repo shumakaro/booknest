@@ -11,6 +11,7 @@ from app.core.auth import CurrentUser, Database
 from app.core.security import decode_token, token_expiration, token_hash
 from app.schemas.auth import ConfirmationRequest, MessageRead, RegisterRequest, TokenRead, UserRead
 from app.services.auth import AuthService
+from app.models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 optional_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
@@ -59,13 +60,14 @@ async def limit_login(request: Request) -> None:
 
 
 @router.post("/register", response_model=UserRead, status_code=201)
-def register(payload: RegisterRequest, db: Database):
+def register(payload: RegisterRequest, db: Database) -> User:
     """Регистрация всегда создаёт member; роль нельзя назначить телом запроса."""
     return AuthService(db).register(str(payload.email), payload.password)
 
 
 @router.post("/token", response_model=TokenRead, status_code=200, dependencies=[Depends(limit_login)])
-def token(form: Annotated[OAuth2PasswordRequestForm, Depends()], db: Database, response: Response, request: Request):
+def token(form: Annotated[OAuth2PasswordRequestForm, Depends()], db: Database,
+          response: Response, request: Request) -> dict:
     """Пароль передаётся как OAuth2 form; при любой неудаче сообщение одинаковое."""
     # Вход тоже устанавливает cookie: запрещенный Origin не должен менять сеанс браузера.
     check_cookie_origin(request)
@@ -77,7 +79,7 @@ def token(form: Annotated[OAuth2PasswordRequestForm, Depends()], db: Database, r
 
 
 @router.post("/refresh", response_model=TokenRead, status_code=200)
-def refresh(request: Request, response: Response, db: Database):
+def refresh(request: Request, response: Response, db: Database) -> dict:
     """Одноразовое обновление с отзывом прежнего refresh-токена."""
     check_cookie_origin(request)
     cookie = request.cookies.get("refresh_token")
@@ -89,7 +91,7 @@ def refresh(request: Request, response: Response, db: Database):
 
 
 @router.get("/me", response_model=UserRead, status_code=200)
-def me(user: CurrentUser, response: Response):
+def me(user: CurrentUser, response: Response) -> User:
     response.headers["Cache-Control"] = "no-store"
     return user
 

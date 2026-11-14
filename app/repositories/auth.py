@@ -1,5 +1,6 @@
 """Хранилище учётных записей, отзыва токенов и журнала действий."""
 
+from datetime import datetime
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from app.models import AuditEvent, DeniedToken, User
@@ -24,12 +25,12 @@ class AuthRepository:
     def revoked(self, digest: str) -> bool:
         return self.db.get(DeniedToken, digest) is not None
 
-    def revoke(self, digest: str, expiration) -> None:
+    def revoke(self, digest: str, expiration: datetime) -> None:
         if not self.revoked(digest):
             self.db.add(DeniedToken(digest=digest, expires_at=expiration))
             self.db.flush()
 
-    def consume(self, digest: str, expiration) -> None:
+    def consume(self, digest: str, expiration: datetime) -> None:
         # В отличие от обычного logout повторная вставка здесь обязана завершиться конфликтом.
         self.db.add(DeniedToken(digest=digest, expires_at=expiration))
         self.db.flush()
