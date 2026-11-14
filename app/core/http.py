@@ -76,7 +76,8 @@ def configure_http(app: FastAPI, write_limit: int) -> None:
         response.headers["X-Request-ID"] = request.state.request_id
         response.headers["X-Process-Time-ms"] = f"{elapsed:.1f}"
         # Личные ответы и отказы доступа не должны оставаться в HTTP-кэше после выхода.
-        if request.headers.get("authorization") or request.url.path.startswith(("/auth/", "/api/v1/auth/")):
+        if (response.status_code in {401, 403} or request.headers.get("authorization")
+                or request.url.path.startswith(("/auth/", "/api/v1/auth/"))):
             response.headers["Cache-Control"] = "no-store"
         log.info(
             "%s %s %s %s %.1fms",
