@@ -59,6 +59,9 @@ base codex/lecture-practice-audit, open, merged=false. Коммиты: 371e392,
 
 ## Лекция 9 — продолжение 14 ноября 2026
 
+PR37 https://github.com/shumakaro/booknest/pull/37 открыт, merged=false;
+base codex/lecture-08-materials. Опубликованы dc5366c, 6c4f472, 2562ae9, a932e04.
+
 Ветка codex/lecture-09-materials от 605d0d5, после опубликованной лекции 8.
 Подготовлены 10 ответов с 26 реальными ссылками на код; старые ответы сохранены,
 значения лекций 8 и 10–15 не изменены. Эти материалы войдут в общий отчет позже.
