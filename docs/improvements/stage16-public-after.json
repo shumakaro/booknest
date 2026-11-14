@@ -1,0 +1,215 @@
+{
+  "base": "https://booknest-rzxk.onrender.com",
+  "checked_at_utc": "2026-11-14T07:55:22.078197+00:00",
+  "production_writes": false,
+  "requests": [
+    {
+      "path": "/health",
+      "status": 200,
+      "elapsed_ms": 987,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/books",
+      "status": 200,
+      "elapsed_ms": 227,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/discover",
+      "status": 200,
+      "elapsed_ms": 212,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/wishlist",
+      "status": 200,
+      "elapsed_ms": 222,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/loans",
+      "status": 200,
+      "elapsed_ms": 210,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/librarian",
+      "status": 200,
+      "elapsed_ms": 208,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "elapsed_ms": 223,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/register",
+      "status": 200,
+      "elapsed_ms": 210,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/books/1",
+      "status": 200,
+      "elapsed_ms": 240,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "hsts_present": false
+    },
+    {
+      "path": "/assets/client-CJIk-LZE.js",
+      "status": 200,
+      "elapsed_ms": 222,
+      "content_type": "text/javascript; charset=utf-8",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/assets/index-CBS2s83T.js",
+      "status": 200,
+      "elapsed_ms": 348,
+      "content_type": "text/javascript; charset=utf-8",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/assets/index-DJMIZfDo.css",
+      "status": 200,
+      "elapsed_ms": 209,
+      "content_type": "text/css; charset=utf-8",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/books?page=1&size=7",
+      "status": 200,
+      "elapsed_ms": 3181,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/books?page=2&size=7",
+      "status": 200,
+      "elapsed_ms": 318,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/books?page=3&size=7",
+      "status": 200,
+      "elapsed_ms": 383,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/books?page=4&size=7",
+      "status": 200,
+      "elapsed_ms": 315,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/books?page=5&size=7",
+      "status": 200,
+      "elapsed_ms": 390,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/books?q=BookNest-no-match-98472f0b",
+      "status": 200,
+      "elapsed_ms": 311,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/wishlist",
+      "status": 401,
+      "elapsed_ms": 213,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/loans",
+      "status": 401,
+      "elapsed_ms": 213,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/nonexistent",
+      "status": 404,
+      "elapsed_ms": 205,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/assets/nonexistent-ci.js",
+      "status": 404,
+      "elapsed_ms": 212,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/api/v1/discover/books?title=Harry%20Potter&author=Rowling&page=1&size=2",
+      "status": 200,
+      "elapsed_ms": 1186,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    },
+    {
+      "path": "/openapi.json",
+      "status": 200,
+      "elapsed_ms": 568,
+      "content_type": "application/json",
+      "cache_control": null,
+      "hsts_present": false
+    }
+  ],
+  "assets": [
+    "/assets/client-CJIk-LZE.js",
+    "/assets/index-CBS2s83T.js",
+    "/assets/index-DJMIZfDo.css"
+  ],
+  "catalog": {
+    "total": 30,
+    "loaded": 30,
+    "no_duplicates": true,
+    "complete": true
+  },
+  "global_search": {
+    "total": 266,
+    "loaded": 2
+  },
+  "api_paths": 22
+}
