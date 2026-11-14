@@ -28,6 +28,8 @@ RUN pip install --no-cache-dir -r requirements-lock.txt
 COPY tests ./tests
 COPY tools/refresh_demo_catalog.py ./tools/refresh_demo_catalog.py
 COPY tools/generate_api_types.py tools/measure_orm.py tools/check_orm_metadata.py ./tools/
+# Защитные тесты аудита Neon запускаются без сети, но импортируют сам проверяемый модуль.
+COPY tools/audit_neon.py ./tools/audit_neon.py
 COPY docs/api/openapi.json ./docs/api/openapi.json
 COPY react-app/src/api/generated.ts ./react-app/src/api/generated.ts
 COPY examples ./examples
