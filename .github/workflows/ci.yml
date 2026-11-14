@@ -108,7 +108,7 @@ jobs:
           else:
               raise RuntimeError('Render image failed to start')
           PY
-          BOOKNEST_CHECK_BASE_URL=http://127.0.0.1:8090 python tools/check_container_http.py
+          BOOKNEST_CHECK_IMMUTABLE=1 BOOKNEST_CHECK_GZIP=1 BOOKNEST_CHECK_BASE_URL=http://127.0.0.1:8090 python tools/check_container_http.py
       - name: Smoke and persistence without deleting volumes
         run: |
           BOOKNEST_CHECK_IMMUTABLE=1 python tools/check_container_http.py
