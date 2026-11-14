@@ -447,5 +447,5 @@ for item in inventory:
         if numbers:
             overview.append(f"- {section}: {len(numbers)} абзацев, {numbers[0]}-{numbers[-1]}.")
     overview.append("")
-(AUDIT / "source-inventory.md").write_text("\n".join(overview) + "\n", encoding="utf-8")
+(AUDIT / "source-inventory.md").write_text("\n".join(overview).rstrip() + "\n", encoding="utf-8")
 print(json.dumps({"rows": len(rows), "questions": 82, "counts": dict(counts), "files_verified": len(paths)}, ensure_ascii=False))
