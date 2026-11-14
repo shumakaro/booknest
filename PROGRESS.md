@@ -23,8 +23,8 @@ Engine.connect запрещен на весь прогон, попыток по�
 в доступной среде, без изменения env-файлов или подключения к Neon.
 
 Протоколы: docs/lectures/lecture-09-validation.json, lecture-09-contract-before.json,
-docs/test-results/lecture-09. OpenAPI/TS совпадают; новый frontend build,
-Docker build, полноценный PostgreSQL-набор и deploy в этом блоке не выполнялись.
+docs/test-results/lecture-09. OpenAPI/TS совпадают. Локально не запускались новые frontend/Docker-сборки
+и полный PostgreSQL-набор. Отдельный CI описан ниже; deploy не выполнялся.
 Исторический docs/lab7/swagger.png сохранен; новый GET /docs проверяет HTML,
 а не готовность всех браузерных ресурсов и не новый скриншот.
 
@@ -32,6 +32,20 @@ Docker build, полноценный PostgreSQL-набор и deploy в этом
 Практики остаются отдельным следующим этапом. Итоговые четыре DOCX — в конце,
 после пользовательского DOCX со скриншотами. Готовый сборник защиты не изменен.
 docs.zip, миграции, Neon, Render и прежние отчеты сохранены.
+
+### Полный CI лекции 9
+
+GitHub Actions 43599915876 на 809f0614315ec0771cd1eafc93303d727ac02007:
+https://github.com/shumakaro/booknest/actions/runs/43599915876
+Итог success, оба jobs checks и containers успешны. Проверены полный backend
+на одноразовом PostgreSQL, frontend-тесты/lint/build, Compose и образ Render,
+HTTP smoke, сохранность данных при перезапуске, резервная копия/восстановление
+в новую тестовую БД, браузерный сценарий, proxy rate limit и контейнерный test-profile.
+Это CI в изолированной среде, без deploy и без операций с рабочей Neon.
+Исходный прогон 43599822655 отменен автоматически после обновления того же PR;
+он не выдается за успешный. Протокол: docs/lectures/lecture-09-ci.json.
+После проверенного SHA менялись только генератор документации и журналы.
+
 
 ---
 

@@ -4481,7 +4481,7 @@
       "note": "Итоговые пользовательские кадры и актуализация старых договоренностей об авторстве ожидаются.",
       "commits": [
         "0255f49",
-        "605d0d5",
+        "a932e04",
         "d43464c"
       ],
       "row_kind": "ASSIGNMENT"
@@ -7637,7 +7637,7 @@
       "check": "Планы есть.",
       "note": "Нужна синхронизация после данного аудита и без ожидания peer review.",
       "commits": [
-        "605d0d5",
+        "809f061",
         "d43464c"
       ],
       "row_kind": "ASSIGNMENT"
@@ -7677,6 +7677,7 @@
   "new_application_tests": true,
   "new_test_protocol": "docs/lectures/lecture-08-validation.json",
   "new_backend_test_protocol": "docs/lectures/lecture-09-validation.json",
+  "new_ci_protocol": "docs/lectures/lecture-09-ci.json",
   "source_inventory": [
     {
       "unit": "lecture-08",

@@ -66,3 +66,6 @@ base codex/lecture-practice-audit.
 к БД. Исправление затрагивает метаданные, а не поведение. Merge/deploy не выполнялись.
 Открыт PR37 https://github.com/shumakaro/booknest/pull/37, base codex/lecture-08-materials,
 state=open, merged=false. Ветка опубликована. Обновление Render не выполнялось.
+
+Последующий опубликованный коммит 809f061 добавил реальный PR37 и его статусы.
+Полный CI 43599915876 на этом SHA: checks/containers success. Итоговый протокол lecture-09-ci.json.

@@ -314,5 +314,6 @@
     }
   ],
   "frontend_validation": "docs/lectures/lecture-08-validation.json",
-  "backend_validation": "docs/lectures/lecture-09-validation.json"
+  "backend_validation": "docs/lectures/lecture-09-validation.json",
+  "ci_validation": "docs/lectures/lecture-09-ci.json"
 }

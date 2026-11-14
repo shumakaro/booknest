@@ -182,7 +182,7 @@ def main() -> None:
     # Прежние три полных примера сохраняются буквально; меняется полнота спецификации.
     design_path = ROOT / "docs/api-design.md"
     original = design_path.read_text(encoding="utf-8")
-    examples = original.split("## Три ключевые операции", 1)[1].split("## Ошибка", 1)[0]
+    examples = "\n" + original.split("## Три ключевые операции", 1)[1].split("## Ошибка", 1)[0].strip() + "\n"
     # Проверяются все тела трех пар запрос/ответ, а не только наличие Markdown.
     inline = re.findall(r"`(\{[^`\n]+\})`", examples)
     blocks = re.findall(r"```json\n(.*?)\n```", examples, flags=re.S)
@@ -245,7 +245,8 @@ def main() -> None:
            "Реальный исторический скриншот: docs/lab7/swagger.png. Новый браузерный скриншот не сделан.", "",
            "Протоколы: docs/lectures/lecture-09-contract-before.json и lecture-09-validation.json. "
            "OpenAPI сверена с приложением, типы TypeScript не изменились. Соединения с БД запрещены технически; "
-           "полный PostgreSQL-набор и production CRUD в этом блоке не запускались. "
+           "этот локальный протокол не включает полный PostgreSQL-набор или production CRUD. "
+           "Отдельный CI использует одноразовый PostgreSQL; его результаты сохраняются в docs/lectures/lecture-09-ci.json. "
            "Взаимная проверка исключена по мастер-промпту как EXCLUDED_PEER_TASK; индивидуальная самопроверка выполнена.", ""]
     design_path.write_text("\n".join(md), encoding="utf-8")
     payload = {"lecture": 9, "title": "FastAPI и REST API", "date": "2026-11-14",
@@ -272,7 +273,7 @@ def main() -> None:
            "- До исправления описаний внешних ошибок: 7 failed, 37 passed, 1 deselected. После: 44 passed, 1 deselected.",
            "- Один DB-тест исключен намеренно. 0 попыток соединения с БД, секреты и env-файлы не изменялись.",
            "- Предупреждение PytestAssertRewriteWarning для anyio сохранено: модуль импортирован TestClient до запуска pytest.",
-           "- Новый frontend build, Docker build и публичное развертывание в этом блоке не выполнялись. Типы TS совпадают с проверенной схемой.",
+           "- Локально frontend/Docker build не запускались. Отдельные результаты GitHub Actions сохраняются в lecture-09-ci.json; развертывание не выполнялось. Типы TS совпадают с проверенной схемой.",
            "", "Точные счетчики и HTTP-ответы: lecture-09-validation.json. Доказательства не заменяют личную защиту и ручные кадры.", ""]
     (OUT / "lecture-09.md").write_text("\n".join(md), encoding="utf-8")
     legacy_path = ROOT / "docs/course/lecture-answers.json"

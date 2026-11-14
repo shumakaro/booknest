@@ -418,6 +418,7 @@ payload = {
     "new_application_tests": bool(updates.get("frontend_validation") or updates.get("backend_validation")),
     "new_test_protocol": updates.get("frontend_validation"),
     "new_backend_test_protocol": updates.get("backend_validation"),
+    "new_ci_protocol": updates.get("ci_validation"),
     "source_inventory": inventory,
 }
 AUDIT.mkdir(parents=True, exist_ok=True)
