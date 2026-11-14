@@ -1,0 +1,1449 @@
+{
+  "date_utc": "2026-11-14T13:43:49.487346+00:00",
+  "local_postgresql": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35229, 64-bit",
+  "scratch_databases": [
+    "booknest_lect_11141343454601_ddl_test",
+    "booknest_lect_11141343454601_orm_test"
+  ],
+  "production_connections": 0,
+  "existing_databases_modified": false,
+  "env_files_modified": false,
+  "scratch_databases_deleted": false,
+  "book_rows": 30,
+  "base_tables": [
+    "authors",
+    "book_genres",
+    "books",
+    "genres",
+    "loans",
+    "profiles",
+    "users"
+  ],
+  "columns_include_views": true,
+  "sql_queries": [
+    {
+      "number": 1,
+      "sql": "SELECT b.id,b.title,a.name AS author,\n (SELECT string_agg(g.name, ', ' ORDER BY g.name) FROM genres g JOIN book_genres bg ON bg.genre_id=g.id WHERE bg.book_id=b.id) AS genres,\n b.total_copies-(SELECT count(*) FROM loans l WHERE l.book_id=b.id AND l.returned_at IS NULL) AS available\nFROM books b JOIN authors a ON a.id=b.author_id ORDER BY b.title,b.id LIMIT 20",
+      "rows": 20
+    },
+    {
+      "number": 2,
+      "sql": "SELECT l.id,b.title,u.email,l.due_date FROM loans l JOIN books b ON b.id=l.book_id JOIN users u ON u.id=l.user_id WHERE l.returned_at IS NULL AND l.due_date<current_date",
+      "rows": 10
+    },
+    {
+      "number": 3,
+      "sql": "SELECT a.name,count(l.id) AS issues FROM authors a JOIN books b ON b.author_id=a.id LEFT JOIN loans l ON l.book_id=b.id GROUP BY a.id ORDER BY issues DESC,a.id LIMIT 5",
+      "rows": 5
+    },
+    {
+      "number": 4,
+      "sql": "SELECT u.email FROM users u LEFT JOIN loans l ON l.user_id=u.id WHERE l.id IS NULL",
+      "rows": 2
+    },
+    {
+      "number": 5,
+      "sql": "SELECT g.name,count(bg.book_id) FROM genres g LEFT JOIN book_genres bg ON bg.genre_id=g.id GROUP BY g.id ORDER BY g.id",
+      "rows": 5
+    },
+    {
+      "number": 6,
+      "sql": "SELECT a.name,count(b.id) FROM authors a JOIN books b ON b.author_id=a.id GROUP BY a.id HAVING count(b.id)>5",
+      "rows": 5
+    },
+    {
+      "number": 7,
+      "sql": "SELECT id,title,year FROM books ORDER BY year DESC,id LIMIT 10 OFFSET 10",
+      "rows": 10
+    },
+    {
+      "number": 8,
+      "sql": "SELECT id,current_date-due_date AS days_overdue FROM overdue_loans",
+      "rows": 10
+    },
+    {
+      "number": 9,
+      "sql": "SELECT b.id,b.title FROM books b LEFT JOIN loans l ON l.book_id=b.id WHERE l.id IS NULL",
+      "rows": 10
+    },
+    {
+      "number": 10,
+      "sql": "SELECT author_id,round(avg(year),1) AS average_year FROM books GROUP BY author_id",
+      "rows": 5
+    },
+    {
+      "number": 11,
+      "sql": "SELECT id,title,count(*) OVER() AS total FROM books ORDER BY title,id LIMIT 10",
+      "rows": 10
+    },
+    {
+      "number": 12,
+      "sql": "SELECT b.id,b.total_copies,count(l.id) FILTER(WHERE l.returned_at IS NULL) AS active FROM books b LEFT JOIN loans l ON l.book_id=b.id GROUP BY b.id ORDER BY b.id",
+      "rows": 30
+    }
+  ],
+  "initial_ddl_equals_migration_001": true,
+  "initial_schema": {
+    "columns": [
+      [
+        "authors",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "authors",
+        "name",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        120
+      ],
+      [
+        "authors",
+        "birth_year",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "book_genres",
+        "book_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "book_genres",
+        "genre_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "books",
+        "title",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        200
+      ],
+      [
+        "books",
+        "author_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "year",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "isbn",
+        "character varying",
+        "varchar",
+        "YES",
+        null,
+        "NO",
+        null,
+        13
+      ],
+      [
+        "books",
+        "total_copies",
+        "integer",
+        "int4",
+        "NO",
+        "1",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "description",
+        "text",
+        "text",
+        "NO",
+        "''::text",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "created_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "NO",
+        "now()",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "genres",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "genres",
+        "code",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        30
+      ],
+      [
+        "genres",
+        "name",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        100
+      ],
+      [
+        "loans",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "loans",
+        "book_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "user_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "issued_at",
+        "date",
+        "date",
+        "NO",
+        "CURRENT_DATE",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "due_date",
+        "date",
+        "date",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "returned_at",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "book_id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "user_id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "issued_at",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "due_date",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "returned_at",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "user_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "full_name",
+        "text",
+        "text",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "faculty",
+        "text",
+        "text",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "users",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "users",
+        "email",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        254
+      ],
+      [
+        "users",
+        "password_hash",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        255
+      ],
+      [
+        "users",
+        "role",
+        "character varying",
+        "varchar",
+        "NO",
+        "'member'::character varying",
+        "NO",
+        null,
+        20
+      ],
+      [
+        "users",
+        "is_active",
+        "boolean",
+        "bool",
+        "NO",
+        "true",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "users",
+        "created_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "NO",
+        "now()",
+        "NO",
+        null,
+        null
+      ]
+    ],
+    "constraints": [
+      [
+        "authors",
+        "c",
+        "CHECK (((birth_year >= 1000) AND (birth_year <= 2100)))"
+      ],
+      [
+        "authors",
+        "c",
+        "CHECK ((length(TRIM(BOTH FROM name)) > 0))"
+      ],
+      [
+        "authors",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "authors",
+        "u",
+        "UNIQUE (name)"
+      ],
+      [
+        "book_genres",
+        "f",
+        "FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE"
+      ],
+      [
+        "book_genres",
+        "f",
+        "FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE"
+      ],
+      [
+        "book_genres",
+        "p",
+        "PRIMARY KEY (book_id, genre_id)"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((isbn IS NULL) OR ((isbn)::text ~ '^[0-9]{13}$'::text)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((year >= 1450) AND (year <= 2100)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK ((length(TRIM(BOTH FROM title)) > 0))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK ((total_copies >= 0))"
+      ],
+      [
+        "books",
+        "f",
+        "FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE RESTRICT"
+      ],
+      [
+        "books",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "books",
+        "u",
+        "UNIQUE (isbn)"
+      ],
+      [
+        "genres",
+        "c",
+        "CHECK (((code)::text = ANY ((ARRAY['scifi'::character varying, 'history'::character varying, 'poetry'::character varying, 'cs'::character varying, 'fiction'::character varying])::text[])))"
+      ],
+      [
+        "genres",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "genres",
+        "u",
+        "UNIQUE (code)"
+      ],
+      [
+        "loans",
+        "c",
+        "CHECK (((returned_at IS NULL) OR (returned_at >= issued_at)))"
+      ],
+      [
+        "loans",
+        "c",
+        "CHECK ((due_date > issued_at))"
+      ],
+      [
+        "loans",
+        "f",
+        "FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE RESTRICT"
+      ],
+      [
+        "loans",
+        "f",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT"
+      ],
+      [
+        "loans",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "profiles",
+        "f",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+      ],
+      [
+        "profiles",
+        "p",
+        "PRIMARY KEY (user_id)"
+      ],
+      [
+        "users",
+        "c",
+        "CHECK (((role)::text = ANY ((ARRAY['member'::character varying, 'librarian'::character varying])::text[])))"
+      ],
+      [
+        "users",
+        "c",
+        "CHECK ((POSITION(('@'::text) IN (email)) > 1))"
+      ],
+      [
+        "users",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "users",
+        "u",
+        "UNIQUE (email)"
+      ]
+    ]
+  },
+  "current_schema": {
+    "columns": [
+      [
+        "audit_events",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "audit_events",
+        "user_id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "audit_events",
+        "method",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        10
+      ],
+      [
+        "audit_events",
+        "path",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        500
+      ],
+      [
+        "audit_events",
+        "created_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "NO",
+        "now()",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "authors",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "authors",
+        "name",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        120
+      ],
+      [
+        "authors",
+        "birth_year",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "book_genres",
+        "book_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "book_genres",
+        "genre_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "books",
+        "title",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        200
+      ],
+      [
+        "books",
+        "author_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "year",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "isbn",
+        "character varying",
+        "varchar",
+        "YES",
+        null,
+        "NO",
+        null,
+        13
+      ],
+      [
+        "books",
+        "total_copies",
+        "integer",
+        "int4",
+        "NO",
+        "1",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "description",
+        "text",
+        "text",
+        "NO",
+        "''::text",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "created_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "NO",
+        "now()",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "language",
+        "character varying",
+        "varchar",
+        "NO",
+        "'ru'::character varying",
+        "NO",
+        null,
+        30
+      ],
+      [
+        "books",
+        "deleted_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "publisher",
+        "character varying",
+        "varchar",
+        "NO",
+        "'Не указано'::character varying",
+        "NO",
+        null,
+        100
+      ],
+      [
+        "books",
+        "edition_year",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "pages",
+        "integer",
+        "int4",
+        "NO",
+        "1",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "books",
+        "external_work_id",
+        "character varying",
+        "varchar",
+        "YES",
+        null,
+        "NO",
+        null,
+        30
+      ],
+      [
+        "books",
+        "cover_id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "denied_tokens",
+        "digest",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        64
+      ],
+      [
+        "denied_tokens",
+        "expires_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "genres",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "genres",
+        "code",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        30
+      ],
+      [
+        "genres",
+        "name",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        100
+      ],
+      [
+        "loans",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "loans",
+        "book_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "user_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "issued_at",
+        "date",
+        "date",
+        "NO",
+        "CURRENT_DATE",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "due_date",
+        "date",
+        "date",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "loans",
+        "returned_at",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "book_id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "user_id",
+        "integer",
+        "int4",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "issued_at",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "due_date",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "overdue_loans",
+        "returned_at",
+        "date",
+        "date",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "user_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "first_name",
+        "text",
+        "text",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "faculty",
+        "text",
+        "text",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "profiles",
+        "last_name",
+        "text",
+        "text",
+        "YES",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "users",
+        "id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "YES",
+        "BY DEFAULT",
+        null
+      ],
+      [
+        "users",
+        "email",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        254
+      ],
+      [
+        "users",
+        "password_hash",
+        "character varying",
+        "varchar",
+        "NO",
+        null,
+        "NO",
+        null,
+        255
+      ],
+      [
+        "users",
+        "role",
+        "character varying",
+        "varchar",
+        "NO",
+        "'member'::character varying",
+        "NO",
+        null,
+        20
+      ],
+      [
+        "users",
+        "is_active",
+        "boolean",
+        "bool",
+        "NO",
+        "true",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "users",
+        "created_at",
+        "timestamp with time zone",
+        "timestamptz",
+        "NO",
+        "now()",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "users",
+        "email_verified",
+        "boolean",
+        "bool",
+        "NO",
+        "false",
+        "NO",
+        null,
+        null
+      ],
+      [
+        "wishlist_entries",
+        "user_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ],
+      [
+        "wishlist_entries",
+        "book_id",
+        "integer",
+        "int4",
+        "NO",
+        null,
+        "NO",
+        null,
+        null
+      ]
+    ],
+    "constraints": [
+      [
+        "audit_events",
+        "f",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL"
+      ],
+      [
+        "audit_events",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "authors",
+        "c",
+        "CHECK (((birth_year >= 1000) AND (birth_year <= 2100)))"
+      ],
+      [
+        "authors",
+        "c",
+        "CHECK ((length(TRIM(BOTH FROM name)) > 0))"
+      ],
+      [
+        "authors",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "authors",
+        "u",
+        "UNIQUE (name)"
+      ],
+      [
+        "book_genres",
+        "f",
+        "FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE"
+      ],
+      [
+        "book_genres",
+        "f",
+        "FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE"
+      ],
+      [
+        "book_genres",
+        "p",
+        "PRIMARY KEY (book_id, genre_id)"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((cover_id IS NULL) OR (cover_id > 0)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((edition_year >= year) AND (edition_year <= 2100)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((external_work_id IS NULL) OR ((external_work_id)::text ~ '^OL[0-9]+W$'::text)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((isbn IS NULL) OR ((isbn)::text ~ '^[0-9]{13}$'::text)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((pages >= 1) AND (pages <= 10000)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK (((year >= 1450) AND (year <= 2100)))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK ((length(TRIM(BOTH FROM title)) > 0))"
+      ],
+      [
+        "books",
+        "c",
+        "CHECK ((total_copies >= 0))"
+      ],
+      [
+        "books",
+        "f",
+        "FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE RESTRICT"
+      ],
+      [
+        "books",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "books",
+        "u",
+        "UNIQUE (external_work_id)"
+      ],
+      [
+        "books",
+        "u",
+        "UNIQUE (isbn)"
+      ],
+      [
+        "denied_tokens",
+        "p",
+        "PRIMARY KEY (digest)"
+      ],
+      [
+        "genres",
+        "c",
+        "CHECK (((code)::text = ANY ((ARRAY['scifi'::character varying, 'history'::character varying, 'poetry'::character varying, 'cs'::character varying, 'fiction'::character varying])::text[])))"
+      ],
+      [
+        "genres",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "genres",
+        "u",
+        "UNIQUE (code)"
+      ],
+      [
+        "loans",
+        "c",
+        "CHECK (((returned_at IS NULL) OR (returned_at >= issued_at)))"
+      ],
+      [
+        "loans",
+        "c",
+        "CHECK ((due_date > issued_at))"
+      ],
+      [
+        "loans",
+        "f",
+        "FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE RESTRICT"
+      ],
+      [
+        "loans",
+        "f",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT"
+      ],
+      [
+        "loans",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "profiles",
+        "f",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+      ],
+      [
+        "profiles",
+        "p",
+        "PRIMARY KEY (user_id)"
+      ],
+      [
+        "users",
+        "c",
+        "CHECK (((role)::text = ANY ((ARRAY['member'::character varying, 'librarian'::character varying])::text[])))"
+      ],
+      [
+        "users",
+        "c",
+        "CHECK ((POSITION(('@'::text) IN (email)) > 1))"
+      ],
+      [
+        "users",
+        "p",
+        "PRIMARY KEY (id)"
+      ],
+      [
+        "users",
+        "u",
+        "UNIQUE (email)"
+      ],
+      [
+        "wishlist_entries",
+        "f",
+        "FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE"
+      ],
+      [
+        "wishlist_entries",
+        "f",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+      ],
+      [
+        "wishlist_entries",
+        "p",
+        "PRIMARY KEY (user_id, book_id)"
+      ]
+    ]
+  },
+  "current_revision": "006_external_books",
+  "metadata_check": "",
+  "upgrade_downgrade_upgrade": true,
+  "names_including_spaces_preserved": true
+}
