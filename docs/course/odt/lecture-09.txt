@@ -1,0 +1,194 @@
+[183] Лекция 9 · Неделя 9
+[184] Python для веба и REST API на FastAPI
+[185] 2 ч
+[186] Learning objectives
+[187] Развернуть проект FastAPI и объяснить роль ASGI-сервера Uvicorn.
+[188] Спроектировать ресурсный API: перечень эндпоинтов, методы, коды ответов.
+[189] Описать входные и выходные данные схемами Pydantic v2 и разделить Create/Update/Read.
+[190] Возвращать корректные коды состояний и осмысленные сообщения об ошибках.
+[191] Пользоваться автогенерируемой документацией OpenAPI как средством проверки собственного API.
+[192] Основные понятия
+[193] WSGI и ASGI, Uvicorn, маршрут, декоратор пути, path-параметр, query-параметр, тело запроса, схема, Pydantic v2, BaseModel, валидатор, Field, model_config, response_model, status_code, HTTPException, APIRouter, префикс и теги, Depends, внедрение зависимостей, middleware, OpenAPI, Swagger UI, ReDoc, ресурсная модель, пагинация, фильтрация, идемпотентность, виртуальное окружение
+[194] План лекции
+[195] 1. 0–10 мин. Что такое backend и что он обязан делать: хранить данные, применять правила предметной области, проверять права. Почему нельзя доверять клиенту — третье повторение тезиса недели 1.
+[196] 2. 10–25 мин. Подготовка окружения: venv, pip install fastapi uvicorn, структура пакета, запуск с автоперезагрузкой, первый эндпоинт за 6 строк. Что делает async def и когда он не нужен.
+[197] 3. 25–45 мин. Проектирование REST: ресурсы существительными во множественном числе, методы вместо глаголов в URL (POST /books, а не /createBook), вложенные ресурсы, коды 200/201/204/400/401/403/404/409/422. Разбор плохого и хорошего API на одной задаче.
+[198] 4. 45–70 мин. Pydantic v2: схема как контракт, типы и ограничения через Field, разделение BookCreate / BookUpdate / BookRead и зачем оно нужно; собственный валидатор; автоматический ответ 422 и его формат.
+[199] 5. 70–85 мин. Организация кода: APIRouter, разделение по ресурсам, зависимости Depends как способ переиспользования (параметры пагинации, доступ к хранилищу), lifespan.
+[200] 6. 85–100 мин. Ошибки: HTTPException, единый обработчик, что можно и что нельзя писать в сообщении об ошибке. Логирование запроса через middleware.
+[201] 7. 100–110 мин. OpenAPI: Swagger UI как рабочий инструмент, проверка API без клиента, экспорт схемы, генерация типов для фронтенда — обзорно. Задание на лабораторную 7.
+[202] Теоретический материал
+[203] FastAPI выбран в качестве backend-фреймворка курса по методическим причинам: он делает контракт API видимым. Аннотации типов Python одновременно являются валидацией, документацией и подсказками редактора, поэтому студент физически не может «забыть» описать входные данные — иначе эндпоинт не примет их. Автогенерируемый Swagger UI превращает проверку API в самостоятельное действие, не требующее готового фронтенда: студент видит своё API так, как его увидит потребитель.
+[204] Ключевая содержательная тема лекции — проектирование ресурсной модели. Студенты приходят с привычкой мыслить «функциями» (/getBooks, /deleteBookById), а REST требует мыслить существительными и состояниями. Практическое правило: сначала выпишите список сущностей, затем для каждой — пять базовых операций, затем отдельно нестандартные действия (выдать книгу, вернуть книгу) как переходы состояния подчинённого ресурса (POST /books/42/loans). Второй акцент — разделение схем: при создании книги id не передаётся, при чтении — обязателен, при частичном обновлении все поля необязательны, а пароль присутствует во входной схеме и категорически отсутствует в выходной. Эта дисциплина предотвращает наиболее опасный класс дефектов — утечку данных через ответ API.
+[205] Практические примеры
+[206] Совместное проектирование API BookNest на доске: 6 ресурсов, 22 эндпоинта, коды ответов для каждого.
+[207] Демонстрация 422: отправить строку в поле year и разобрать структуру ответа detail.
+[208] Сравнение ответа с response_model=UserRead и без него — во втором случае в JSON виден хеш пароля.
+[209] Code examples
+[210] Схемы Pydantic: три роли одной сущности
+[211] # app/schemas/book.py
+[212] from datetime import date
+[213] from typing import Annotated, Literal, Optional
+[214] from pydantic import BaseModel, Field, field_validator, ConfigDict
+[215]
+[216] Genre = Literal["scifi", "history", "poetry", "cs"]
+[217]
+[218] class BookBase(BaseModel):
+[219]     title:  Annotated[str, Field(min_length=1, max_length=200)]
+[220]     genre:  Genre
+[221]     year:   Annotated[int, Field(ge=1450, le=2100)]
+[222]     isbn:   Annotated[str | None, Field(pattern=r"^\d{13}$")] = None
+[223]
+[224]     @field_validator("title")
+[225]     @classmethod
+[226]     def strip_title(cls, v: str) -> str:
+[227]         v = v.strip()
+[228]         if not v:
+[229]             raise ValueError("Название не может состоять из пробелов")
+[230]         return v
+[231]
+[232] class BookCreate(BookBase):            # вход: id не передаётся — его выдаёт сервер
+[233]     author_id: int
+[234]     total_copies: Annotated[int, Field(ge=1, le=100)] = 1
+[235]
+[236] class BookUpdate(BaseModel):           # PATCH: все поля необязательны
+[237]     title: Optional[str] = None
+[238]     genre: Optional[Genre] = None
+[239]     year:  Optional[int] = None
+[240]     total_copies: Optional[int] = None
+[241]
+[242] class AuthorRead(BaseModel):
+[243]     model_config = ConfigDict(from_attributes=True)   # позволит собирать из ORM-объекта
+[244]     id: int
+[245]     name: str
+[246]
+[247] class BookRead(BookBase):              # выход: только то, что можно показывать
+[248]     model_config = ConfigDict(from_attributes=True)
+[249]     id: int
+[250]     author: AuthorRead
+[251]     available_copies: int
+[252]     created_at: date
+[253]
+[254] class Page[T](BaseModel):              # единый конверт для всех списков API
+[255]     items: list[T]
+[256]     total: int
+[257]     page: int
+[258]     size: int
+[259] Роутер: коды ответов, зависимости, обработка конфликтов
+[260] # app/routers/books.py
+[261] from fastapi import APIRouter, Depends, HTTPException, Query, status
+[262]
+[263] router = APIRouter(prefix="/books", tags=["books"])
+[264]
+[265] # зависимость: переиспользуемые параметры пагинации для всех списков
+[266] class Pagination:
+[267]     def __init__(self,
+[268]                  page: int = Query(1, ge=1),
+[269]                  size: int = Query(20, ge=1, le=100)):
+[270]         self.page, self.size = page, size
+[271]         self.offset = (page - 1) * size
+[272]
+[273] @router.get("", response_model=Page[BookRead], summary="Список книг с фильтрами")
+[274] def list_books(
+[275]     pg: Pagination = Depends(),
+[276]     q: str | None = Query(None, min_length=2, description="Поиск по названию"),
+[277]     genre: Genre | None = None,
+[278]     available_only: bool = False,
+[279]     repo: BookRepository = Depends(get_book_repo),
+[280] ):
+[281]     items, total = repo.list(q=q, genre=genre, available_only=available_only,
+[282]                              offset=pg.offset, limit=pg.size)
+[283]     return Page(items=items, total=total, page=pg.page, size=pg.size)
+[284]
+[285] @router.get("/{book_id}", response_model=BookRead,
+[286]             responses={404: {"description": "Книга не найдена"}})
+[287] def get_book(book_id: int, repo: BookRepository = Depends(get_book_repo)):
+[288]     book = repo.get(book_id)
+[289]     if book is None:
+[290]         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+[291]     return book
+[292]
+[293] @router.post("", response_model=BookRead, status_code=status.HTTP_201_CREATED)
+[294] def create_book(payload: BookCreate, repo: BookRepository = Depends(get_book_repo)):
+[295]     if payload.isbn and repo.get_by_isbn(payload.isbn):
+[296]         # 409 — запрос корректен, но противоречит текущему состоянию данных
+[297]         raise HTTPException(status.HTTP_409_CONFLICT, detail="Книга с таким ISBN уже есть")
+[298]     return repo.create(payload)
+[299]
+[300] @router.patch("/{book_id}", response_model=BookRead)
+[301] def update_book(book_id: int, payload: BookUpdate,
+[302]                 repo: BookRepository = Depends(get_book_repo)):
+[303]     # exclude_unset: обновляем только переданные поля, а не все
+[304]     updated = repo.update(book_id, payload.model_dump(exclude_unset=True))
+[305]     if updated is None:
+[306]         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+[307]     return updated
+[308]
+[309] @router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+[310] def delete_book(book_id: int, repo: BookRepository = Depends(get_book_repo)):
+[311]     if not repo.delete(book_id):
+[312]         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+[313]     # 204 — тело ответа отсутствует, return не нужен
+[314] Точка входа приложения и логирующее middleware
+[315] # app/main.py
+[316] import time, logging
+[317] from fastapi import FastAPI, Request
+[318] from app.routers import books, authors, loans
+[319]
+[320] app = FastAPI(
+[321]     title="BookNest API",
+[322]     version="1.0.0",
+[323]     description="Учебный API книжного клуба. Курс «Современные веб-технологии».",
+[324] )
+[325]
+[326] log = logging.getLogger("booknest")
+[327]
+[328] @app.middleware("http")
+[329] async def log_requests(request: Request, call_next):
+[330]     started = time.perf_counter()
+[331]     response = await call_next(request)
+[332]     ms = (time.perf_counter() - started) * 1000
+[333]     log.info("%s %s → %s (%.1f ms)", request.method, request.url.path,
+[334]              response.status_code, ms)
+[335]     response.headers["X-Process-Time-ms"] = f"{ms:.1f}"
+[336]     return response
+[337]
+[338] app.include_router(books.router,   prefix="/api/v1")
+[339] app.include_router(authors.router, prefix="/api/v1")
+[340] app.include_router(loans.router,   prefix="/api/v1")
+[341]
+[342] @app.get("/health", tags=["service"])
+[343] def health():
+[344]     return {"status": "ok"}
+[345]
+[346] # uvicorn app.main:app --reload  →  http://127.0.0.1:8000/docs
+[347] Демонстрация на занятии
+[348] «API за 20 минут в Swagger UI». Создать проект с нуля, написать эндпоинт списка книг и открыть /docs. Далее, не покидая Swagger UI: выполнить POST с корректным телом (201 и объект в ответе), затем с year: "давно" (422 с точным указанием поля), затем повторить создание с тем же ISBN (409), затем GET несуществующего id (404), затем DELETE (204 без тела). Показать, что документация обновилась автоматически после добавления поля в схему. Финал: удалить response_model у эндпоинта пользователя и показать в ответе password_hash — наглядная демонстрация, зачем нужны отдельные схемы чтения.
+[349] Типичные ошибки студентов
+[350] Глаголы в URL: /getAllBooks, /book/delete/5.
+[351] Код 200 на все случаи, включая ошибки; ошибка передаётся в теле как {"success": false}.
+[352] Одна схема на все операции: клиент может передать id или created_at при создании.
+[353] Отсутствие response_model → в ответе оказываются служебные и чувствительные поля.
+[354] Возврат 200 вместо 201 при создании и тела при 204.
+[355] Вся логика в одном main.py на 400 строк без роутеров.
+[356] Валидация «руками» через if вместо ограничений Pydantic.
+[357] Текст исключения Python отдаётся клиенту целиком — раскрытие внутренней структуры приложения.
+[358] Блокирующие операции внутри async def (например, time.sleep) — сервер перестаёт отвечать.
+[359] Контрольные вопросы
+[360] 1. Чем ASGI отличается от WSGI и зачем нужен Uvicorn?
+[361] 2. Как должен выглядеть URL и метод для операций «получить все книги», «создать книгу», «выдать книгу №42»?
+[362] 3. Когда возвращается 201, 204, 400, 404, 409, 422?
+[363] 4. Зачем разделять схемы Create, Update и Read? Приведите поле, которое есть только в одной из них.
+[364] 5. Что делает response_model и какую уязвимость предотвращает?
+[365] 6. Как Pydantic сообщает клиенту об ошибке валидации и как выглядит структура ответа?
+[366] 7. Для чего нужен механизм Depends? Приведите два применения.
+[367] 8. Чем PATCH отличается от PUT и что делает exclude_unset=True?
+[368] 9. Что даёт OpenAPI-схема и как проверить API без клиентского приложения?
+[369] 10. Почему нельзя выполнять блокирующий код внутри async def?
+[370] Домашнее задание
+[371] Составить и сдать проектную спецификацию API собственного итогового проекта в файле docs/api-design.md: перечень ресурсов; таблица эндпоинтов (метод, путь, назначение, коды ответов, требуемая роль); примеры тел запроса и ответа для трёх ключевых операций; описание формата ошибки; правила пагинации и фильтрации. Дополнительно реализовать в FastAPI два эндпоинта из этой спецификации на хранилище в памяти и приложить скриншот Swagger UI. Документ становится основой лабораторных 7–9 и оценивается как часть промежуточного контроля.
+[372] Материалы
+[373] fastapi.tiangolo.com — Tutorial: User Guide, разделы Path Parameters, Query Parameters, Request Body, Response Model, Handling Errors, Bigger Applications.
+[374] docs.pydantic.dev — Models, Fields, Validators (v2).
+[375] MDN — HTTP response status codes (повторение недели 1 в применении к своему API).
+[376] docs.python.org — venv, typing, asyncio (обзорно).

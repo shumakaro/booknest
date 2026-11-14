@@ -1,0 +1,204 @@
+[757] Лекция 12 · Неделя 12
+[758] Аутентификация, авторизация и безопасность веб-приложений
+[759] 2 ч
+[760] Learning objectives
+[761] Различать идентификацию, аутентификацию и авторизацию и приводить примеры каждой.
+[762] Реализовать регистрацию и вход с корректным хешированием паролей.
+[763] Объяснить устройство JWT, его проверку и границы применимости.
+[764] Защитить эндпоинты по признаку принадлежности ресурса и по роли пользователя.
+[765] Выявить в собственном коде уязвимости из OWASP Top 10 и устранить их.
+[766] Основные понятия
+[767] идентификация, аутентификация, авторизация, фактор аутентификации, хеш, соль, bcrypt/argon2, атака по словарю, сессия и cookie, токен, JWT (header.payload.signature), подпись HS256, exp/sub/iat, access и refresh токены, Authorization: Bearer, OAuth2 password flow, RBAC, принцип наименьших привилегий, CORS и preflight, XSS (хранимый и отражённый), SQL-инъекция, CSRF, IDOR, перечисление пользователей, rate limiting, HTTPS, секреты и .env, OWASP Top 10
+[768] План лекции
+[769] 1. 0–12 мин. Три разных вопроса: «кто вы?», «докажите» и «что вам разрешено». Почему студенты путают второе и третье и к каким дефектам это ведёт.
+[770] 2. 12–30 мин. Пароли: почему нельзя хранить в открытом виде и почему нельзя MD5/SHA-256 без соли; демонстрация подбора хеша по радужной таблице; bcrypt, соль, стоимость хеширования; политика минимальных требований к паролю.
+[771] 3. 30–45 мин. Два подхода к состоянию входа: серверная сессия + cookie против токена. Сравнение по масштабируемости, отзыву доступа, уязвимостям. Почему курс выбирает JWT (и в чём его цена).
+[772] 4. 45–65 мин. JWT изнутри: разбор реального токена на jwt.io, три части, что подпись гарантирует и чего не гарантирует. Ключевой момент: payload не зашифрован — в токен нельзя помещать секреты. Срок жизни, refresh-токен, отзыв.
+[773] 5. 65–80 мин. Реализация в FastAPI: OAuth2PasswordBearer, эндпоинты /register и /token, зависимость get_current_user, зависимость require_role. Хранение токена на клиенте: localStorage против cookie — сравнение рисков.
+[774] 6. 80–92 мин. Авторизация на объектах: IDOR — почему GET /loans/17 не должен отдавать чужую выдачу. Проверка владения ресурсом.
+[775] 7. 92–105 мин. Уязвимости и защита: XSS (и почему React защищает по умолчанию, а dangerouslySetInnerHTML — нет), SQL-инъекция (и почему параметризованные запросы решают её), CSRF, CORS и его правильная настройка, перечисление пользователей через сообщения об ошибке, отсутствие ограничения частоты запросов.
+[776] 8. 105–110 мин. Секреты: .env, .gitignore, что делать, если ключ уже попал в репозиторий. Задание на лабораторную 9.
+[777] Теоретический материал
+[778] Лекция строится на одном сквозном различении: аутентификация отвечает «кто», авторизация — «что можно». Массовая ошибка студенческих проектов — реализовать вход и считать приложение защищённым. При этом любой вошедший пользователь может запросить GET /api/loans/17 и получить чужие данные, потому что проверяется лишь наличие токена, а не право на конкретный объект. Курс требует, чтобы каждый эндпоинт отвечал на два вопроса: «есть ли действительный токен» и «имеет ли этот пользователь право на этот ресурс».
+[779] Второй тезис — подпись не равна шифрованию. JWT защищён от изменения, но полностью читаем: разбор токена на jwt.io обычно производит на студентов сильное впечатление и надёжно предотвращает попытки положить в payload номер телефона или внутренние идентификаторы. Из читаемости и невозможности мгновенного отзыва следуют практические правила: короткий срок жизни access-токена, отдельный refresh-токен, минимум данных в payload. Третий тезис — защита многослойна: React экранирует вывод, но dangerouslySetInnerHTML отменяет защиту; ORM параметризует запросы, но text() со форматированием строк возвращает инъекцию; HTTPS защищает канал, но не приложение. Каждый механизм следует называть вместе с условиями, при которых он перестаёт работать.
+[780] Практические примеры
+[781] Разбор своего же токена на jwt.io: изменить role на admin в payload и получить 401 — подпись не совпала.
+[782] IDOR на учебном эндпоинте: войти за пользователя A и запросить ресурс пользователя B. Закрыть проверкой владения.
+[783] Настройка CORS: показать ошибку в консоли браузера, затем добавить корректный allow_origins; показать, почему allow_origins=["*"] вместе с allow_credentials=True не работает.
+[784] Code examples
+[785] Пароли и токены: слой безопасности
+[786] # app/core/security.py
+[787] from datetime import datetime, timedelta, timezone
+[788] from jose import jwt, JWTError
+[789] from passlib.context import CryptContext
+[790] from app.config import settings
+[791]
+[792] pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
+[793]
+[794] def hash_password(raw: str) -> str:
+[795]     return pwd.hash(raw)                       # соль генерируется автоматически
+[796]
+[797] def verify_password(raw: str, hashed: str) -> bool:
+[798]     return pwd.verify(raw, hashed)
+[799]
+[800] def create_access_token(sub: str, role: str) -> str:
+[801]     payload = {
+[802]         "sub": sub,                            # subject: id пользователя
+[803]         "role": role,
+[804]         "type": "access",
+[805]         "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.access_ttl_min),
+[806]         "iat": datetime.now(timezone.utc),
+[807]     }
+[808]     # ВНИМАНИЕ: payload только подписан, но НЕ зашифрован — его прочитает любой
+[809]     return jwt.encode(payload, settings.secret_key, algorithm="HS256")
+[810]
+[811] def decode_token(token: str) -> dict:
+[812]     try:
+[813]         return jwt.decode(token, settings.secret_key, algorithms=["HS256"])
+[814]     except JWTError as e:
+[815]         raise CredentialsError("Недействительный или истёкший токен") from e
+[816] Зависимости: кто вошёл, что ему разрешено, кому принадлежит ресурс
+[817] # app/core/deps.py
+[818] from fastapi import Depends, HTTPException, status
+[819] from fastapi.security import OAuth2PasswordBearer
+[820]
+[821] oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+[822]
+[823] # 1. АУТЕНТИФИКАЦИЯ: кто это?
+[824] def get_current_user(token: str = Depends(oauth2_scheme),
+[825]                      db: Session = Depends(get_db)) -> User:
+[826]     unauthorized = HTTPException(
+[827]         status.HTTP_401_UNAUTHORIZED, "Не удалось подтвердить учётные данные",
+[828]         headers={"WWW-Authenticate": "Bearer"},
+[829]     )
+[830]     try:
+[831]         payload = decode_token(token)
+[832]     except CredentialsError:
+[833]         raise unauthorized
+[834]
+[835]     user = db.get(User, int(payload["sub"]))
+[836]     if user is None or not user.is_active:
+[837]         raise unauthorized
+[838]     return user
+[839]
+[840] # 2. АВТОРИЗАЦИЯ ПО РОЛИ: что вам разрешено?
+[841] def require_role(*roles: str):
+[842]     def dependency(user: User = Depends(get_current_user)) -> User:
+[843]         if user.role not in roles:
+[844]             raise HTTPException(status.HTTP_403_FORBIDDEN, "Недостаточно прав")
+[845]         return user
+[846]     return dependency
+[847]
+[848] # 3. АВТОРИЗАЦИЯ НА ОБЪЕКТЕ: защита от IDOR
+[849] def get_own_loan(loan_id: int, user: User = Depends(get_current_user),
+[850]                  db: Session = Depends(get_db)) -> Loan:
+[851]     loan = db.get(Loan, loan_id)
+[852]     if loan is None:
+[853]         raise HTTPException(404, "Выдача не найдена")
+[854]     if loan.user_id != user.id and user.role not in ("librarian", "admin"):
+[855]         # 404, а не 403: иначе подтверждаем существование чужого ресурса
+[856]         raise HTTPException(404, "Выдача не найдена")
+[857]     return loan
+[858]
+[859] # app/routers/auth.py
+[860] @router.post("/register", response_model=UserRead, status_code=201)
+[861] def register(payload: UserCreate, db: Session = Depends(get_db)):
+[862]     if db.scalar(select(User).where(User.email == payload.email)):
+[863]         # осознанный компромисс: сообщаем о занятости e-mail, но НЕ на /token
+[864]         raise HTTPException(409, "Пользователь с таким e-mail уже зарегистрирован")
+[865]     user = User(email=payload.email, password_hash=hash_password(payload.password),
+[866]                 role="member")
+[867]     db.add(user); db.commit(); db.refresh(user)
+[868]     return user                                # UserRead не содержит password_hash
+[869]
+[870] @router.post("/token", response_model=TokenPair)
+[871] def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+[872]     user = db.scalar(select(User).where(User.email == form.username))
+[873]     if not user or not verify_password(form.password, user.password_hash):
+[874]         # ОДИН текст для обоих случаев — иначе перечисление пользователей
+[875]         raise HTTPException(401, "Неверный e-mail или пароль")
+[876]     return TokenPair(
+[877]         access_token=create_access_token(str(user.id), user.role),
+[878]         refresh_token=create_refresh_token(str(user.id)),
+[879]         token_type="bearer",
+[880]     )
+[881]
+[882] # защита маршрута ролью — одна строка
+[883] @router.delete("/books/{book_id}", status_code=204,
+[884]                dependencies=[Depends(require_role("librarian", "admin"))])
+[885] def delete_book(book_id: int, service: BookService = Depends(get_book_service)):
+[886]     service.delete(book_id)
+[887] CORS, секреты и перехватчик токена на клиенте
+[888] # app/main.py — CORS настраивается на СЕРВЕРЕ, никогда на клиенте
+[889] app.add_middleware(
+[890]     CORSMiddleware,
+[891]     allow_origins=settings.cors_origins,   # ["http://localhost:5173", "https://booknest.kz"]
+[892]     allow_credentials=True,                # при этом "*" в origins недопустим
+[893]     allow_methods=["*"],
+[894]     allow_headers=["Authorization", "Content-Type"],
+[895] )
+[896]
+[897] # app/config.py — секреты только из окружения, .env в .gitignore
+[898] class Settings(BaseSettings):
+[899]     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+[900]     database_url: str
+[901]     secret_key: str                        # нет значения по умолчанию — приложение
+[902]     access_ttl_min: int = 15               # не запустится без явно заданного ключа
+[903]     refresh_ttl_days: int = 7
+[904]     cors_origins: list[str] = []
+[905]
+[906] settings = Settings()
+[907] // src/api/client.ts — токен добавляется в одном месте
+[908] export async function request(path: string, options: RequestInit = {}) {
+[909]   const token = tokenStore.get();
+[910]   const response = await fetch(`${BASE_URL}${path}`, {
+[911]     ...options,
+[912]     headers: {
+[913]       "Content-Type": "application/json",
+[914]       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+[915]       ...options.headers,
+[916]     },
+[917]   });
+[918]
+[919]   if (response.status === 401) {
+[920]     const refreshed = await tokenStore.tryRefresh();   // одна попытка обновления
+[921]     if (refreshed) return request(path, options);
+[922]     tokenStore.clear();
+[923]     window.location.assign("/login");
+[924]     throw new ApiError(401, "Сессия истекла, войдите снова");
+[925]   }
+[926]   ...
+[927] }
+[928] Демонстрация на занятии
+[929] «Атака и защита за 20 минут». Подготовить заведомо уязвимое учебное приложение и выполнить четыре действия. (1) XSS: отправить в поле отзыва <img src=x onerror="fetch('/steal?c='+localStorage.token)"> и показать в логе перехваченный токен; закрыть, убрав dangerouslySetInnerHTML. (2) SQL-инъекция: ввести в поиск ' OR 1=1 -- на эндпоинте с форматированием строки; закрыть параметризацией. (3) Изменение токена: вставить в jwt.io свой токен, изменить role, подставить в запрос — 401. (4) IDOR: запросить чужую выдачу по id — успех; добавить проверку владения — 404. Каждый шаг сопровождается вопросом «где в вашем проекте то же самое?».
+[930] Типичные ошибки студентов
+[931] Пароли в открытом виде или хеш без соли (MD5, SHA-256 «руками»).
+[932] Проверка только наличия токена без проверки прав на конкретный объект (IDOR).
+[933] Секретный ключ и .env в репозитории; ключ по умолчанию вида "secret".
+[934] Чувствительные данные в payload токена (e-mail, телефон, внутренние идентификаторы).
+[935] Токен без срока действия либо срок в несколько месяцев.
+[936] Различающиеся сообщения «неверный пароль» и «пользователь не найден» — перечисление учётных записей.
+[937] allow_origins=["*"] вместе с allow_credentials=True; попытка «исправить» CORS на клиенте.
+[938] Защита только на клиенте: маршрут скрыт в React, но эндпоинт открыт для любого запроса.
+[939] Возврат User с полем password_hash из-за отсутствия response_model.
+[940] Хранение токена так, что при XSS он немедленно утекает, без осознания этого риска.
+[941] Контрольные вопросы
+[942] 1. Чем аутентификация отличается от авторизации? Приведите по эндпоинту, где нужна каждая.
+[943] 2. Зачем нужна соль при хешировании пароля и почему SHA-256 недостаточно?
+[944] 3. Из каких трёх частей состоит JWT и что гарантирует подпись?
+[945] 4. Можно ли поместить в payload номер телефона? Обоснуйте.
+[946] 5. Зачем нужен refresh-токен, если есть access-токен?
+[947] 6. Что такое IDOR? Приведите пример из своего проекта и способ защиты.
+[948] 7. Почему на неудачный вход следует возвращать одинаковое сообщение в обоих случаях?
+[949] 8. Кто и почему блокирует запрос при ошибке CORS и где она устраняется?
+[950] 9. Как React защищает от XSS и в каком случае эта защита отключается?
+[951] 10. Почему параметризованные запросы устраняют SQL-инъекцию?
+[952] 11. Что делать, если секретный ключ уже попал в публичный репозиторий?
+[953] 12. Достаточно ли HTTPS, чтобы считать приложение защищённым?
+[954] Домашнее задание
+[955] Security review своего проекта. Заполнить чек-лист из 15 пунктов (хеширование паролей; отсутствие секретов в репозитории; срок жизни токена; отсутствие чувствительных данных в payload; response_model на всех эндпоинтах; проверка владения ресурсом; проверка роли на изменяющих операциях; отсутствие dangerouslySetInnerHTML; параметризация всех запросов; ограниченный список origins в CORS; единое сообщение при ошибке входа; валидация на сервере, а не только на клиенте; отсутствие внутренних сообщений об ошибках в ответах; HTTPS в конфигурации развёртывания; ограничение частоты запросов на /token). По каждому пункту — статус, ссылка на строку кода и, при наличии дефекта, коммит с исправлением. Формат — docs/security-review.md. Дополнительно: найти и описать одну уязвимость в проекте однокурсника (по согласованию) в виде корректного отчёта.
+[956] Материалы
+[957] fastapi.tiangolo.com — Security (полный раздел), OAuth2 with Password and JWT, CORS.
+[958] OWASP Top 10 (актуальная редакция) — обзорно; OWASP Cheat Sheet Series — Password Storage, JWT for Java (принципы применимы вне языка).
+[959] MDN — Website security, Content Security Policy (обзорно), CORS.
+[960] jwt.io — инструмент разбора токена (только для учебных токенов, не для реальных).
