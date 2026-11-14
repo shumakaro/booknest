@@ -1,5 +1,6 @@
 """ЛР11: read-only smoke изолированных контейнеров, SPA и кэша собранных файлов."""
 import json
+import gzip
 import os
 import urllib.error
 import urllib.request
@@ -46,6 +47,21 @@ def main() -> None:
                 assert 'javascript' in response.headers['Content-Type']
             if os.environ.get('BOOKNEST_CHECK_IMMUTABLE') == '1':
                 assert 'immutable' in ','.join(response.headers.get_all('Cache-Control', []))
+        if os.environ.get('BOOKNEST_CHECK_GZIP') == '1' and path.endswith(('.js', '.css')):
+            # Проверяется реально работающий Render-образ, не только TestClient.
+            request = urllib.request.Request(base+path, headers={'Accept-Encoding': 'gzip'})
+            with urllib.request.urlopen(request, timeout=5) as response:
+                assert response.headers['Content-Encoding'] == 'gzip'
+                assert 'accept-encoding' in response.headers['Vary'].lower()
+                assert gzip.decompress(response.read()), 'Сжатый файл должен содержать сборку'
+    for path in ['/api/v1/wishlist', '/api/v1/loans']:
+        try:
+            urllib.request.urlopen(base+path, timeout=5)
+        except urllib.error.HTTPError as error:
+            assert error.code == 401
+            assert 'no-store' in error.headers.get('Cache-Control', '')
+        else:
+            raise AssertionError('Личные данные не должны открываться без авторизации')
     for path in ['/api/v1/nonexistent', '/assets/nonexistent-ci.js']:
         try:
             urllib.request.urlopen(base+path, timeout=5)

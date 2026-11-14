@@ -3,6 +3,7 @@
 import logging
 import time
 from collections import defaultdict, deque
+from collections.abc import Awaitable, Callable
 from uuid import uuid4
 from fastapi import FastAPI, Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -45,7 +46,7 @@ def configure_http(app: FastAPI, write_limit: int) -> None:
     requests: dict[str, deque] = defaultdict(deque)
 
     @app.middleware("http")
-    async def trace(request: Request, call_next) -> Response:
+    async def trace(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         started = time.perf_counter()
         request.state.request_id = str(uuid4())
 
@@ -76,7 +77,8 @@ def configure_http(app: FastAPI, write_limit: int) -> None:
         response.headers["X-Request-ID"] = request.state.request_id
         response.headers["X-Process-Time-ms"] = f"{elapsed:.1f}"
         # Личные ответы и отказы доступа не должны оставаться в HTTP-кэше после выхода.
-        if request.headers.get("authorization") or request.url.path.startswith(("/auth/", "/api/v1/auth/")):
+        if (response.status_code in {401, 403} or request.headers.get("authorization")
+                or request.url.path.startswith(("/auth/", "/api/v1/auth/"))):
             response.headers["Cache-Control"] = "no-store"
         log.info(
             "%s %s %s %s %.1fms",

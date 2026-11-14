@@ -49,7 +49,7 @@ class Settings(BaseSettings):
         return value
 
     @model_validator(mode="after")
-    def render_origin(self):
+    def render_origin(self) -> "Settings":
         # Явная настройка сохраняет приоритет. Локальная разработка не меняется.
         if not self.cors_origins and self.render_external_url:
             url = urlsplit(self.render_external_url)

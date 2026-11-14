@@ -45,7 +45,7 @@ class SearchResponse(BaseModel):
 
 
 class OpenLibrary:
-    def __init__(self, interval: float = 1.0):
+    def __init__(self, interval: float = 1.0) -> None:
         # Кэш ограничен 128 ответами и 60 секундами; БД не используется.
         self.cache: OrderedDict[tuple, tuple[float, dict]] = OrderedDict()
         self.lock = Lock()

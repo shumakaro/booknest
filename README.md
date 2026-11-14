@@ -12,6 +12,8 @@ Python 3.12, FastAPI, Pydantic 2, SQLAlchemy 2, Alembic, PostgreSQL 17, React 19
 |---|---|
 | DATABASE_URL | PostgreSQL SQLAlchemy URL рабочей БД |
 | TEST_DATABASE_URL | Отдельная база с суффиксом _test |
+| DATABASE_URL_UNPOOLED | Прямое подключение Neon для миграций и dump; не pooler |
+| LOG_EMAIL_CONFIRMATION | Только локальный учебный вывод кода; по умолчанию false |
 | SECRET_KEY | Обязательный случайный ключ от 32 символов |
 | ACCESS_TTL_MIN | 15–30 минут, по умолчанию 15 |
 | ACCESS_TTL_SECONDS | Только учебная короткая демонстрация; обычно не задаётся |
@@ -36,7 +38,7 @@ Python 3.12, FastAPI, Pydantic 2, SQLAlchemy 2, Alembic, PostgreSQL 17, React 19
 Сервер: `.venv/Scripts/python -m uvicorn app.main:app --reload`. Swagger: /docs, OpenAPI: /openapi.json, проверка процесса: /health. Клиент: `npm --prefix react-app ci`, затем `npm --prefix react-app run dev`. Vite передаёт /api на VITE_API_TARGET; исходники адреса сервера не содержат.
 
 ## Роли
-Регистрация создаёт только member. Для локальной демонстрации предусмотрен `.venv/Scripts/python -m tools.create_demo_users`: создаются только отсутствующие роли, старые пароли не меняются. Случайные пароли сохраняются в .tools/demo-accounts.json, исключённом из Git. Такие данные не являются публичными проверочными учётными записями эксплуатационного сервера. Вход использует OAuth2; access хранится в памяти, refresh в HttpOnly cookie. В учебную консоль выводится временный код подтверждения e-mail; настоящая почта не отправляется.
+Регистрация создаёт только member. Для локальной демонстрации предусмотрен `.venv/Scripts/python -m tools.create_demo_users`: создаются только отсутствующие роли, старые пароли не меняются. Случайные пароли сохраняются в .tools/demo-accounts.json, исключённом из Git. Такие данные не являются публичными проверочными учётными записями эксплуатационного сервера. Вход использует OAuth2; access хранится в памяти, refresh в HttpOnly cookie. Настоящая почта не отправляется. Учебный токен выводится только локально при явном LOG_EMAIL_CONFIRMATION=true; по умолчанию он отсутствует в логах.
 
 ## Проверки
 На PostgreSQL нужно заранее создать отдельную БД booknest_test и задать TEST_DATABASE_URL. Схема тестовой базы обновляется только при наличии новых ревизий, а данные тестов откатываются.
@@ -53,9 +55,9 @@ npm --prefix react-app run test:e2e
 Для e2e API и клиент должны быть запущены; нужны локальные демонстрационные роли и подходящий браузер. Без Edge Chromium устанавливается командой `npx playwright install chromium` из react-app. Сквозная проверка создаёт новую книгу, выполняет операции только с ней и затем мягко скрывает её; исходный каталог не удаляется.
 
 ## Документация и защита
-[PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Markdown и DOCX различаются только форматом; визуальная проверка всех 52 страниц DOCX завершена; протокол в docs/report-qa.md. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
+[PROGRESS.md](PROGRESS.md) содержит фактические результаты и открытые пункты. Материалы и отчёты находятся в docs/lab7–lab12 по мере выполнения. Исторические отчеты сохранены. Финальная редакция шести DOCX будет собрана после пользовательских скриншотов и материалов. Прежний протокол docs/report-qa.md описывает прежнюю версию, а не будущую финальную редакцию. Аудит — [docs/security-review.md](docs/security-review.md), права — [docs/permissions.md](docs/permissions.md), использование ИИ — [AI_USAGE.md](AI_USAGE.md).
 
-Публичный адрес пока отсутствует: VPS и домен не предоставлены. Итоговый BookNest нельзя объявлять развёрнутым до фактической проверки HTTPS.
+Публичный сайт: [BookNest на Render](https://booknest-rzxk.onrender.com/books), PostgreSQL находится в Neon. Согласованный ручной deploy и публичные GET подтверждены [STAGE16](docs/improvements/STAGE16.md): каталог, поиск, детали, глобальная пагинация, SPA и assets. Личные production-действия ожидают [ручной приемки](docs/improvements/STAGE17_USER_CHECKLIST.md). Это облачное развертывание, не выполненная настройка собственного VPS/SSH/certbot. Новые исправления PR33 еще не объявляются опубликованными.
 
 ## Запуск в Docker
 На машине с Docker Engine и Compose следует заполнить .env (для существующего .env только добавить POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, WEB_BIND и WEB_PORT). Сгенерированный пароль рекомендуется делать URL-safe, например hex. Существующую локальную DATABASE_URL заменять не нужно: Compose отдельно формирует внутренний адрес db.
@@ -68,7 +70,7 @@ npm --prefix react-app run test:e2e
 
 ## Подготовка VPS и результаты ЛР 12
 
-Порядок SSH, HTTPS, обновления, backup и безопасного восстановления описан в [runbook](docs/deployment.md). Production override подключается явно; секреты задаются на сервере отдельно от разработки. Публичный адрес и внешний мониторинг остаются открытыми.
+Порядок облачного обновления, SSH-варианта, backup и безопасного восстановления описан в [runbook](docs/deployment.md). Production override подключается явно; секреты задаются отдельно от разработки. Постоянный внешний мониторинг и ежедневное расписание копий пока не подтверждены. Наличие подготовленного timer/workflow само по себе не означает работающий сервис.
 
 Реальный CI ЛР12: https://github.com/shumakaro/booknest/actions/runs/42236984907. Прошли checks, containers, восстановление 30 книг и 20 выдач в новую БД, запрет повторного восстановления и защита лимита входа от подмены адресов. PR https://github.com/shumakaro/booknest/pull/13 открыт без объединения.
 

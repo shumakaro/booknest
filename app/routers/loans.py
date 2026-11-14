@@ -14,7 +14,7 @@ OwnLoan = Annotated[Loan, Depends(get_own_loan)]
 
 
 @router.post("/books/{item_id}/loans", response_model=LoanRead, status_code=201)
-def issue_book(item_id: int, payload: LoanCreate, db: Database, user: CurrentUser):
+def issue_book(item_id: int, payload: LoanCreate, db: Database, user: CurrentUser) -> Loan:
     """Читатель может оформить выдачу только на себя; библиотекарь — на выбранного читателя."""
     target = payload.user_id or user.id
     if target != user.id and user.role != "librarian":
@@ -33,12 +33,12 @@ def list_loans(
 
 
 @router.get("/loans/{loan_id}", response_model=LoanRead, status_code=200)
-def get_loan(loan: OwnLoan):
+def get_loan(loan: OwnLoan) -> Loan:
     return loan
 
 
 @router.patch("/loans/{loan_id}", response_model=LoanRead, status_code=200)
-def return_book(loan_id: int, payload: LoanReturn, db: Database, loan: OwnLoan):
+def return_book(loan_id: int, payload: LoanReturn, db: Database, loan: OwnLoan) -> Loan:
     """Проверка владельца выполняется до изменения состояния выдачи."""
     return LoanService(db).return_book(loan_id)
 

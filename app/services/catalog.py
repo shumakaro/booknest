@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.repositories.catalog import CatalogRepository, LoanRepository
 from app.schemas import BookCreate
+from app.models import Author, Book, Loan
 
 
 class CatalogService:
@@ -15,7 +16,7 @@ class CatalogService:
         self.db = db
         self.repo = CatalogRepository(db)
 
-    def get(self, resource: str, item_id: int, lock: bool = False):
+    def get(self, resource: str, item_id: int, lock: bool = False) -> Book | Author:
         item = (
             self.repo.get_book(item_id, lock=lock) if resource == "books" else self.repo.get_author(item_id)
         )
@@ -78,7 +79,7 @@ class LoanService:
         self.repo = LoanRepository(db)
         self.catalog = CatalogRepository(db)
 
-    def issue(self, book_id: int, user_id: int, due_date: date):
+    def issue(self, book_id: int, user_id: int, due_date: date) -> Loan:
         try:
             # Блокировка строки книги сериализует конкурирующие выдачи последнего экземпляра.
             book = self.catalog.get_book(book_id, lock=True)
@@ -95,7 +96,7 @@ class LoanService:
             self.db.rollback()
             raise HTTPException(409, "Конфликт одновременной выдачи") from None
 
-    def return_book(self, loan_id: int):
+    def return_book(self, loan_id: int) -> Loan:
         loan = self.repo.get(loan_id, lock=True)
         if loan is None:
             raise HTTPException(404, "Выдача не найдена")

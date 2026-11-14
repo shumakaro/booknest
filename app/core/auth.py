@@ -1,6 +1,7 @@
 """Три разные проверки: личность, роль и владелец конкретной выдачи."""
 
 from typing import Annotated
+from collections.abc import Callable
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -26,7 +27,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Database
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
-def require_role(role: str):
+def require_role(role: str) -> Callable[[User, Request, Session], User]:
     def check(user: CurrentUser, request: Request, db: Database) -> User:
         if user.role != role:
             raise HTTPException(403, "Недостаточно прав")

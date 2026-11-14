@@ -15,6 +15,7 @@ from app.core.security import (
     verify_password,
 )
 from app.repositories.auth import AuthRepository
+from app.models import User
 
 log = logging.getLogger("booknest.auth")
 
@@ -24,7 +25,7 @@ class AuthService:
         self.db = db
         self.repo = AuthRepository(db)
 
-    def register(self, email: str, password: str):
+    def register(self, email: str, password: str) -> User:
         if self.repo.by_email(email):
             raise HTTPException(409, "Этот e-mail уже зарегистрирован")
         try:
@@ -40,7 +41,7 @@ class AuthService:
             self.db.rollback()
             raise HTTPException(409, "Этот e-mail уже зарегистрирован") from None
 
-    def authenticate(self, email: str, password: str):
+    def authenticate(self, email: str, password: str) -> User:
         user = self.repo.by_email(email)
         password_fits = len(password.encode("utf-8")) <= 72
         candidate = password if password_fits else "invalid-overlong-password-123"
@@ -49,7 +50,7 @@ class AuthService:
             raise HTTPException(401, "Неверный e-mail или пароль", headers={"WWW-Authenticate": "Bearer"})
         return user
 
-    def tokens(self, user) -> tuple[dict, str]:
+    def tokens(self, user: User) -> tuple[dict, str]:
         settings = Settings()
         lifetime = settings.access_ttl_seconds or settings.access_ttl_min * 60
         access = create_token(user.id, user.role, "access", lifetime)
