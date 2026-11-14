@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-14",
+  "branch": "codex/lecture-08-materials",
+  "baseline": "f9b1c8c",
+  "cwd": "C:/Users/comp/Documents/booknest/react-app",
+  "runs": {
+    "initial_parallel": {
+      "total": 95,
+      "passed": 94,
+      "failed": 1,
+      "success": false,
+      "files": 18,
+      "failures": [
+        {
+          "test": "после регистрации сохраняет маршрут входа и очищает пароль",
+          "message": "Test timed out in 5000ms"
+        }
+      ]
+    },
+    "login_isolated": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "success": true,
+      "files": 1,
+      "failures": []
+    },
+    "routing_added": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "success": true,
+      "files": 1,
+      "failures": []
+    },
+    "final_full": {
+      "total": 99,
+      "passed": 99,
+      "failed": 0,
+      "success": true,
+      "files": 19,
+      "failures": []
+    }
+  },
+  "lint": {
+    "command": "npm.cmd run lint",
+    "exit_code": 0,
+    "checked_at_utc": "2026-11-14T12:41:50.5207925Z"
+  },
+  "build": {
+    "command": "npm.cmd run build",
+    "exit_code": 0,
+    "checked_at_utc": "2026-11-14T12:42:01.2630514Z"
+  },
+  "final_test_command": {
+    "command": "npm.cmd test -- --maxWorkers=2 --reporter=json --outputFile=../.tools/lecture08/full-retry.json",
+    "exit_code": 0,
+    "seconds": 54.06,
+    "checked_at_utc": "2026-11-14T12:37:04.4209576Z"
+  },
+  "initial_test_command": {
+    "command": "npm.cmd test -- --reporter=json --outputFile=../.tools/lecture08/vitest.json",
+    "exit_code": 1,
+    "seconds": 63.5,
+    "checked_at_utc": "2026-11-14T12:32:18.8263359Z"
+  },
+  "explicit_typescript_any": {
+    "files": 90,
+    "any_keywords": []
+  },
+  "health_first_attempt": {
+    "command": "curl.exe GET /health Accept: application/json",
+    "exit_code": 28,
+    "seconds": 60.11,
+    "checked_at_utc": "2026-11-14T12:40:54.2274615Z"
+  },
+  "health_retry": {
+    "command": "curl.exe GET /health Accept: application/json retry",
+    "exit_code": 0,
+    "seconds": 0.54,
+    "checked_at_utc": "2026-11-14T12:42:11.4996748Z",
+    "http_status": 200,
+    "body": {
+      "status": "ok"
+    }
+  },
+  "public_health_scope": "read-only /health only; no authentication or full production acceptance",
+  "questions_verified": 10,
+  "code_references_verified": 23,
+  "defense_docx_unchanged": true,
+  "backend_tests_rerun": false,
+  "database_writes": false,
+  "deployment_performed": false
+}

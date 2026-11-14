@@ -1,0 +1,336 @@
+{
+  "source": "Силлабус раздел 20",
+  "date": "2026-11-14",
+  "items": [
+    {
+      "id": "F01",
+      "group": "Основы веба",
+      "text": "Объясняю путь запроса от ввода URL до отрисовки, называя все участвующие компоненты.",
+      "source_line": 4304,
+      "status": "DONE",
+      "method": "STATIC",
+      "files": [
+        "docs/lectures/lecture-08.md"
+      ],
+      "note": "Путь браузер - React - API - PostgreSQL описан ниже. Самостоятельный устный ответ еще не проверялся.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F02",
+      "group": "Основы веба",
+      "text": "Читаю вкладку Network и по ней определяю причину сбоя.",
+      "source_line": 4305,
+      "status": "NOT_VERIFIED",
+      "method": "MANUAL",
+      "files": [
+        "docs/improvements/STAGE17_USER_CHECKLIST.md"
+      ],
+      "note": "Новый проход DevTools Network не выполнялся; нужен пользовательский кадр при финальной приемке.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F03",
+      "group": "Основы веба",
+      "text": "Называю сценарий для каждого из кодов 200, 201, 204, 301, 400, 401, 403, 404, 409, 422, 500.",
+      "source_line": 4306,
+      "status": "PARTIAL",
+      "method": "STATIC",
+      "files": [
+        "docs/api-design.md",
+        "app/core/http.py"
+      ],
+      "note": "Коды и примеры есть; самостоятельное чтение каждого ответа не проверялось в этом блоке.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F04",
+      "group": "Основы веба",
+      "text": "Различаю статический сайт, SPA и SSR по наблюдаемому поведению.",
+      "source_line": 4307,
+      "status": "DONE",
+      "method": "STATIC",
+      "files": [
+        "docs/lectures/lecture-08.md"
+      ],
+      "note": "BookNest определен как SPA со статической оболочкой и API; SSR в проекте не реализуется.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F05",
+      "group": "Основы веба",
+      "text": "Выполняю запрос через  curl  с нужными заголовками и читаю ответ.",
+      "source_line": 4308,
+      "status": "DONE",
+      "method": "CURL",
+      "files": [
+        "docs/lectures/lecture-08-validation.json"
+      ],
+      "note": "Публичный GET /health с Accept: application/json: первая попытка timeout, повтор 200/status=ok. Это не полная приемка сайта.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F06",
+      "group": "Разметка и стили",
+      "text": "Пишу валидный семантический HTML без ошибок валидатора.",
+      "source_line": 4311,
+      "status": "PARTIAL",
+      "method": "STATIC",
+      "files": [
+        "react-app/src/shared/layout/AppLayout.tsx",
+        "react-app/src/features/books/components/BookForm.tsx"
+      ],
+      "note": "Есть main/nav/label/fieldset; новый полный HTML-валидатор не запускался.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F07",
+      "group": "Разметка и стили",
+      "text": "Собираю форму с нативной валидацией и доступными сообщениями об ошибках.",
+      "source_line": 4312,
+      "status": "DONE",
+      "method": "STATIC_AUTO",
+      "files": [
+        "react-app/src/pages/login/LoginPage.tsx",
+        "react-app/src/tests/BookForm.test.tsx"
+      ],
+      "note": "Вход использует нативные type/email/required; форма книги - noValidate/Zod и полевые сообщения. Механизмы различаются явно.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F08",
+      "group": "Разметка и стили",
+      "text": "Прохожу интерфейс с клавиатуры и устраняю недостижимые элементы.",
+      "source_line": 4313,
+      "status": "PARTIAL",
+      "method": "AUTO_MANUAL",
+      "files": [
+        "react-app/src/tests/Accessibility.test.tsx",
+        "react-app/src/features/accessibility/RouteAccessibility.tsx"
+      ],
+      "note": "Тесты фокуса и уведомлений проходят; полный проход всех страниц клавиатурой еще нужен.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F09",
+      "group": "Разметка и стили",
+      "text": "Считаю специфичность селектора и предсказываю применяемое правило.",
+      "source_line": 4314,
+      "status": "NOT_VERIFIED",
+      "method": "MANUAL",
+      "files": [
+        "react-app/src/App.css"
+      ],
+      "note": "Предсказание приоритета выбранных CSS-селекторов студентом не проверялось; lint/tsc этого не доказывают.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F10",
+      "group": "Разметка и стили",
+      "text": "Строю адаптивную раскладку на Flexbox и Grid по принципу mobile-first.",
+      "source_line": 4315,
+      "status": "PARTIAL",
+      "method": "STATIC_MANUAL",
+      "files": [
+        "react-app/src/App.css",
+        "react-app/src/features/books/components/BookForm.css"
+      ],
+      "note": "Есть адаптивные правила; актуальный визуальный проход ширин и отсутствие горизонтального скролла не проверялись.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F11",
+      "group": "Разметка и стили",
+      "text": "Поддерживаю тёмную тему через токены без дублирования стилей компонентов.",
+      "source_line": 4316,
+      "status": "DONE",
+      "method": "STATIC",
+      "files": [
+        "react-app/src/app/ThemeProvider.tsx",
+        "react-app/src/App.css"
+      ],
+      "note": "Тема задается провайдером и CSS-переменными; новые кадры светлой/темной темы нужны отдельно.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F12",
+      "group": "JavaScript и асинхронность",
+      "text": "Преобразую массив объектов цепочкой методов без мутации исходных данных.",
+      "source_line": 4319,
+      "status": "DONE",
+      "method": "STATIC_AUTO",
+      "files": [
+        "react-app/src/pages/books/BooksPage.tsx",
+        "react-app/src/tests/Wishlist.test.tsx"
+      ],
+      "note": "Преобразования массива и восстановление списка выполняются без изменения исходного массива.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F13",
+      "group": "JavaScript и асинхронность",
+      "text": "Обрабатываю действия пользователя через делегирование событий.",
+      "source_line": 4320,
+      "status": "PARTIAL",
+      "method": "STATIC",
+      "files": [
+        "react-app/src/components/BookList.tsx"
+      ],
+      "note": "React-обработчики не выдаются за самостоятельно написанный пример JS-делегирования. Показ старого JS-примера не выполнялся.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F14",
+      "group": "JavaScript и асинхронность",
+      "text": "Пишу асинхронный код на  async/await  с обработкой ошибок.",
+      "source_line": 4321,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/api/client.ts",
+        "react-app/src/tests/ApiClient.test.ts"
+      ],
+      "note": "Async/await и ветки отказа проверены существующим набором.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F15",
+      "group": "JavaScript и асинхронность",
+      "text": "Отличаю сетевую ошибку от неуспешного кода HTTP и обрабатываю их по-разному.",
+      "source_line": 4322,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/tests/ApiClient.test.ts",
+        "react-app/src/tests/BookFormApi.test.ts"
+      ],
+      "note": "Есть разбор HTTP-ошибок и сетевого отказа; клиент сохраняет понятное сообщение.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F16",
+      "group": "JavaScript и асинхронность",
+      "text": "Реализую четыре состояния данных в интерфейсе и не допускаю «зависших» индикаторов.",
+      "source_line": 4323,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/tests/CatalogSearch.test.tsx",
+        "react-app/src/tests/Discover.test.tsx"
+      ],
+      "note": "Состояния loading/empty/error/success и повторы покрыты компонентными сценариями.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F17",
+      "group": "JavaScript и асинхронность",
+      "text": "Устраняю гонку запросов через отмену и debounce.",
+      "source_line": 4324,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/features/books/hooks/useGlobalBooks.ts",
+        "react-app/src/tests/BookDetailsRace.test.tsx"
+      ],
+      "note": "Отмена и игнорирование поздних результатов проверяются тестами; debounce есть в shared/hooks.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F18",
+      "group": "React",
+      "text": "Раскладываю макет на компоненты и обосновываю место хранения каждого фрагмента состояния.",
+      "source_line": 4327,
+      "status": "DONE",
+      "method": "STATIC",
+      "files": [
+        "docs/lectures/lecture-08.md",
+        "react-app/src/pages/books/BooksPage.tsx"
+      ],
+      "note": "Размещение состояния и компонентов объяснено; обратные зависимости AppLayout отдельно отмечены как долг.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F19",
+      "group": "React",
+      "text": "Обновляю состояние иммутабельно и объясняю, почему это обязательно.",
+      "source_line": 4328,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/tests/Wishlist.test.tsx",
+        "react-app/src/pages/books/BooksPage.tsx"
+      ],
+      "note": "Оптимистичное изменение/откат и иммутабельные обновления проверены.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F20",
+      "group": "React",
+      "text": "Использую  useEffect  с корректными зависимостями и функцией очистки.",
+      "source_line": 4329,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/shared/hooks/useDebounce.ts",
+        "react-app/src/features/books/hooks/useGlobalBooks.ts"
+      ],
+      "note": "Очистка таймера и AbortController присутствуют; гонки покрыты тестами.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F21",
+      "group": "React",
+      "text": "Выношу работу с сервером в собственный хук и слой API.",
+      "source_line": 4330,
+      "status": "DONE",
+      "method": "STATIC_AUTO",
+      "files": [
+        "react-app/src/features/books/hooks/useGlobalBooks.ts",
+        "react-app/src/api/discover.ts"
+      ],
+      "note": "Собственный хук глобального поиска и отдельный сетевой адаптер уже существуют.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F22",
+      "group": "React",
+      "text": "Настраиваю маршрутизацию с вложенными layout-маршрутами, параметрами и 404.",
+      "source_line": 4331,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/tests/RoutingAcceptance.test.tsx",
+        "react-app/src/app/router/AppRouter.tsx"
+      ],
+      "note": "Проверены настоящий AppRouter, 404, переход назад, bookId и доступ к форме.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F23",
+      "group": "React",
+      "text": "Реализую форму со схемной валидацией и отображением серверных ошибок на полях.",
+      "source_line": 4332,
+      "status": "DONE",
+      "method": "AUTO",
+      "files": [
+        "react-app/src/tests/BookForm.test.tsx",
+        "react-app/src/tests/BookFormApi.test.ts"
+      ],
+      "note": "Схема, полевые ошибки, сохранение ввода и блокировка повторов проверены.",
+      "student_demonstration": "NOT_VERIFIED"
+    },
+    {
+      "id": "F24",
+      "group": "React",
+      "text": "Типизирую props, состояние и ответы API без использования  any .",
+      "source_line": 4333,
+      "status": "DONE",
+      "method": "TSC_AST",
+      "files": [
+        "react-app/tsconfig.app.json",
+        "docs/lectures/lecture-08-validation.json"
+      ],
+      "note": "tsc -b успешен; отдельный AST-проход 90 TS/TSX файлов обнаружил 0 AnyKeyword. expect.any не является типом any.",
+      "student_demonstration": "NOT_VERIFIED"
+    }
+  ]
+}

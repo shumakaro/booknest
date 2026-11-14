@@ -1,6 +1,7 @@
 """Проверяет полноту учета источников, а не подменяет выполнение учебных заданий."""
 
 from collections import Counter
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -8,6 +9,10 @@ import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("--implementation-stage", action="store_true",
+                    help="Проверить текущую матрицу после доработок, сохранив исходный протокол аудита")
+args = parser.parse_args()
 audit = json.loads((ROOT / "docs/audit/requirements-matrix.json").read_text(encoding="utf-8"))
 rows = audit["rows"]
 assert len(rows) == len({r["id"] for r in rows})
@@ -58,7 +63,9 @@ result = subprocess.run(
      "migrations", "docker", ".github", "docs/reports"],
     cwd=ROOT, capture_output=True, text=True, check=True,
 )
-assert not result.stdout.strip(), "Аудит не должен менять приложение или прежние DOCX"
+changed = result.stdout.splitlines()
+if not args.implementation_stage:
+    assert not changed, "Аудит не должен менять приложение или прежние DOCX"
 defense = json.loads((ROOT / "docs/audit/defense-docx-qa.json").read_text(encoding="utf-8"))
 assert hashlib.sha256((ROOT / defense["document"]).read_bytes()).hexdigest() == defense["document_sha256"]
 summary = {
@@ -68,10 +75,14 @@ summary = {
     "practice_steps": 65, "code_examples_reviewed_statically": 28,
     "source_context_items": 57, "matrix_rows": len(rows),
     "matrix_counts": audit["counts"], "own_practice15_tasks": 8,
-    "application_files_unchanged": True, "defense_docx_unchanged": True,
-    "new_application_tests_run": False,
+    "application_files_unchanged": not changed,
+    "production_files_unchanged": not [p for p in changed if not p.startswith("react-app/src/tests/")],
+    "defense_docx_unchanged": True,
+    "new_application_tests_run": bool(audit.get("new_application_tests")),
+    "tests_executed_by_this_checker": False,
 }
-(ROOT / "docs/audit/course-audit-validation.json").write_text(
+filename = "course-progress-validation.json" if args.implementation_stage else "course-audit-validation.json"
+(ROOT / "docs/audit" / filename).write_text(
     json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
 )
 print(json.dumps(summary, ensure_ascii=False))

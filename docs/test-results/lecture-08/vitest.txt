@@ -1,0 +1,221 @@
+# Извлечение результатов Vitest лекции 8
+
+Это извлечение из настоящих JSON-протоколов, не имитация вывода терминала.
+Первые 95 тестов запускались параллельно с lint/build: один timeout 5000 ms.
+Изолированный Login и полный повтор не меняли timeout или утверждения тестов.
+Финальная команда: npm.cmd test -- --maxWorkers=2 --reporter=json --outputFile=../.tools/lecture08/full-retry.json
+
+## Первый параллельный: passed=94, failed=1
+
+passed: react-app/src/tests/Accessibility.test.tsx :: обновляет заголовок и фокус при переходе на страницу
+passed: react-app/src/tests/Accessibility.test.tsx :: не забирает фокус поиска при изменении query
+passed: react-app/src/tests/Accessibility.test.tsx :: дает прочитать уведомление под курсором, затем отсчитывает новое время
+passed: react-app/src/tests/Accessibility.test.tsx :: сохраняет фокус кнопки при новом сообщении и возвращает к прежнему действию
+passed: react-app/src/tests/Accessibility.test.tsx :: после ухода фокуса снова закрывается автоматически
+passed: react-app/src/tests/ApiClient.test.ts :: после успешного refresh сохраняет ошибку валидации и не завершает сеанс
+passed: react-app/src/tests/AuthProvider.test.tsx :: поздний ответ восстановления не заменяет пользователя после нового входа
+passed: react-app/src/tests/AuthProvider.test.tsx :: не оставляет access после отказа чтения текущего пользователя при входе
+passed: react-app/src/tests/AuthProvider.test.tsx :: не объявляет серверный выход успешным при сетевой ошибке и позволяет повтор
+passed: react-app/src/tests/BookActions.test.tsx :: при отказе выдачи показывает доступную ошибку и снова разрешает действие
+passed: react-app/src/tests/BookActions.test.tsx :: не отправляет вторую выдачу пока первая не завершена
+passed: react-app/src/tests/BookDetailsRace.test.tsx :: игнорирует старую деталь после перехода к другой книге
+passed: react-app/src/tests/BookForm.test.tsx :: Форма книги не отправляет невалидную форму и объясняет ошибку
+passed: react-app/src/tests/BookForm.test.tsx :: Форма книги показывает конфликт ISBN у поля и не сообщает об успехе
+passed: react-app/src/tests/BookForm.test.tsx :: не придумывает годы и число страниц при создании
+passed: react-app/src/tests/BookForm.test.tsx :: редактирует импортированную книгу без ISBN и отправляет список измененных полей
+passed: react-app/src/tests/BookForm.test.tsx :: блокирует поля и повторное сохранение на время запроса
+passed: react-app/src/tests/BookForm.test.tsx :: сохраняет введенные данные после неизвестной ошибки 422 и показывает сообщение
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN 978-0-306-40615-7
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN 0306406152
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN 0-8044-2957-X
+passed: react-app/src/tests/BookFormApi.test.ts :: отклоняет неверную контрольную цифру до создания автора
+passed: react-app/src/tests/BookFormApi.test.ts :: изменяет только название, не трогая автора ISBN и экземпляры
+passed: react-app/src/tests/BookFormApi.test.ts :: передает null для явной очистки ISBN
+passed: react-app/src/tests/BookFormApi.test.ts :: создает книгу без ISBN и с подтвержденным числом экземпляров
+passed: react-app/src/tests/BookFormApi.test.ts :: не выдает любой конфликт данных за дубликат ISBN
+passed: react-app/src/tests/BookFormApi.test.ts :: привязывает серверную ошибку числа экземпляров к соответствующему полю
+passed: react-app/src/tests/BookPresentation.test.tsx :: позволяет раскрыть длинное описание и снова свернуть его
+passed: react-app/src/tests/BookPresentation.test.tsx :: показывает внешний HTML текстом, не создавая исполняемую разметку
+passed: react-app/src/tests/BookPresentation.test.tsx :: сворачивает многострочное описание даже при небольшом числе символов
+passed: react-app/src/tests/BookPresentation.test.tsx :: после ошибки картинки показывает подписанную замену без сломанной обложки
+passed: react-app/src/tests/BookPresentation.test.tsx :: отличает неизвестные характеристики от настоящего нуля
+passed: react-app/src/tests/CatalogSearch.test.tsx :: передает фильтры прямой ссылки серверу и показывает диапазон по total
+passed: react-app/src/tests/CatalogSearch.test.tsx :: убирает один фильтр, сохраняя остальные и сбрасывая страницу
+passed: react-app/src/tests/CatalogSearch.test.tsx :: исправляет неизвестные и дробные параметры прямой ссылки до запроса API
+passed: react-app/src/tests/CatalogSearch.test.tsx :: возвращается с несуществующей страницы на последнюю существующую
+passed: react-app/src/tests/CatalogSearch.test.tsx :: возвращает из детали к фильтрам, странице и позиции каталога
+passed: react-app/src/tests/CatalogSearch.test.tsx :: отменяет старый запрос сразу при вводе; запоздавший ответ не заменяет новый
+passed: react-app/src/tests/Discover.test.tsx :: не запрашивает весь внешний каталог без запроса; ищет только по автору
+passed: react-app/src/tests/Discover.test.tsx :: накапливает страницы без дублей и скрывает кнопку в конце
+passed: react-app/src/tests/Discover.test.tsx :: сохраняет первую страницу при ошибке следующей и повторяет именно неудачную страницу
+passed: react-app/src/tests/Discover.test.tsx :: новый запрос очищает старые результаты и показывает пустое состояние
+passed: react-app/src/tests/Discover.test.tsx :: запоздавший ответ старого запроса не заменяет новый
+passed: react-app/src/tests/Discover.test.tsx :: открывает внешние детали напрямую и не предлагает локальную выдачу
+passed: react-app/src/tests/Discover.test.tsx :: отображает ошибку отсутствующей внешней книги
+passed: react-app/src/tests/Discover.test.tsx :: после деталей возвращает накопленные страницы и поисковый запрос
+passed: react-app/src/tests/Discover.test.tsx :: при подгрузке сохраняет карточки и блокирует повторный запрос до ответа
+passed: react-app/src/tests/ImportBook.test.tsx :: открывает уже существующую библиотечную запись после импорта
+passed: react-app/src/tests/ImportBook.test.tsx :: показывает конфликт архива и оставляет форму доступной
+passed: react-app/src/tests/ImportBook.test.tsx :: не предлагает импорт роли member
+passed: react-app/src/tests/ImportBook.test.tsx :: не предлагает импорт роли null
+passed: react-app/src/tests/ImportBook.test.tsx :: не подставляет выдуманный год и требует проверенное значение
+passed: react-app/src/tests/ImportBook.test.tsx :: блокирует форму и повтор запроса до получения существующей записи
+passed: react-app/src/tests/ImportBook.test.tsx :: после ошибки сохраняет исправленные параметры для повторной попытки
+passed: react-app/src/tests/ImportBook.test.tsx :: не отправляет известный неполный импорт без автора
+passed: react-app/src/tests/Librarian.test.tsx :: дает переходы к готовым действиям и показывает запись с недоступным пользователем
+passed: react-app/src/tests/Librarian.test.tsx :: не загружает журнал гостю или читателю
+passed: react-app/src/tests/Librarian.test.tsx :: фильтрует сервером и сбрасывает страницу
+passed: react-app/src/tests/Librarian.test.tsx :: повторяет отказ чтения и отличает пустой фильтр
+passed: react-app/src/tests/Librarian.test.tsx :: показывает серверный 403 без автоматического обхода запрета
+passed: react-app/src/tests/Librarian.test.tsx :: переходит с несуществующей страницы и не отправляет неизвестный метод
+passed: react-app/src/tests/Loans.test.tsx :: запрашивает текущие выдачи по умолчанию и меняет серверный фильтр со сбросом страницы
+passed: react-app/src/tests/Loans.test.tsx :: не отправляет некорректные параметры URL в API
+passed: react-app/src/tests/Loans.test.tsx :: блокирует повтор возврата и сохраняет запись после отказа
+passed: react-app/src/tests/Loans.test.tsx :: после подтвержденного возврата перечитывает данные и уходит с исчезнувшей страницы
+passed: react-app/src/tests/Loans.test.tsx :: не предлагает вернуть завершенную выдачу и показывает читателя библиотекарю
+passed: react-app/src/tests/Loans.test.tsx :: повторяет ошибку чтения и показывает отдельное пустое состояние истории
+passed: react-app/src/tests/Loans.test.tsx :: не заменяет свежий фильтр запоздавшим ответом
+passed: react-app/src/tests/Loans.test.tsx :: считает срок включительно и сохраняет возвращенное состояние после срока
+failed: react-app/src/tests/Login.test.tsx :: после регистрации сохраняет маршрут входа и очищает пароль
+passed: react-app/src/tests/Login.test.tsx :: не отправляет пароль длиннее 72 байт и фокусирует поле
+passed: react-app/src/tests/Login.test.tsx :: сохраняет ввод после ошибки и блокирует повтор и переключение во время запроса
+passed: react-app/src/tests/Login.test.tsx :: переключает видимость пароля без отправки формы
+passed: react-app/src/tests/Login.test.tsx :: разрешает внутренний маршрут и отклоняет внешние адреса и циклы входа
+passed: react-app/src/tests/SessionClient.test.ts :: параллельные 401 и запоздавший старый 401 используют одну ротацию
+passed: react-app/src/tests/SessionClient.test.ts :: старый refresh после выхода не возвращает access в память
+passed: react-app/src/tests/SessionClient.test.ts :: запрос старого аккаунта не повторяется от имени нового
+passed: react-app/src/tests/SessionClient.test.ts :: не отдает успешный личный ответ старого аккаунта после смены сеанса
+passed: react-app/src/tests/SessionClient.test.ts :: ошибка сети при refresh не объявляется завершением сеанса
+passed: react-app/src/tests/SessionClient.test.ts :: повторный 401 завершает сеанс без бесконечного цикла
+passed: react-app/src/tests/SessionClient.test.ts :: отмененный запрос не повторяется после общего refresh
+passed: react-app/src/tests/Wishlist.test.tsx :: восстанавливает книгу после ошибки оптимистичного удаления
+passed: react-app/src/tests/Wishlist.test.tsx :: ищет автора и доступность по загруженному списку без новых запросов
+passed: react-app/src/tests/Wishlist.test.tsx :: сортирует по году, оставляя неизвестный год в конце
+passed: react-app/src/tests/Wishlist.test.tsx :: отличает отсутствие совпадений от пустого личного списка
+passed: react-app/src/tests/Wishlist.test.tsx :: блокирует удаление остальных книг и восстанавливает список после отказа
+passed: react-app/src/tests/Wishlist.test.tsx :: повторяет неудачную загрузку и очищает ошибку
+passed: react-app/src/tests/WishlistAction.test.tsx :: гостю предлагает вход без запроса личного списка
+passed: react-app/src/tests/WishlistAction.test.tsx :: показывает серверное сохранение и удаляет именно эту книгу
+passed: react-app/src/tests/WishlistAction.test.tsx :: после ошибки чтения сначала повторяет проверку, не изменяя данные
+passed: react-app/src/tests/WishlistAction.test.tsx :: блокирует повтор и откатывает сохранение после ошибки
+passed: react-app/src/tests/WishlistApi.test.ts :: читает следующую страницу и не дублирует повторившуюся книгу
+passed: react-app/src/tests/WishlistApi.test.ts :: не начинает чтение, если запрос уже отменен
+passed: react-app/src/tests/WishlistApi.test.ts :: не продолжает страницы после отмены даже при запоздавшем ответе
+
+## Login отдельно: passed=5, failed=0
+
+passed: react-app/src/tests/Login.test.tsx :: после регистрации сохраняет маршрут входа и очищает пароль
+passed: react-app/src/tests/Login.test.tsx :: не отправляет пароль длиннее 72 байт и фокусирует поле
+passed: react-app/src/tests/Login.test.tsx :: сохраняет ввод после ошибки и блокирует повтор и переключение во время запроса
+passed: react-app/src/tests/Login.test.tsx :: переключает видимость пароля без отправки формы
+passed: react-app/src/tests/Login.test.tsx :: разрешает внутренний маршрут и отклоняет внешние адреса и циклы входа
+
+## Новые маршруты: passed=4, failed=0
+
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: неизвестный адрес показывает 404 и позволяет вернуться в настоящий каталог
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: прямая ссылка передает строковый bookId настоящей странице деталей
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: гость направляется ко входу с сохранением намерения открыть новую книгу
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: читатель получает отказ роли при прямом открытии формы библиотекаря
+
+## Полный повтор: passed=99, failed=0
+
+passed: react-app/src/tests/Accessibility.test.tsx :: обновляет заголовок и фокус при переходе на страницу
+passed: react-app/src/tests/Accessibility.test.tsx :: не забирает фокус поиска при изменении query
+passed: react-app/src/tests/Accessibility.test.tsx :: дает прочитать уведомление под курсором, затем отсчитывает новое время
+passed: react-app/src/tests/Accessibility.test.tsx :: сохраняет фокус кнопки при новом сообщении и возвращает к прежнему действию
+passed: react-app/src/tests/Accessibility.test.tsx :: после ухода фокуса снова закрывается автоматически
+passed: react-app/src/tests/ApiClient.test.ts :: после успешного refresh сохраняет ошибку валидации и не завершает сеанс
+passed: react-app/src/tests/AuthProvider.test.tsx :: поздний ответ восстановления не заменяет пользователя после нового входа
+passed: react-app/src/tests/AuthProvider.test.tsx :: не оставляет access после отказа чтения текущего пользователя при входе
+passed: react-app/src/tests/AuthProvider.test.tsx :: не объявляет серверный выход успешным при сетевой ошибке и позволяет повтор
+passed: react-app/src/tests/BookActions.test.tsx :: при отказе выдачи показывает доступную ошибку и снова разрешает действие
+passed: react-app/src/tests/BookActions.test.tsx :: не отправляет вторую выдачу пока первая не завершена
+passed: react-app/src/tests/BookDetailsRace.test.tsx :: игнорирует старую деталь после перехода к другой книге
+passed: react-app/src/tests/BookForm.test.tsx :: Форма книги не отправляет невалидную форму и объясняет ошибку
+passed: react-app/src/tests/BookForm.test.tsx :: Форма книги показывает конфликт ISBN у поля и не сообщает об успехе
+passed: react-app/src/tests/BookForm.test.tsx :: не придумывает годы и число страниц при создании
+passed: react-app/src/tests/BookForm.test.tsx :: редактирует импортированную книгу без ISBN и отправляет список измененных полей
+passed: react-app/src/tests/BookForm.test.tsx :: блокирует поля и повторное сохранение на время запроса
+passed: react-app/src/tests/BookForm.test.tsx :: сохраняет введенные данные после неизвестной ошибки 422 и показывает сообщение
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN 978-0-306-40615-7
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN 0306406152
+passed: react-app/src/tests/BookFormApi.test.ts :: нормализует ISBN 0-8044-2957-X
+passed: react-app/src/tests/BookFormApi.test.ts :: отклоняет неверную контрольную цифру до создания автора
+passed: react-app/src/tests/BookFormApi.test.ts :: изменяет только название, не трогая автора ISBN и экземпляры
+passed: react-app/src/tests/BookFormApi.test.ts :: передает null для явной очистки ISBN
+passed: react-app/src/tests/BookFormApi.test.ts :: создает книгу без ISBN и с подтвержденным числом экземпляров
+passed: react-app/src/tests/BookFormApi.test.ts :: не выдает любой конфликт данных за дубликат ISBN
+passed: react-app/src/tests/BookFormApi.test.ts :: привязывает серверную ошибку числа экземпляров к соответствующему полю
+passed: react-app/src/tests/BookPresentation.test.tsx :: позволяет раскрыть длинное описание и снова свернуть его
+passed: react-app/src/tests/BookPresentation.test.tsx :: показывает внешний HTML текстом, не создавая исполняемую разметку
+passed: react-app/src/tests/BookPresentation.test.tsx :: сворачивает многострочное описание даже при небольшом числе символов
+passed: react-app/src/tests/BookPresentation.test.tsx :: после ошибки картинки показывает подписанную замену без сломанной обложки
+passed: react-app/src/tests/BookPresentation.test.tsx :: отличает неизвестные характеристики от настоящего нуля
+passed: react-app/src/tests/CatalogSearch.test.tsx :: передает фильтры прямой ссылки серверу и показывает диапазон по total
+passed: react-app/src/tests/CatalogSearch.test.tsx :: убирает один фильтр, сохраняя остальные и сбрасывая страницу
+passed: react-app/src/tests/CatalogSearch.test.tsx :: исправляет неизвестные и дробные параметры прямой ссылки до запроса API
+passed: react-app/src/tests/CatalogSearch.test.tsx :: возвращается с несуществующей страницы на последнюю существующую
+passed: react-app/src/tests/CatalogSearch.test.tsx :: возвращает из детали к фильтрам, странице и позиции каталога
+passed: react-app/src/tests/CatalogSearch.test.tsx :: отменяет старый запрос сразу при вводе; запоздавший ответ не заменяет новый
+passed: react-app/src/tests/Discover.test.tsx :: не запрашивает весь внешний каталог без запроса; ищет только по автору
+passed: react-app/src/tests/Discover.test.tsx :: накапливает страницы без дублей и скрывает кнопку в конце
+passed: react-app/src/tests/Discover.test.tsx :: сохраняет первую страницу при ошибке следующей и повторяет именно неудачную страницу
+passed: react-app/src/tests/Discover.test.tsx :: новый запрос очищает старые результаты и показывает пустое состояние
+passed: react-app/src/tests/Discover.test.tsx :: запоздавший ответ старого запроса не заменяет новый
+passed: react-app/src/tests/Discover.test.tsx :: открывает внешние детали напрямую и не предлагает локальную выдачу
+passed: react-app/src/tests/Discover.test.tsx :: отображает ошибку отсутствующей внешней книги
+passed: react-app/src/tests/Discover.test.tsx :: после деталей возвращает накопленные страницы и поисковый запрос
+passed: react-app/src/tests/Discover.test.tsx :: при подгрузке сохраняет карточки и блокирует повторный запрос до ответа
+passed: react-app/src/tests/ImportBook.test.tsx :: открывает уже существующую библиотечную запись после импорта
+passed: react-app/src/tests/ImportBook.test.tsx :: показывает конфликт архива и оставляет форму доступной
+passed: react-app/src/tests/ImportBook.test.tsx :: не предлагает импорт роли member
+passed: react-app/src/tests/ImportBook.test.tsx :: не предлагает импорт роли null
+passed: react-app/src/tests/ImportBook.test.tsx :: не подставляет выдуманный год и требует проверенное значение
+passed: react-app/src/tests/ImportBook.test.tsx :: блокирует форму и повтор запроса до получения существующей записи
+passed: react-app/src/tests/ImportBook.test.tsx :: после ошибки сохраняет исправленные параметры для повторной попытки
+passed: react-app/src/tests/ImportBook.test.tsx :: не отправляет известный неполный импорт без автора
+passed: react-app/src/tests/Librarian.test.tsx :: дает переходы к готовым действиям и показывает запись с недоступным пользователем
+passed: react-app/src/tests/Librarian.test.tsx :: не загружает журнал гостю или читателю
+passed: react-app/src/tests/Librarian.test.tsx :: фильтрует сервером и сбрасывает страницу
+passed: react-app/src/tests/Librarian.test.tsx :: повторяет отказ чтения и отличает пустой фильтр
+passed: react-app/src/tests/Librarian.test.tsx :: показывает серверный 403 без автоматического обхода запрета
+passed: react-app/src/tests/Librarian.test.tsx :: переходит с несуществующей страницы и не отправляет неизвестный метод
+passed: react-app/src/tests/Loans.test.tsx :: запрашивает текущие выдачи по умолчанию и меняет серверный фильтр со сбросом страницы
+passed: react-app/src/tests/Loans.test.tsx :: не отправляет некорректные параметры URL в API
+passed: react-app/src/tests/Loans.test.tsx :: блокирует повтор возврата и сохраняет запись после отказа
+passed: react-app/src/tests/Loans.test.tsx :: после подтвержденного возврата перечитывает данные и уходит с исчезнувшей страницы
+passed: react-app/src/tests/Loans.test.tsx :: не предлагает вернуть завершенную выдачу и показывает читателя библиотекарю
+passed: react-app/src/tests/Loans.test.tsx :: повторяет ошибку чтения и показывает отдельное пустое состояние истории
+passed: react-app/src/tests/Loans.test.tsx :: не заменяет свежий фильтр запоздавшим ответом
+passed: react-app/src/tests/Loans.test.tsx :: считает срок включительно и сохраняет возвращенное состояние после срока
+passed: react-app/src/tests/Login.test.tsx :: после регистрации сохраняет маршрут входа и очищает пароль
+passed: react-app/src/tests/Login.test.tsx :: не отправляет пароль длиннее 72 байт и фокусирует поле
+passed: react-app/src/tests/Login.test.tsx :: сохраняет ввод после ошибки и блокирует повтор и переключение во время запроса
+passed: react-app/src/tests/Login.test.tsx :: переключает видимость пароля без отправки формы
+passed: react-app/src/tests/Login.test.tsx :: разрешает внутренний маршрут и отклоняет внешние адреса и циклы входа
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: неизвестный адрес показывает 404 и позволяет вернуться в настоящий каталог
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: прямая ссылка передает строковый bookId настоящей странице деталей
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: гость направляется ко входу с сохранением намерения открыть новую книгу
+passed: react-app/src/tests/RoutingAcceptance.test.tsx :: читатель получает отказ роли при прямом открытии формы библиотекаря
+passed: react-app/src/tests/SessionClient.test.ts :: параллельные 401 и запоздавший старый 401 используют одну ротацию
+passed: react-app/src/tests/SessionClient.test.ts :: старый refresh после выхода не возвращает access в память
+passed: react-app/src/tests/SessionClient.test.ts :: запрос старого аккаунта не повторяется от имени нового
+passed: react-app/src/tests/SessionClient.test.ts :: не отдает успешный личный ответ старого аккаунта после смены сеанса
+passed: react-app/src/tests/SessionClient.test.ts :: ошибка сети при refresh не объявляется завершением сеанса
+passed: react-app/src/tests/SessionClient.test.ts :: повторный 401 завершает сеанс без бесконечного цикла
+passed: react-app/src/tests/SessionClient.test.ts :: отмененный запрос не повторяется после общего refresh
+passed: react-app/src/tests/Wishlist.test.tsx :: восстанавливает книгу после ошибки оптимистичного удаления
+passed: react-app/src/tests/Wishlist.test.tsx :: ищет автора и доступность по загруженному списку без новых запросов
+passed: react-app/src/tests/Wishlist.test.tsx :: сортирует по году, оставляя неизвестный год в конце
+passed: react-app/src/tests/Wishlist.test.tsx :: отличает отсутствие совпадений от пустого личного списка
+passed: react-app/src/tests/Wishlist.test.tsx :: блокирует удаление остальных книг и восстанавливает список после отказа
+passed: react-app/src/tests/Wishlist.test.tsx :: повторяет неудачную загрузку и очищает ошибку
+passed: react-app/src/tests/WishlistAction.test.tsx :: гостю предлагает вход без запроса личного списка
+passed: react-app/src/tests/WishlistAction.test.tsx :: показывает серверное сохранение и удаляет именно эту книгу
+passed: react-app/src/tests/WishlistAction.test.tsx :: после ошибки чтения сначала повторяет проверку, не изменяя данные
+passed: react-app/src/tests/WishlistAction.test.tsx :: блокирует повтор и откатывает сохранение после ошибки
+passed: react-app/src/tests/WishlistApi.test.ts :: читает следующую страницу и не дублирует повторившуюся книгу
+passed: react-app/src/tests/WishlistApi.test.ts :: не начинает чтение, если запрос уже отменен
+passed: react-app/src/tests/WishlistApi.test.ts :: не продолжает страницы после отмены даже при запоздавшем ответе
