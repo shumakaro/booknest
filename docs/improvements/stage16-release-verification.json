@@ -1,0 +1,19 @@
+{
+  "checked_at_utc": "2026-11-14T07:56:42.753475+00:00",
+  "expected_deploy_sha": "1eb0eb934a82ca0671a93dfd625f8548cb8a8492",
+  "deploy_live_reported_by_user": true,
+  "deploy_sha_independently_read_from_dashboard": false,
+  "production_writes": false,
+  "checks": {
+    "openapi_matches_repository": true,
+    "assets_changed_from_previous_release": true,
+    "built_assets_match_public_bytes": true,
+    "author_search_and_whitespace_normalization": true,
+    "empty_search": true,
+    "local_details": true,
+    "global_pagination": true,
+    "global_details": true
+  },
+  "author_search_total": 6,
+  "status": "ok"
+}
