@@ -1,0 +1,36 @@
+{
+  "id": 43584962994,
+  "head_sha": "98a1be3a00d8327f44e62c38e9984410360a696b",
+  "html_url": "https://github.com/shumakaro/booknest/actions/runs/43584962994",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 132417355441,
+      "name": "checks",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 132417776699,
+      "name": "containers",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "test_reports": {
+    "container-tests": {
+      "tests": 165,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend-tests": {
+      "tests": 165,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "frontend_tests_passed": 95
+  }
+}

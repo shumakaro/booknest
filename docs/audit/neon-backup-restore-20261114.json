@@ -1,0 +1,78 @@
+{
+  "status": "ok",
+  "checked_at_utc": "2026-11-14T10:19:27.110068+00:00",
+  "scope": "existing_neon_public_schema",
+  "source_snapshot_used": true,
+  "existing_private_archive_reused": true,
+  "comparison_scope": "read_only_source_snapshot_at_verification",
+  "source_read_only": true,
+  "source_client_tls": true,
+  "production_writes": false,
+  "restore_database_is_new_and_local": true,
+  "restore_target": "booknest_neon20261114c_restore_test",
+  "revision": [
+    "006_external_books"
+  ],
+  "archive_sha256": "8a5e10523e8889badc9cb18a0e3bc54a042e61ee8effc6bcc5bd0c38e1ece3e9",
+  "all_table_contents_match": true,
+  "tables": {
+    "alembic_version": {
+      "source_rows": 1,
+      "restored_rows": 1,
+      "contents_match": true
+    },
+    "audit_events": {
+      "source_rows": 9,
+      "restored_rows": 9,
+      "contents_match": true
+    },
+    "authors": {
+      "source_rows": 13,
+      "restored_rows": 13,
+      "contents_match": true
+    },
+    "book_genres": {
+      "source_rows": 32,
+      "restored_rows": 32,
+      "contents_match": true
+    },
+    "books": {
+      "source_rows": 32,
+      "restored_rows": 32,
+      "contents_match": true
+    },
+    "denied_tokens": {
+      "source_rows": 18,
+      "restored_rows": 18,
+      "contents_match": true
+    },
+    "genres": {
+      "source_rows": 5,
+      "restored_rows": 5,
+      "contents_match": true
+    },
+    "loans": {
+      "source_rows": 23,
+      "restored_rows": 23,
+      "contents_match": true
+    },
+    "profiles": {
+      "source_rows": 10,
+      "restored_rows": 10,
+      "contents_match": true
+    },
+    "users": {
+      "source_rows": 13,
+      "restored_rows": 13,
+      "contents_match": true
+    },
+    "wishlist_entries": {
+      "source_rows": 1,
+      "restored_rows": 1,
+      "contents_match": true
+    }
+  },
+  "private_dump_in_git": false,
+  "automatic_schedule_installed": false,
+  "existing_target_retry_refused": true
+}
