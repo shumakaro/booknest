@@ -1,3 +1,13 @@
+# Этап 16 — подготовка Render, 14 ноября 2026
+
+Создана codex/render-release-check от 2841e05. Подтверждены прежний deploy 41c5c57, ветка Render codex/global-book-search, Dockerfile docker/render.Dockerfile, context '.', /health, Auto-Deploy Off (текст Settings от владелицы). Управление Chrome ненадежно: инструмент прекращал работу из-за определения URL; настройки/секреты/деплой не менялись. Публичные GET успешны: health, 8 SPA/no-store, 3 assets, 30 книг за 5 страниц без дублей, global total266/2 результата, ожидаемые 401/404. Протокол stage16-public-before.json; отсутствие HSTS/явного cache assets зафиксировано как исходное состояние.
+
+CI 43566009669 на 2841e05 реально завершился failure: checks success, containers упал при collection tests.test_neon_audit (нет tools.audit_neon в test-образе). Исправлено COPY только test-stage, коммит 1eb0eb9. Он опубликован в исходной ветке Neon простым fast-forward без merge PR/перезаписи истории, чтобы исправить PR30. Новый run 43568061841 на 1eb0eb934a82ca0671a93dfd625f8548cb8a8492 пока проверяется. Render-кандидат не предлагается к деплою до двух успешных jobs. Новых миграций относительно прежнего deploy нет (diff migrations/versions пуст).
+
+Подготовлена STAGE16.md с порядком ручного Deploy a specific commit, приемкой и возвратом старого SHA без восстановления/отката БД. Локальные проверки с системным tmp дали setup errors, повтор workspace завис и остановлен; итог нового запуска будет дописан по факту. docs.zip, рабочая Neon, секреты, DOCX и ЛР1–6 сохранены. Деплой/merge не запускались. Публикация документации и PR этапа 16 еще не завершены; предыдущие этапы ниже — история.
+
+Повторный локальный прогон с новым basetemp вне ограниченной песочницы успешен: 16 passed, 1 warning, 3,18 с; JUnit .tools/stage16-local-tests.xml. Ruff и diff --check прошли. Исправленный CI уже прошел checks и Build and smoke the unified Render image; полный containers еще ожидается, success всего run заранее не заявляется.
+
 # Этап 15 — Neon проверена, 13 ноября 2026
 
 14 ноября после паузы завершено сохранение: опубликована ветка codex/neon-verification и открыт PR30 https://github.com/shumakaro/booknest/pull/30 в codex/container-ci-reproducibility, merged=false. Реальные коммиты: 18198fb (аудит/защитные тесты), d4f63b3 (протокол/порядок миграций), 07ac0d7 (прогресс/план). Повторно локально прошли 5 тестов за 0,23 с (1 прежнее предупреждение), Ruff и diff --check. Проверки production Neon не повторялись; Render не менялся. CI этого PR не объявляется успешным до фактического результата. docs.zip остается нетронутым. Следующее действие — отдельный этап Render по команде владелицы.
