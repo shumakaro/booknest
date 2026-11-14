@@ -1,0 +1,89 @@
+{
+  "checked_at_utc": "2026-11-13T05:22:04.614860+00:00",
+  "expected_revision": [
+    "006_external_books"
+  ],
+  "connection_pair_matches": true,
+  "production_writes": false,
+  "connections": {
+    "pooled": {
+      "status": "ok",
+      "client_tls": true,
+      "transaction_read_only": "on",
+      "revision": [
+        "006_external_books"
+      ],
+      "revision_matches": true,
+      "missing_tables": [],
+      "missing_columns": {},
+      "counts": {
+        "book_genres": 32,
+        "authors": 13,
+        "books": 32,
+        "genres": 5,
+        "users": 13,
+        "profiles": 10,
+        "loans": 23,
+        "denied_tokens": 15,
+        "audit_events": 9,
+        "wishlist_entries": 1
+      },
+      "orm_book_read": true,
+      "active_books": 30,
+      "duplicate_external_ids": 0,
+      "book_indexes": [
+        "books_author_year_idx",
+        "books_external_work_id_key",
+        "books_isbn_key",
+        "books_search_idx"
+      ]
+    },
+    "direct": {
+      "status": "ok",
+      "client_tls": true,
+      "transaction_read_only": "on",
+      "revision": [
+        "006_external_books"
+      ],
+      "revision_matches": true,
+      "missing_tables": [],
+      "missing_columns": {},
+      "counts": {
+        "book_genres": 32,
+        "authors": 13,
+        "books": 32,
+        "genres": 5,
+        "users": 13,
+        "profiles": 10,
+        "loans": 23,
+        "denied_tokens": 15,
+        "audit_events": 9,
+        "wishlist_entries": 1
+      },
+      "orm_book_read": true,
+      "active_books": 30,
+      "duplicate_external_ids": 0,
+      "book_indexes": [
+        "books_author_year_idx",
+        "books_external_work_id_key",
+        "books_isbn_key",
+        "books_search_idx"
+      ]
+    }
+  },
+  "status": "ok",
+  "http": {
+    "status": "ok",
+    "transport": "TestClient",
+    "database": "real_neon_read_only",
+    "total": 30,
+    "pages_checked": 5,
+    "checks": {
+      "pagination_complete": true,
+      "empty_search": true,
+      "health": true,
+      "details": true,
+      "title_search": true
+    }
+  }
+}
