@@ -11,11 +11,11 @@
   "source_context_items": 57,
   "matrix_rows": 356,
   "matrix_counts": {
-    "DONE": 138,
-    "PARTIAL": 70,
-    "NOT_VERIFIED": 121,
+    "DONE": 202,
+    "PARTIAL": 69,
+    "NOT_VERIFIED": 59,
     "EXCLUDED_PEER_TASK": 19,
-    "MISSING": 5,
+    "MISSING": 4,
     "BLOCKED": 3
   },
   "own_practice15_tasks": 8,
