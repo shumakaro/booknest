@@ -1,0 +1,35 @@
+Подготовлено изолированное окружение проверки
+OpenAPI получен без обращения к БД
+INFO:booknest:139f60ef-6a00-4f47-82fb-a9a125a9e4f9 GET /health 200 1.0ms
+INFO:httpx:HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+INFO:booknest:0d8704f5-70aa-4632-b511-11dc8b93cf5b GET /docs 200 0.2ms
+INFO:httpx:HTTP Request: GET http://testserver/docs "HTTP/1.1 200 OK"
+INFO:booknest:80db3a49-379a-4d41-b01b-27c2a138b77d POST /api/v1/authors 201 1.8ms
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/authors "HTTP/1.1 201 Created"
+INFO:booknest:d90992e1-ef6d-4b7a-a224-b8af30fef4e3 POST /api/v1/books 201 4.1ms
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/books "HTTP/1.1 201 Created"
+INFO:booknest:a2c47401-cdea-4473-a082-0d27492c5e3e POST /api/v1/books 409 0.9ms
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/books "HTTP/1.1 409 Conflict"
+INFO:booknest:1a7c6df3-5eec-4f71-839b-7f1567e644ff POST /api/v1/books 422 0.7ms
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/books "HTTP/1.1 422 Unprocessable Entity"
+INFO:booknest:d4c13b8c-43c9-4399-8822-c7658d203809 GET /api/v1/books 200 1.6ms
+INFO:httpx:HTTP Request: GET http://testserver/api/v1/books?q=%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F&page=1&size=1 "HTTP/1.1 200 OK"
+INFO:booknest:b6679788-2e9d-4231-8489-1871655a3c33 GET /api/v1/books/999 404 0.6ms
+INFO:httpx:HTTP Request: GET http://testserver/api/v1/books/999 "HTTP/1.1 404 Not Found"
+INFO:booknest:298b4704-6f48-44cb-afd5-8df4e3c1f36c PATCH /api/v1/books/1 200 4.3ms
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/books/1 "HTTP/1.1 200 OK"
+INFO:booknest:98e2efff-358c-42e3-993b-b408d2469705 DELETE /api/v1/books/1 204 0.6ms
+INFO:httpx:HTTP Request: DELETE http://testserver/api/v1/books/1 "HTTP/1.1 204 No Content"
+INFO:booknest:d33d4007-37ff-46f1-8594-aab75ffd073c GET /api/v1/books/1 404 0.6ms
+INFO:httpx:HTTP Request: GET http://testserver/api/v1/books/1 "HTTP/1.1 404 Not Found"
+HTTP-сценарии API в памяти завершены
+............................................                             [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\config\__init__.py:1277
+  C:\Users\comp\Documents\booknest\.venv\Lib\site-packages\_pytest\config\__init__.py:1277: PytestAssertRewriteWarning: Module already imported so cannot be rewritten: anyio
+    self._mark_plugins_for_rewrite(hook)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\comp\Documents\booknest\.tools\lecture09\pytest.xml -
+44 passed, 1 deselected, 1 warning in 8.86s
+{"pytest": {"tests": 44, "failures": 0, "errors": 0, "skipped": 0}, "database_connection_attempts": 0, "paths": 22, "operations": 30, "memory_http_cases": 11}

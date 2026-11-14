@@ -1,0 +1,10 @@
+=========================== short test summary info ===========================
+FAILED tests/test_api_contracts.py::test_live_schema_snapshot_and_generated_types_match
+FAILED tests/test_discover.py::test_external_failures_have_normal_error_envelope[upstream0-502]
+FAILED tests/test_discover.py::test_external_failures_have_normal_error_envelope[upstream1-503]
+FAILED tests/test_discover.py::test_external_failures_have_normal_error_envelope[upstream2-502]
+FAILED tests/test_discover.py::test_external_failures_have_normal_error_envelope[upstream3-502]
+FAILED tests/test_discover.py::test_external_failures_have_normal_error_envelope[upstream4-504]
+FAILED tests/test_discover.py::test_external_failures_have_normal_error_envelope[upstream5-502]
+7 failed, 37 passed, 1 deselected, 1 warning in 10.57s
+{"pytest": {"tests": 44, "failures": 7, "errors": 0, "skipped": 0}, "database_connection_attempts": 0, "paths": 22, "operations": 30, "memory_http_cases": 11}
