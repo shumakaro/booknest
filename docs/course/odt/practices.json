@@ -1,0 +1,1778 @@
+{
+  "source": "вебпр.odt",
+  "sha256": "ac7919f667bd751058333df0b60f588591e96ae1ebfdc6bfc66af2b8096cc6e5",
+  "paragraphs": 219,
+  "tables": 0,
+  "images": 0,
+  "embedded_objects": 0,
+  "units": {
+    "8": [
+      {
+        "paragraph": 1,
+        "text": "Практика 8 · W8",
+        "style": "P1",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 2,
+        "text": "Форма с валидацией Zod и обработкой серверных ошибок",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 3,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 4,
+        "text": "Собрать форму производственного качества: схемная валидация, полная обратная связь, доступность, отображение ошибок сервера.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 5,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 6,
+        "text": "Маршрутизация, контролируемые формы, схемы валидации, лекция 8.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 7,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 8,
+        "text": "Проект практики 7 + react-router-dom, react-hook-form, zod, @hookform/resolvers; учебный эндпоинт-заглушка, отдающий 422 и 409.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 9,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 10,
+        "text": "Настроить маршруты: /books, /books/:bookId, /books/new, * (404) с общим layout через Outlet.",
+        "style": "P6",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 11,
+        "text": "Описать схему Zod для формы выдачи: обязательные поля, длины, формат e-mail, положительное число, две даты.",
+        "style": "P7",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 12,
+        "text": "Добавить правило уровня схемы через refine: дата возврата строго позже даты выдачи, ошибка привязана к полю dueDate.",
+        "style": "P6",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 13,
+        "text": "Вывести тип значений формы из схемы (z.infer) — не описывать его вручную.",
+        "style": "P6",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 14,
+        "text": "Подключить useForm с zodResolver и mode: \"onBlur\"; связать сообщения об ошибке с полями через aria-describedby и role=\"alert\".",
+        "style": "P6",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 15,
+        "text": "Заблокировать кнопку на время отправки и показать текст «Сохраняем…».",
+        "style": "P7",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 16,
+        "text": "Обработать ответ 422 от заглушки: расставить сообщения по полям из detail. Обработать 409: показать ошибку на поле выбора книги.",
+        "style": "P6",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 17,
+        "text": "После успешной отправки выполнить переход на страницу созданной записи через useNavigate.",
+        "style": "P6",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 18,
+        "text": "Перенести фильтры каталога в useSearchParams; проверить, что ссылка на отфильтрованный список открывается в новой вкладке в том же состоянии.",
+        "style": "P6",
+        "list_ordinal": 9,
+        "list_kind": "number",
+        "list_style": "L1"
+      },
+      {
+        "paragraph": 19,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 20,
+        "text": ".refine((v) => v.dueDate > v.issuedAt,",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 21,
+        "text": "        { message: \"Дата возврата должна быть позже даты выдачи\", path: [\"dueDate\"] })",
+        "style": "P9",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 22,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 23,
+        "text": "Сделать один компонент формы, работающий в двух режимах — создание и редактирование (по наличию :bookId в маршруте), с предзаполнением полей и корректным заголовком страницы.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 24,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 25,
+        "text": "Реализовать защиту от потери данных: при попытке ухода со страницы с несохранёнными изменениями показать подтверждение (через состояние isDirty и блокировку навигации), не используя window.confirm в качестве единственного средства.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 26,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 27,
+        "text": "Многостраничное SPA с рабочей формой. Зачтено, если: невалидные данные не отправляются; ошибка 422 отображается на конкретных полях; кнопка защищена от двойного нажатия; каждое сообщение об ошибке связано с полем и доступно скринридеру; фильтры сохраняются в URL; маршрут 404 работает; переход по прямой ссылке на /books/42 открывает нужную страницу.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "9": [
+      {
+        "paragraph": 28,
+        "text": "Практика 9 · W9",
+        "style": "P10",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 29,
+        "text": "Проектирование ресурсного API и первые эндпоинты FastAPI",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 30,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 31,
+        "text": "Научиться проектировать API до написания кода и проверять его в Swagger UI без готового клиента.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 32,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 33,
+        "text": "Python, аннотации типов, коды HTTP, REST-соглашения, лекция 9.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 34,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 35,
+        "text": "Python 3.12, venv, fastapi, uvicorn, pydantic, Thunder Client, VS Code с расширением Python.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 36,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 37,
+        "text": "Проектирование на бумаге (12 минут). Для предметной области своего итогового проекта выписать: сущности; для каждой — таблицу «метод / путь / назначение / коды ответов»; отдельно нестандартные действия как переходы состояния подчинённого ресурса.",
+        "style": "P11",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 38,
+        "text": "Взаимная проверка в парах: сосед ищет в вашей спецификации глаголы в URL, отсутствующие коды ошибок и несогласованные имена. Исправить найденное.",
+        "style": "P11",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 39,
+        "text": "Создать проект: виртуальное окружение, requirements.txt, структура app/{main,schemas,routers}, запуск с --reload.",
+        "style": "P12",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 40,
+        "text": "Описать схемы XCreate, XUpdate, XRead для главной сущности с ограничениями через Field.",
+        "style": "P12",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 41,
+        "text": "Реализовать GET /items (с query-параметрами фильтрации и пагинации) и POST /items (код 201) на хранилище в виде словаря в памяти.",
+        "style": "P12",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 42,
+        "text": "Проверить в Swagger UI: корректный запрос (201), нарушение ограничения (422 — изучить структуру detail), несуществующий id (404).",
+        "style": "P12",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 43,
+        "text": "Добавить GET /health и заполнить метаданные приложения (title, version, description).",
+        "style": "P12",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 44,
+        "text": "Экспортировать openapi.json и приложить его в репозиторий.",
+        "style": "P12",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L2"
+      },
+      {
+        "paragraph": 45,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 46,
+        "text": "@router.post(\"\", response_model=ItemRead, status_code=201)",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 47,
+        "text": "def create(payload: ItemCreate, store: Store = Depends(get_store)):",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 48,
+        "text": "    return store.add(payload)",
+        "style": "P9",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 49,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 50,
+        "text": "Дописать GET /items/{id}, PATCH (с exclude_unset) и DELETE (204); обеспечить 404 во всех трёх случаях отсутствия записи.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 51,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 52,
+        "text": "Реализовать зависимость Pagination и применить её к двум разным эндпоинтам без дублирования кода; добавить в ответ конверт Page[T] с полями items/total/page/size, типизированный через дженерик.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 53,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 54,
+        "text": "docs/api-design.md + работающий API. Зачтено, если: в путях нет глаголов; для каждого эндпоинта заданы response_model и status_code; схемы разделены на три роли; ошибка 422 воспроизведена и разобрана; Swagger UI отображает все эндпоинты с описаниями.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "10": [
+      {
+        "paragraph": 55,
+        "text": "Практика 10 · W10",
+        "style": "P10",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 56,
+        "text": "Проектирование схемы БД и SQL в psql",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 57,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 58,
+        "text": "Спроектировать нормализованную схему предметной области, реализовать её в PostgreSQL и написать запросы, которые понадобятся приложению.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 59,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 60,
+        "text": "Реляционная модель, нормализация, типы связей, синтаксис SQL, лекция 10.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 61,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 62,
+        "text": "PostgreSQL 17 (локально либо в Docker), psql, DBeaver/pgAdmin, dbdiagram.io.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 63,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 64,
+        "text": "Получить «плохую» широкую таблицу от преподавателя; выявить и записать три аномалии (вставки, обновления, удаления) с конкретным примером каждой.",
+        "style": "P13",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 65,
+        "text": "Провести нормализацию до 3NF; нарисовать ER-диаграмму в dbdiagram.io, экспортировать PNG в db/.",
+        "style": "P14",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 66,
+        "text": "Написать DDL-скрипт db/schema.sql: не менее 6 таблиц, связи 1:N, M:N (через таблицу-связку с составным ключом) и 1:1, ограничения NOT NULL/UNIQUE/CHECK, осознанный выбор поведения ON DELETE для каждого внешнего ключа.",
+        "style": "P14",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 67,
+        "text": "Написать db/seed.sql с тестовыми данными: не менее 30 строк в основной таблице и заполненные связи.",
+        "style": "P14",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 68,
+        "text": "Проверить, что ограничения работают: выполнить три заведомо некорректные вставки и записать текст полученных ошибок в отчёт.",
+        "style": "P13",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 69,
+        "text": "Написать 6 запросов из списка преподавателя: соединение трёх таблиц, агрегат с группировкой, HAVING, LEFT JOIN с поиском «сирот», пагинация с сортировкой, вычисляемое поле.",
+        "style": "P14",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 70,
+        "text": "Выполнить операцию из двух шагов в транзакции; повторить с ROLLBACK и убедиться, что данные не изменились.",
+        "style": "P14",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L3"
+      },
+      {
+        "paragraph": 71,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 72,
+        "text": "-- проверка, что ограничение действительно защищает данные",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 73,
+        "text": "INSERT INTO loans (book_id, user_id, due_date) VALUES (1, 1, '2020-01-01');",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 74,
+        "text": "-- ERROR:  new row violates check constraint \"loans_dates_ck\"",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 75,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 76,
+        "text": "Написать запрос, воспроизводящий главный экран вашего приложения одним обращением к БД (со всеми связанными данными и признаками, вычисляемыми на стороне сервера).",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 77,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 78,
+        "text": "Сгенерировать 500 000 строк через generate_series, замерить EXPLAIN ANALYZE для запроса вашего главного экрана, создать индекс, замерить снова; приложить оба плана и объяснить, почему планировщик сменил стратегию. Дополнительно: выразить одно бизнес-правило частичным уникальным индексом.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 79,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 80,
+        "text": "Каталог db/ со схемой, данными, запросами и отчётом. Зачтено, если: схема в 3NF без списков в одном поле; все внешние ключи объявлены; присутствуют все три типа связей; не менее 8 ограничений целостности; 6 запросов возвращают корректный результат; продемонстрирован откат транзакции.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "11": [
+      {
+        "paragraph": 81,
+        "text": "Практика 11 · W11",
+        "style": "P10",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 82,
+        "text": "ORM против SQL: N+1 и цикл миграций",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 83,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 84,
+        "text": "Научиться видеть SQL за кодом ORM, обнаруживать и устранять N+1, уверенно выполнять цикл миграций.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 85,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 86,
+        "text": "Схема БД из практики 10, модели SQLAlchemy, сессии, лекция 11.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 87,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 88,
+        "text": "sqlalchemy 2.0, alembic, psycopg, pydantic-settings, PostgreSQL, psql.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 89,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 90,
+        "text": "Описать 3 модели своей схемы в app/models.py с корректными relationship и back_populates, включая связь M:N через secondary.",
+        "style": "P15",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 91,
+        "text": "Настроить engine с echo=True, фабрику сессий и зависимость get_db.",
+        "style": "P15",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 92,
+        "text": "Инициализировать Alembic, указать target_metadata, создать первую ревизию и применить её. Сравнить результат в psql (\\d) с DDL-скриптом практики 10 — расхождения устранить.",
+        "style": "P15",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 93,
+        "text": "Переписать один запрос из практики 10 на select()-стиль; сравнить сгенерированный SQL из лога с рукописным вариантом и записать различия.",
+        "style": "P15",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 94,
+        "text": "Воспроизвести N+1: в цикле обратиться к связанной сущности, посчитать строки SELECT в логе, приложить фрагмент лога.",
+        "style": "P15",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 95,
+        "text": "Устранить через selectinload; приложить лог после устранения и указать итоговое число запросов.",
+        "style": "P15",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 96,
+        "text": "Добавить поле в модель, сгенерировать ревизию, открыть файл ревизии и проверить его вручную, применить, откатить (downgrade -1), применить снова.",
+        "style": "P15",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 97,
+        "text": "Реализовать репозиторий одной сущности с list/get/create/update/delete и пагинацией на стороне БД.",
+        "style": "P15",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L4"
+      },
+      {
+        "paragraph": 98,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 99,
+        "text": "stmt = select(Book).options(selectinload(Book.author), selectinload(Book.genres))",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 100,
+        "text": "# 21 запрос → 3 запроса",
+        "style": "P16",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 101,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 102,
+        "text": "Перевести эндпоинты из практики 9 с хранилища в памяти на репозиторий поверх PostgreSQL, сохранив контракт API без изменений (те же пути, схемы и коды ответов).",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 103,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 104,
+        "text": "Написать миграцию с преобразованием данных: разделить поле full_name на first_name и last_name, обеспечив работоспособность downgrade (обратное склеивание) и сохранность существующих значений.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 105,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 106,
+        "text": "Backend на PostgreSQL. Зачтено, если: alembic upgrade head поднимает схему на пустой базе; в репозитории не менее двух ревизий; откат работает; приложены логи до и после устранения N+1; отсутствуют create_all() и сессии на уровне модуля; API возвращает те же ответы, что и на хранилище в памяти.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "12": [
+      {
+        "paragraph": 107,
+        "text": "Практика 12 · W12",
+        "style": "P10",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 108,
+        "text": "Атака и защита: устранение уязвимостей в собственном коде",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 109,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 110,
+        "text": "Увидеть работу типовых атак на учебном стенде и закрыть соответствующие уязвимости в своём проекте.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 111,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 112,
+        "text": "JWT, хеширование, роли, CORS, классы уязвимостей, лекция 12.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 113,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 114,
+        "text": "Учебный уязвимый стенд vuln-lab (предоставляется преподавателем и работает только локально), собственный проект, python-jose, passlib[bcrypt], jwt.io.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 115,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 116,
+        "text": "Стенд, XSS. Отправить в поле отзыва полезную нагрузку <img src=x onerror=\"...\">, увидеть срабатывание, найти в коде dangerouslySetInnerHTML, устранить, повторить попытку.",
+        "style": "P17",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 117,
+        "text": "Стенд, SQL-инъекция. Ввести ' OR 1=1 -- в поиск, получить все записи, найти строковую интерполяцию в SQL, заменить на параметризованный запрос, повторить попытку.",
+        "style": "P17",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 118,
+        "text": "Стенд, подделка токена. Разобрать свой токен на jwt.io, изменить role на admin, отправить запрос — получить 401; объяснить, что именно не совпало.",
+        "style": "P17",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 119,
+        "text": "Стенд, IDOR. Войти пользователем A, запросить ресурс пользователя B по идентификатору, получить данные; добавить проверку владения, повторить — 404. Объяснить, почему 404, а не 403.",
+        "style": "P18",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 120,
+        "text": "Свой проект. Реализовать хеширование паролей bcrypt, эндпоинты /auth/register и /auth/token, единое сообщение при неудачном входе.",
+        "style": "P17",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 121,
+        "text": "Реализовать зависимость get_current_user и защитить один эндпоинт; проверить в Swagger UI кнопкой Authorize.",
+        "style": "P17",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 122,
+        "text": "Настроить CORS с явным списком origins; воспроизвести ошибку с неверным origin и устранить её.",
+        "style": "P18",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 123,
+        "text": "Проверить, что .env в .gitignore, а SECRET_KEY не имеет значения по умолчанию в коде.",
+        "style": "P17",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L5"
+      },
+      {
+        "paragraph": 124,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 125,
+        "text": "# уязвимо",
+        "style": "P16",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 126,
+        "text": "db.execute(text(f\"SELECT * FROM books WHERE title LIKE '%{q}%'\"))",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 127,
+        "text": "# безопасно",
+        "style": "P16",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 128,
+        "text": "db.execute(text(\"SELECT * FROM books WHERE title ILIKE :q\"), {\"q\": f\"%{q}%\"})",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 129,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 130,
+        "text": "Реализовать зависимость require_role и защитить все изменяющие эндпоинты; проверить каждый тремя запросами: без токена (401), с токеном обычного пользователя (403), с токеном роли (200/201).",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 131,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 132,
+        "text": "Реализовать refresh-токены с раздельными сроками жизни и клиентским перехватчиком, который однократно обновляет access-токен при получении 401 и повторяет исходный запрос; продемонстрировать сценарий, установив срок жизни access-токена в 30 секунд.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 133,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 134,
+        "text": "Отчёт docs/security-review.md + защищённые эндпоинты. Зачтено, если: все четыре атаки на стенде воспроизведены и закрыты с приложенными подтверждениями; в проекте пароли хешируются; вход выдаёт токен; защищённый эндпоинт возвращает 401 без токена и 403 при недостатке прав; секреты отсутствуют в репозитории; CORS ограничен списком.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "13": [
+      {
+        "paragraph": 135,
+        "text": "Практика 13 · W13",
+        "style": "P19",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 136,
+        "text": "Первые тесты и разбор «красного» теста",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 137,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 138,
+        "text": "Научиться писать изолированные тесты API и компонентов и использовать их как инструмент диагностики, а не формальное требование.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 139,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 140,
+        "text": "Аутентификация, слои backend, состояния клиента, лекция 13.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 141,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 142,
+        "text": "pytest, httpx, pytest-cov, отдельная БД *_test; vitest, @testing-library/react, @testing-library/user-event, jsdom.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 143,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 144,
+        "text": "Создать тестовую БД и tests/conftest.py с фикстурами db (транзакция с откатом), client (подмена get_db), member_token, librarian_token.",
+        "style": "P20",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 145,
+        "text": "Написать тест успешного создания записи (201 и содержимое ответа).",
+        "style": "P21",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 146,
+        "text": "Написать тест 404 для несуществующего идентификатора.",
+        "style": "P21",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 147,
+        "text": "Написать тест 422 для нарушения ограничения схемы.",
+        "style": "P21",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 148,
+        "text": "Написать тест 401 (без токена) и 403 (недостаточная роль).",
+        "style": "P21",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 149,
+        "text": "Написать тест главного бизнес-правила проекта с ожидаемым кодом 409.",
+        "style": "P21",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 150,
+        "text": "Запустить все тесты дважды подряд и убедиться, что второй запуск также зелёный (проверка изоляции).",
+        "style": "P21",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 151,
+        "text": "Настроить Vitest, написать тест формы: невалидный ввод → сообщение об ошибке, отправка не выполняется.",
+        "style": "P21",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 152,
+        "text": "Разбор регрессии. Преподаватель выдаёт патч с внесённым дефектом; применить, увидеть красный тест, прочитать сообщение и по нему найти причину, не читая патч.",
+        "style": "P21",
+        "list_ordinal": 9,
+        "list_kind": "number",
+        "list_style": "L6"
+      },
+      {
+        "paragraph": 153,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 154,
+        "text": "def test_member_cannot_delete(client, member_token, book):",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 155,
+        "text": "    r = client.delete(f\"/api/v1/books/{book.id}\",",
+        "style": "P9",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 156,
+        "text": "                      headers={\"Authorization\": f\"Bearer {member_token}\"})",
+        "style": "P9",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 157,
+        "text": "    assert r.status_code == 403",
+        "style": "P9",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 158,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 159,
+        "text": "Довести число тестов до 10 (не менее 8 API и 2 клиентских); добиться зелёного результата на чистой тестовой базе; приложить вывод обеих команд запуска.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 160,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 161,
+        "text": "Параметризовать один тест через pytest.mark.parametrize, покрыв 6 комбинаций «роль × операция × ожидаемый код», и оформить результат в виде таблицы прав доступа в docs/permissions.md.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 162,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 163,
+        "text": "Каталог tests/ с зелёным набором. Зачтено, если: тесты выполняются на отдельной БД и не зависят от порядка запуска; повторный запуск проходит; покрыты коды 201, 401, 403, 404, 422 и главное бизнес-правило; клиентский тест проверяет поведение, а не разметку; причина регрессии найдена по сообщению теста.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "14": [
+      {
+        "paragraph": 164,
+        "text": "Практика 14 · W14",
+        "style": "P19",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 165,
+        "text": "Диагностика контейнеров: почему приложение не поднимается",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 166,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 167,
+        "text": "Освоить не только запуск, но и диагностику многосервисного приложения: чтение логов, проверка сети, вход в контейнер.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 168,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 169,
+        "text": "Образы, контейнеры, тома, сети, Nginx, лекция 14.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 170,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 171,
+        "text": "Docker Engine + Compose v2, набор из пяти заведомо сломанных compose-конфигураций от преподавателя, собственный проект.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 172,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 173,
+        "text": "Запустить эталонный docker compose up и разобрать вывод по фазам: получение образов, сборка, healthcheck, миграции, старт.",
+        "style": "P22",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 174,
+        "text": "Дефект 1. API падает с ошибкой подключения к БД. Прочитать docker compose logs api, найти localhost в строке подключения, заменить на имя сервиса.",
+        "style": "P22",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 175,
+        "text": "Дефект 2. API стартует раньше БД. Добавить healthcheck и condition: service_healthy.",
+        "style": "P22",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 176,
+        "text": "Дефект 3. После down/up данные исчезли. Обнаружить отсутствие тома, добавить его, проверить сохранность.",
+        "style": "P22",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 177,
+        "text": "Дефект 4. Страница /books/42 при обновлении даёт 404. Найти отсутствие try_files в конфигурации Nginx, исправить.",
+        "style": "P22",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 178,
+        "text": "Дефект 5. Сборка образа занимает 3 минуты при правке одной строки. Найти неверный порядок инструкций COPY, исправить, замерить время повторно.",
+        "style": "P22",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 179,
+        "text": "Освоить диагностический набор: docker compose ps, logs -f, exec api sh, exec db psql -U ..., docker images, docker system df.",
+        "style": "P22",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 180,
+        "text": "Применить всё найденное к собственному проекту; выполнить docker compose down -v и полный запуск «с нуля».",
+        "style": "P22",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L7"
+      },
+      {
+        "paragraph": 181,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 182,
+        "text": "docker compose exec api sh -c 'env | grep DATABASE_URL'",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 183,
+        "text": "docker compose exec db psql -U booknest -d booknest -c '\\dt'",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 184,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 185,
+        "text": "Довести собственный docker-compose.yml до состояния «запуск двумя командами на чистой машине»; приложить вывод docker compose ps и docker images с размерами образов.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 186,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 187,
+        "text": "Добавить в compose отдельный профиль для тестов (docker compose --profile test up), поднимающий тестовую БД и выполняющий pytest внутри контейнера, с корректным кодом выхода при падении тестов.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 188,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 189,
+        "text": "Отчёт docs/docker-debug.md + работающий compose проекта. Зачтено, если: все пять дефектов найдены с указанием симптома, причины и исправления; собственный проект поднимается после down -v; данные БД сохраняются между перезапусками; страницы SPA открываются по прямым ссылкам; студент выполнил вход в контейнер и получил доступ к psql.",
+        "style": "P5",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ],
+    "15": [
+      {
+        "paragraph": 190,
+        "text": "Практика 15 · W15",
+        "style": "P19",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 191,
+        "text": "Взаимное code review по официальной рубрике",
+        "style": "P2",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 192,
+        "text": "Цель",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 193,
+        "text": "Научиться проверять чужой проект структурно и формулировать замечания так, чтобы они были приняты и выполнены.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 194,
+        "text": "Исходные знания",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 195,
+        "text": "Весь материал курса; рубрика итогового проекта (раздел 15).",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 196,
+        "text": "ПО",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 197,
+        "text": "GitHub (комментарии к Pull Request), Docker, браузер, Lighthouse; проект закреплённого однокурсника.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 198,
+        "text": "Пошаговое задание",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 199,
+        "text": "Воспроизводимость (7 мин). Клонировать проект и запустить строго по README, ничего не додумывая. Зафиксировать каждый шаг, которого в инструкции не хватило.",
+        "style": "P23",
+        "list_ordinal": 1,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 200,
+        "text": "Функциональность (8 мин). Пройти основной сценарий: регистрация, вход, создание, просмотр, изменение, удаление, выход. Отметить, где нет обратной связи или где ошибка не обработана.",
+        "style": "P23",
+        "list_ordinal": 2,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 201,
+        "text": "Безопасность (8 мин). Проверить пять пунктов: секреты в репозитории; ответ /api/users/me на предмет лишних полей; доступ к чужому объекту по идентификатору; изменяющий эндпоинт без токена; хранение пароля в БД.",
+        "style": "P24",
+        "list_ordinal": 3,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 202,
+        "text": "Код (10 мин). Три файла на выбор: структура и слои, повторяющийся код, обработка ошибок, наличие миграций под изменения моделей.",
+        "style": "P23",
+        "list_ordinal": 4,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 203,
+        "text": "Оформление (5 мин). История коммитов (распределена по семестру или сделана за два дня), README, наличие тестов и их результат.",
+        "style": "P23",
+        "list_ordinal": 5,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 204,
+        "text": "Оформить не менее 8 комментариев к PR по шаблону «место → следствие → предложение → приоритет», из них минимум 2 по безопасности.",
+        "style": "P23",
+        "list_ordinal": 6,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 205,
+        "text": "Заполнить рубрику с баллами по каждому критерию и обосновать три самые низкие оценки.",
+        "style": "P23",
+        "list_ordinal": 7,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 206,
+        "text": "Обменяться результатами; получить ревью на свой проект и составить план исправлений до защиты.",
+        "style": "P23",
+        "list_ordinal": 8,
+        "list_kind": "number",
+        "list_style": "L8"
+      },
+      {
+        "paragraph": 207,
+        "text": "Пример",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 208,
+        "text": "Блокирующее · backend/app/routers/loans.py:52",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 209,
+        "text": "Эндпоинт возвращает выдачу по id без проверки владельца — любой",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 210,
+        "text": "вошедший пользователь читает чужие данные (проверено токеном member).",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 211,
+        "text": "Предлагаю зависимость get_own_loan с проверкой loan.user_id == user.id.",
+        "style": "P8",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 212,
+        "text": "Самостоятельная часть",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 213,
+        "text": "Устранить полученные от рецензента блокирующие замечания и ответить на каждый комментарий ссылкой на коммит с исправлением.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 214,
+        "text": "Challenge task",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 215,
+        "text": "Найти в проверяемом проекте один дефект производительности (N+1, отсутствующий индекс, избыточная загрузка) и подтвердить его измерением — фрагментом лога SQL, планом запроса или отчётом Lighthouse.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 216,
+        "text": "Результат и критерии",
+        "style": "P3",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 217,
+        "text": "Ревью в PR однокурсника + заполненная рубрика + план исправлений своего проекта. Зачтено, если: проект рецензента был реально запущен (приложен скриншот); не менее 8 конструктивных комментариев с указанием места и предложения; минимум 2 замечания по безопасности; ни одного замечания в форме личной оценки; на собственные замечания даны ответы.",
+        "style": "P4",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 218,
+        "text": "",
+        "style": "Standard",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      },
+      {
+        "paragraph": 219,
+        "text": "",
+        "style": "Standard",
+        "list_ordinal": null,
+        "list_kind": null,
+        "list_style": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,237 @@
+[961] Лекция 13 · Неделя 13
+[962] Интеграция Full-Stack, обработка ошибок и тестирование
+[963] 2 ч
+[964] Learning objectives
+[965] Настроить взаимодействие клиента и сервера в режиме разработки и объяснить роль dev-proxy.
+[966] Вынести всю конфигурацию в переменные окружения по принципам 12-factor.
+[967] Спроектировать единый формат ошибки API и корректно отобразить её в интерфейсе.
+[968] Написать интеграционные тесты API на тестовой базе и unit-тесты компонентов.
+[969] Определить, что именно следует тестировать в учебном проекте при ограниченном времени.
+[970] Основные понятия
+[971] интеграция, dev-proxy, порты и origin, переменные окружения, 12-factor app, .env и .env.example, единый формат ошибки, problem detail, обработчик исключений, корреляционный идентификатор запроса, логирование и уровни логов, пирамида тестирования, unit / integration / e2e, фикстура, изоляция теста, тестовая БД, TestClient/httpx.AsyncClient, подмена зависимости, Vitest, React Testing Library, запрос по роли, покрытие, регрессия
+[972] План лекции
+[973] 1. 0–15 мин. Два процесса на одной машине: Vite на 5173, Uvicorn на 8000. Три способа их соединить (CORS, dev-proxy, единый origin через Nginx) и почему в разработке выбирается proxy, а в продуктивной среде — Nginx.
+[974] 2. 15–30 мин. Конфигурация: что обязано быть переменной окружения (адрес БД, секрет, список origins, базовый URL API), правило «в репозитории лежит .env.example, а не .env», особенности VITE_-префикса и почему клиентские переменные не являются секретами.
+[975] 3. 30–50 мин. Ошибки: проектирование единого формата ответа об ошибке; централизованный обработчик исключений FastAPI; трансляция исключений предметной области в коды HTTP; что можно и что нельзя сообщать клиенту; логирование с идентификатором запроса и как по нему найти проблему.
+[976] 4. 50–62 мин. Отображение ошибок в интерфейсе: карта «код → сообщение для пользователя», компонент ErrorBoundary, повторная попытка, различение восстановимых и невосстановимых ошибок.
+[977] 5. 62–80 мин. Зачем тесты: демонстрация регрессии — правка в сервисе ломает выдачу книги, тест ловит это за 2 секунды. Пирамида тестирования и что она означает для учебного проекта.
+[978] 6. 80–98 мин. Тестирование API: фикстуры pytest, отдельная тестовая БД, подмена зависимости get_db, откат транзакции после каждого теста, тесты на 201/404/422/401/403, тест бизнес-правила.
+[979] 7. 98–108 мин. Тестирование клиента: Vitest + React Testing Library, поиск элементов по роли и метке, имитация ввода пользователя, подмена сетевого слоя. Что тестировать в первую очередь: утилиты, валидацию, критичный компонент.
+[980] 8. 108–110 мин. Задание на лабораторную 10.
+[981] Теоретический материал
+[982] Неделя интеграции — момент, когда студент впервые видит систему целиком, и главная её тема — воспроизводимость. Приложение не должно содержать ни одного значения, зависящего от машины разработчика: адреса, порты, пароли и ключи приходят из окружения. Практический критерий: проект запускается на чужом компьютере после копирования .env.example в .env и заполнения значений, без правки исходного кода. Это же требование через неделю сделает Docker естественным продолжением, а не новой темой.
+[983] Второй сюжет — ошибка как часть контракта API. Если каждый эндпоинт сообщает об ошибке по-своему, клиент вынужден разбирать каждый случай отдельно. Единый формат (code, message, details, request_id) позволяет написать обработку ошибок один раз в клиенте API. Отдельно проговаривается граница: пользователю показывается понятное сообщение, в лог пишется техническая подробность, а внутренние трассировки клиенту не отдаются никогда. Третий сюжет — тесты как экономия времени, а не бюрократия. Требования курса умеренны и потому выполнимы: 8–12 тестов на проект, покрывающих критический путь (аутентификация, главное бизнес-правило, коды ошибок). Цель — не покрытие в процентах, а способность студента изменить код и в течение минуты убедиться, что он ничего не сломал.
+[984] Практические примеры
+[985] Демонстрация ошибки CORS при запуске «в лоб», затем настройка dev-proxy — ошибка исчезает без правки backend.
+[986] Обрыв соединения с БД: показать, что видит пользователь (понятное сообщение) и что попадает в лог (трассировка и request_id).
+[987] Внесение регрессии в сервис выдачи книги — «красный» тест на экране через 2 секунды.
+[988] Code examples
+[989] Конфигурация и dev-proxy: ни одного адреса в коде
+[990] # .env.example — лежит в репозитории, .env — никогда
+[991] DATABASE_URL=postgresql+psycopg://booknest:changeme@localhost:5432/booknest
+[992] SECRET_KEY=replace-with-openssl-rand-hex-32
+[993] ACCESS_TTL_MIN=15
+[994] CORS_ORIGINS=["http://localhost:5173"]
+[995] LOG_LEVEL=INFO
+[996] // vite.config.ts — запросы на /api уходят на backend, origin один → CORS не нужен
+[997] export default defineConfig({
+[998]   plugins: [react()],
+[999]   server: {
+[1000]     port: 5173,
+[1001]     proxy: {
+[1002]       "/api": {
+[1003]         target: process.env.VITE_API_TARGET ?? "http://localhost:8000",
+[1004]         changeOrigin: true,
+[1005]       },
+[1006]     },
+[1007]   },
+[1008] });
+[1009]
+[1010] // src/api/client.ts — базовый URL относительный: работает и в dev, и за Nginx
+[1011] const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
+[1012] Единый формат ошибки и централизованный обработчик
+[1013] # app/core/errors.py
+[1014] class AppError(Exception):
+[1015]     status_code = 400
+[1016]     code = "app_error"
+[1017]     def __init__(self, message: str, details: dict | None = None):
+[1018]         self.message, self.details = message, details or {}
+[1019]
+[1020] class NotFoundError(AppError):      status_code, code = 404, "not_found"
+[1021] class ConflictError(AppError):      status_code, code = 409, "conflict"
+[1022] class PermissionError_(AppError):   status_code, code = 403, "forbidden"
+[1023]
+[1024] # app/main.py
+[1025] @app.middleware("http")
+[1026] async def add_request_id(request: Request, call_next):
+[1027]     request.state.request_id = str(uuid4())          # сквозной идентификатор
+[1028]     response = await call_next(request)
+[1029]     response.headers["X-Request-ID"] = request.state.request_id
+[1030]     return response
+[1031]
+[1032] @app.exception_handler(AppError)
+[1033] async def app_error_handler(request: Request, exc: AppError):
+[1034]     log.warning("%s %s → %s: %s", request.method, request.url.path, exc.code, exc.message)
+[1035]     return JSONResponse(
+[1036]         status_code=exc.status_code,
+[1037]         content={"code": exc.code, "message": exc.message, "details": exc.details,
+[1038]                  "request_id": request.state.request_id},
+[1039]     )
+[1040]
+[1041] @app.exception_handler(Exception)
+[1042] async def unhandled_handler(request: Request, exc: Exception):
+[1043]     # в лог — всё; клиенту — ничего внутреннего
+[1044]     log.exception("unhandled error, request_id=%s", request.state.request_id)
+[1045]     return JSONResponse(
+[1046]         status_code=500,
+[1047]         content={"code": "internal_error",
+[1048]                  "message": "Внутренняя ошибка сервера. Обратитесь к администратору.",
+[1049]                  "request_id": request.state.request_id},
+[1050]     )
+[1051] // src/shared/lib/errorMessage.ts — код ошибки → текст для пользователя
+[1052] const MESSAGES: Record<string, string> = {
+[1053]   not_found:  "Запись не найдена. Возможно, её удалили.",
+[1054]   conflict:   "Действие невозможно: данные изменились. Обновите страницу.",
+[1055]   forbidden:  "У вас нет прав на это действие.",
+[1056]   unauthorized:"Сессия истекла. Войдите снова.",
+[1057]   validation_error: "Проверьте правильность заполнения полей.",
+[1058] };
+[1059]
+[1060] export function toUserMessage(err: unknown): string {
+[1061]   if (err instanceof ApiError) {
+[1062]     if (err.status === 0) return "Нет соединения с сервером. Проверьте интернет.";
+[1063]     return MESSAGES[err.code] ?? "Не удалось выполнить действие. Попробуйте позже.";
+[1064]   }
+[1065]   return "Произошла непредвиденная ошибка.";
+[1066] }
+[1067] Тесты API: изолированная БД, подмена зависимости, тест бизнес-правила
+[1068] # tests/conftest.py
+[1069] import pytest
+[1070] from fastapi.testclient import TestClient
+[1071] from sqlalchemy import create_engine
+[1072] from sqlalchemy.orm import sessionmaker
+[1073] from app.main import app
+[1074] from app.db import get_db
+[1075] from app.models import Base
+[1076]
+[1077] TEST_URL = "postgresql+psycopg://booknest:changeme@localhost:5432/booknest_test"
+[1078] engine = create_engine(TEST_URL)
+[1079] TestSession = sessionmaker(engine)
+[1080]
+[1081] @pytest.fixture(scope="session", autouse=True)
+[1082] def create_schema():
+[1083]     Base.metadata.create_all(engine)
+[1084]     yield
+[1085]     Base.metadata.drop_all(engine)
+[1086]
+[1087] @pytest.fixture
+[1088] def db():
+[1089]     # каждый тест — в своей транзакции, которая откатывается: тесты не влияют друг на друга
+[1090]     connection = engine.connect()
+[1091]     transaction = connection.begin()
+[1092]     session = TestSession(bind=connection)
+[1093]     yield session
+[1094]     session.close(); transaction.rollback(); connection.close()
+[1095]
+[1096] @pytest.fixture
+[1097] def client(db):
+[1098]     app.dependency_overrides[get_db] = lambda: db
+[1099]     yield TestClient(app)
+[1100]     app.dependency_overrides.clear()
+[1101]
+[1102] @pytest.fixture
+[1103] def librarian_token(client, db):
+[1104]     db.add(User(email="lib@u.kz", password_hash=hash_password("Pass1234"), role="librarian"))
+[1105]     db.commit()
+[1106]     r = client.post("/api/v1/auth/token", data={"username": "lib@u.kz", "password": "Pass1234"})
+[1107]     return r.json()["access_token"]
+[1108]
+[1109] # tests/test_books.py
+[1110] def test_create_book_returns_201_and_body(client, librarian_token, author):
+[1111]     r = client.post("/api/v1/books",
+[1112]                     json={"title": "Солярис", "year": 1961, "genre": "scifi",
+[1113]                           "author_id": author.id, "total_copies": 2},
+[1114]                     headers={"Authorization": f"Bearer {librarian_token}"})
+[1115]     assert r.status_code == 201
+[1116]     assert r.json()["title"] == "Солярис"
+[1117]     assert "id" in r.json()
+[1118]
+[1119] def test_create_book_without_token_returns_401(client, author):
+[1120]     r = client.post("/api/v1/books", json={"title": "X", "year": 2020,
+[1121]                                            "genre": "cs", "author_id": author.id})
+[1122]     assert r.status_code == 401
+[1123]
+[1124] def test_create_book_with_invalid_year_returns_422(client, librarian_token, author):
+[1125]     r = client.post("/api/v1/books",
+[1126]                     json={"title": "X", "year": 3000, "genre": "cs", "author_id": author.id},
+[1127]                     headers={"Authorization": f"Bearer {librarian_token}"})
+[1128]     assert r.status_code == 422
+[1129]
+[1130] def test_member_cannot_delete_book(client, member_token, book):
+[1131]     r = client.delete(f"/api/v1/books/{book.id}",
+[1132]                       headers={"Authorization": f"Bearer {member_token}"})
+[1133]     assert r.status_code == 403
+[1134]
+[1135] # tests/test_loans.py — главное бизнес-правило проекта
+[1136] def test_cannot_issue_book_without_free_copies(client, member_token, book_one_copy, other_loan):
+[1137]     r = client.post(f"/api/v1/books/{book_one_copy.id}/loans",
+[1138]                     headers={"Authorization": f"Bearer {member_token}"})
+[1139]     assert r.status_code == 409
+[1140]     assert r.json()["code"] == "conflict"
+[1141]
+[1142] def test_user_cannot_read_foreign_loan(client, member_token, foreign_loan):
+[1143]     r = client.get(f"/api/v1/loans/{foreign_loan.id}",
+[1144]                    headers={"Authorization": f"Bearer {member_token}"})
+[1145]     assert r.status_code == 404      # не 403: не подтверждаем существование ресурса
+[1146] Тест компонента: проверяем поведение, а не разметку
+[1147] // src/features/loans/LoanForm.test.tsx
+[1148] import { render, screen } from "@testing-library/react";
+[1149] import userEvent from "@testing-library/user-event";
+[1150] import { vi } from "vitest";
+[1151] import { LoanForm } from "./LoanForm";
+[1152]
+[1153] vi.mock("../../api/loans", () => ({
+[1154]   loansApi: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+[1155] }));
+[1156]
+[1157] test("не отправляет форму с некорректным e-mail и показывает ошибку", async () => {
+[1158]   const onSuccess = vi.fn();
+[1159]   render(<LoanForm onSuccess={onSuccess} />);
+[1160]
+[1161]   await userEvent.type(screen.getByLabelText(/e-mail/i), "не-почта");
+[1162]   await userEvent.click(screen.getByRole("button", { name: /выдать/i }));
+[1163]
+[1164]   expect(await screen.findByRole("alert")).toHaveTextContent(/формат e-mail/i);
+[1165]   expect(onSuccess).not.toHaveBeenCalled();
+[1166] });
+[1167] Демонстрация на занятии
+[1168] «Регрессия за две секунды». Запустить pytest -q — 12 тестов зелёные. Затем внести в сервис выдачи «безобидную» правку: заменить >= на > в проверке числа свободных экземпляров. Повторить запуск — один тест красный, с точным указанием, что ожидалось 409, а получено 201. Подчеркнуть: тот же дефект без теста был бы обнаружен на защите проекта. Вторая часть — vitest --watch: изменить сообщение об ошибке в схеме валидации и увидеть моментальную реакцию теста. Третья часть — показать в логе сервера строку с request_id и найти по этому же идентификатору заголовок ответа в DevTools: так дефект связывается с конкретным запросом пользователя.
+[1169] Типичные ошибки студентов
+[1170] Захардкоженные http://localhost:8000 в десятках компонентов.
+[1171] .env закоммичен в репозиторий; .env.example отсутствует.
+[1172] Уверенность, что VITE_-переменные секретны (они попадают в сборку и видны любому).
+[1173] Тесты выполняются на рабочей базе и удаляют реальные данные.
+[1174] Тесты зависят друг от друга и от порядка запуска; повторный запуск падает из-за уже созданных записей.
+[1175] Тестируется вывод console.log или структура разметки вместо поведения.
+[1176] Ответ 500 с полной трассировкой Python отдаётся клиенту.
+[1177] Единственное сообщение «Ошибка!» на все случаи; пользователь не понимает, что делать дальше.
+[1178] Погоня за покрытием в 100 % при отсутствии теста на главное бизнес-правило.
+[1179] Контрольные вопросы
+[1180] 1. Три способа соединить клиент и сервер в разработке — в чём различие и что выбрать?
+[1181] 2. Какие значения обязаны быть переменными окружения и почему?
+[1182] 3. Почему VITE_API_KEY нельзя считать секретом?
+[1183] 4. Из каких полей должен состоять единый формат ошибки API?
+[1184] 5. Что допустимо сообщить клиенту при ошибке 500, а что — только записать в лог?
+[1185] 6. Зачем нужен request_id и как им пользоваться при разборе инцидента?
+[1186] 7. Что такое пирамида тестирования и почему интеграционных тестов API в учебном проекте больше всего?
+[1187] 8. Как обеспечить независимость тестов друг от друга?
+[1188] 9. Зачем подменять зависимость get_db в тестах?
+[1189] 10. Почему в React Testing Library элементы ищут по роли и метке, а не по классу?
+[1190] Домашнее задание
+[1191] (1) Полностью вынести конфигурацию проекта в окружение; добавить .env.example и раздел «Запуск» в README.md, по которому проект поднимается на чужой машине. (2) Реализовать единый формат ошибки и клиентскую функцию toUserMessage; заменить все места, где ошибка выводится как «Ошибка». (3) Довести число тестов до 10: минимум 6 API-тестов (включая 401, 403, 404, 422 и главное бизнес-правило) и 2 клиентских. (4) Приложить к PR вывод pytest -q и npx vitest run.
+[1192] Материалы
+[1193] fastapi.tiangolo.com — Testing, Handling Errors, Settings and Environment Variables, Testing a Database.
+[1194] docs.pytest.org — Fixtures, Parametrizing tests.
+[1195] vitest.dev — Getting Started; testing-library.com — React Testing Library, Queries priority, user-event.
+[1196] 12factor.net — разделы Config, Logs, Dev/prod parity.
+[1197] vite.dev — Env Variables and Modes, Server Proxy.
