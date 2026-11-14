@@ -38,3 +38,8 @@ https://github.com/shumakaro/booknest/pull/34 без merge/deploy.
   оставлены с явной ссылкой на мастер-промпт.
 - Проверки: Ruff и check_course_audit.py успешны. Код приложения и
   SHA-256 сборника защиты не изменились. Новый app/DB прогон не выполнялся.
+
+Опубликованы пять коммитов аудита и PR35:
+https://github.com/shumakaro/booknest/pull/35, open, merged=false.
+После исправления служебных пробелов и EOF весь diff от cc256a7 проверен.
+Следующий этап - задания лекций с лекции 8. Новое объединение или deploy не выполнены.

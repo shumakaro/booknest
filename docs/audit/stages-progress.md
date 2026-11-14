@@ -28,6 +28,12 @@
 Ruff: All checks passed. check_course_audit.py: AUDIT_STRUCTURE_OK.
 Приложение и SHA-256 DOCX защиты не изменены. Новый прикладной прогон не заявляется.
 
+Аудит опубликован в PR35 https://github.com/shumakaro/booknest/pull/35
+(open, merged=false), base codex/lab-defense-questions.
+Коммиты: bff43f8, 4f577d6, 05e135e, f8cb811, 0f83efb.
+Точная следующая задача: этап 3, лекция 8, ответы и frontend-чек-лист;
+не начинать заново готовые работы и сборник защиты.
+
 Этап 1 опубликован в PR34 https://github.com/shumakaro/booknest/pull/34
 (open, merged=false), base codex/lab7-12-final-audit.
 Коммиты: 283ee1d, edc11c1, 1c4ceb0, 9f00b32. Подробности docs/commits-report.md.
