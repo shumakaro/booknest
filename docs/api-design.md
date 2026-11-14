@@ -20,9 +20,34 @@
 ## Три ключевые операции
 Создание автора: `POST /api/v1/authors`, тело `{"name":"Айзек Азимов","birth_year":1920}`; ответ 201: `{"id":1,"name":"Айзек Азимов","birth_year":1920}`.
 
-Создание книги: `POST /api/v1/books`, тело `{"title":"Учебная книга","author_id":1,"year":2020,"isbn":"9780306406157"}`; ответ 201 содержит эти поля, id, genre, total_copies, description, available, author. Служебные поля не принимаются во входном теле.
+Создание книги: `POST /api/v1/books`. Полный пример запроса:
 
-Частичное изменение: `PATCH /api/v1/books/1`, тело `{"year":2021}`; ответ 200 сохраняет все остальные поля. `exclude_unset=True` отличает отсутствие поля от явного null. ISBN можно очистить значением null.
+```json
+{"title":"Учебная книга","author_id":1,"year":2020,"isbn":"9780306406157","genre":"fiction","total_copies":1,"description":"Учебная запись","publisher":"Учебное издательство","language":"ru","edition_year":2021,"pages":200}
+```
+
+Ответ 201:
+
+```json
+{"id":1,"title":"Учебная книга","author_id":1,"author":"Айзек Азимов","year":2020,"isbn":"9780306406157","genre":"fiction","total_copies":1,"description":"Учебная запись","publisher":"Учебное издательство","language":"ru","edition_year":2021,"pages":200,"available":1,"external_work_id":null,"cover_id":null}
+```
+
+Частичное изменение: `PATCH /api/v1/books/1`, тело:
+
+```json
+{"title":"Учебная книга: новое название"}
+```
+
+Ответ 200 сохраняет все остальные поля:
+
+```json
+{"id":1,"title":"Учебная книга: новое название","author_id":1,"author":"Айзек Азимов","year":2020,"isbn":"9780306406157","genre":"fiction","total_copies":1,"description":"Учебная запись","publisher":"Учебное издательство","language":"ru","edition_year":2021,"pages":200,"available":1,"external_work_id":null,"cover_id":null}
+```
+
+Примеры показывают контракт, а не реальные ID production. Для живого запроса берется
+собственный тестовый ID. `exclude_unset=True` отличает отсутствие поля от явного null.
+ISBN можно очистить через null. Год нельзя увеличить выше сохраненного года издания:
+поэтому PATCH в примере меняет название и не создает межполевой конфликт.
 
 ## Ошибка
 `{"code":"HTTP_404","message":"Запись не найдена","details":null,"request_id":"UUID"}`.
