@@ -2,7 +2,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Response
 from app.core.auth import Database, Librarian
-from app.schemas import BookRead
+from app.schemas import BookRead, ErrorRead
 from app.services.import_book import ImportBook, import_book
 from sqlalchemy.exc import IntegrityError
 from app.services.open_library import ExternalDetails, ExternalPage, OpenLibrary, get_open_library
@@ -10,8 +10,25 @@ from app.services.open_library import ExternalDetails, ExternalPage, OpenLibrary
 router = APIRouter(prefix="/discover", tags=["global search"])
 Library = Annotated[OpenLibrary, Depends(get_open_library)]
 
+# Эти ошибки уже возвращает клиент Open Library. Описание нужно Swagger
+# и потребителям API; оно не меняет порядок запросов или обработку данных.
+UPSTREAM_RESPONSES = {
+    502: {"model": ErrorRead, "description": "Некорректный ответ Open Library"},
+    503: {
+        "model": ErrorRead,
+        "description": "Внешний поиск временно занят или ограничил запросы",
+        "headers": {
+            "Retry-After": {
+                "description": "Через сколько секунд можно повторить запрос",
+                "schema": {"type": "integer", "minimum": 1},
+            }
+        },
+    },
+    504: {"model": ErrorRead, "description": "Истекло время ожидания Open Library"},
+}
 
-@router.get("/books", response_model=ExternalPage)
+
+@router.get("/books", response_model=ExternalPage, responses=UPSTREAM_RESPONSES)
 def search_books(library: Library, title: str = Query("", max_length=200),
                  author: str = Query("", max_length=200), page: int = Query(1, ge=1, le=1000),
                  size: int = Query(20, ge=1, le=40)) -> ExternalPage:
@@ -22,13 +39,14 @@ def search_books(library: Library, title: str = Query("", max_length=200),
     return library.search(title, author, page, size)
 
 
-@router.get("/books/{work_id}", response_model=ExternalDetails)
+@router.get("/books/{work_id}", response_model=ExternalDetails, responses=UPSTREAM_RESPONSES)
 def book_details(library: Library, work_id: str = Path(pattern=r"^OL\d+W$", max_length=30)) -> ExternalDetails:
     # Внешний ключ никогда не передается в локальные маршруты /books/{число}.
     return library.details(work_id)
 
 
-@router.post("/imports", response_model=BookRead, status_code=201, responses={200: {"model": BookRead}})
+@router.post("/imports", response_model=BookRead, status_code=201,
+             responses={**UPSTREAM_RESPONSES, 200: {"model": BookRead}})
 def import_selected(payload: ImportBook, library: Library, db: Database,
                     user: Librarian, response: Response) -> dict:
     # Читатели и гости не могут менять библиотеку через внешний поиск.

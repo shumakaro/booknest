@@ -65,6 +65,11 @@ def test_external_failures_have_normal_error_envelope(external, upstream, expect
     assert response.status_code == expected
     assert response.json()["code"] == f"HTTP_{expected}"
     assert response.json()["request_id"]
+    # Код, реально полученный клиентом, должен быть описан и в Swagger.
+    documented = client.get("/openapi.json").json()["paths"]["/api/v1/discover/books"]["get"]["responses"]
+    assert documented[str(expected)]["content"]["application/json"]["schema"] == {
+        "$ref": "#/components/schemas/ErrorRead"
+    }
 
 
 def test_end_of_results_and_bad_work_ids(external):
